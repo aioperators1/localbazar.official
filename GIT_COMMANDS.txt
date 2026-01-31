@@ -1,0 +1,20 @@
+# Git Commands to Push Updates
+
+Since the `git` command is not available in my current environment's PATH, I cannot push the changes automatically.
+Please run the following commands in your terminal (VS Code terminal or PowerShell) to push your "x1200 pro" updates:
+
+```powershell
+# 1. Add all changes
+git add .
+
+# 2. Commit the changes
+git commit -m "Final visual polish: Light mode fixes, pro UI enhancements, and responsiveness optimization"
+
+# 3. Ensure remote is correct (optional, but good to be safe)
+git remote remove origin
+git remote add origin https://github.com/ALBATOURE/electrosilam.git
+
+# 4. Push to GitHub
+git branch -M main
+git push -u origin main
+```
