@@ -150,6 +150,11 @@ async function main() {
             const categorySlug = categoryMap[item.category] || 'components';
             const cat = await prisma.category.findUnique({ where: { slug: categorySlug } });
 
+            if (!cat) {
+                console.error(`Category not found: ${categorySlug}`);
+                continue;
+            }
+
             await prisma.product.create({
                 data: {
                     name: productData.name,
@@ -161,10 +166,11 @@ async function main() {
                     brand: brand,
                     images: JSON.stringify(images),
                     specs: JSON.stringify(mappedSpecs),
-                    categoryId: cat ? cat.id : undefined, // Should exist
+                    categoryId: cat.id,
                     status: 'APPROVED',
                 }
             });
+
             console.log(`Created: ${productData.name} (${brand})`);
 
         } catch (e: any) {
