@@ -67,6 +67,21 @@ export const useCart = create<CartStore>()(
         {
             name: 'electro-cart-storage',
             storage: createJSONStorage(() => localStorage),
+            onRehydrateStorage: () => (state) => {
+                if (state) {
+                    // Sanitize all items on load
+                    state.items = state.items.map(item => ({
+                        ...item,
+                        name: item.name
+                            .replace(/Setup Game/gi, '')
+                            .replace(/SetupGame/gi, '')
+                            .replace(/Prix Maroc/gi, '')
+                            .replace(/- Setup Game/gi, '')
+                            .replace(/Gaming Maroc/gi, '')
+                            .trim()
+                    }));
+                }
+            }
         }
     )
 )
