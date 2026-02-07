@@ -3,7 +3,7 @@
 import { motion, Variants } from "framer-motion";
 import { AddToCart } from "@/components/store/AddToCart";
 import { ProductGallery } from "@/components/store/ProductGallery";
-import { Star, Truck, ShieldCheck, ArrowLeft, Cpu, Zap, Layers, Monitor, ChevronRight, MessageCircle } from "lucide-react";
+import { Star, Truck, ShieldCheck, ArrowLeft, Cpu, Zap, Layers, Monitor, ChevronRight, MessageCircle, Database, HardDrive, Box, CircuitBoard, Component } from "lucide-react";
 import Link from "next/link";
 
 interface ProductPageClientProps {
@@ -142,10 +142,50 @@ export default function ProductPageClient({ product, images }: ProductPageClient
                             </p>
 
                             <div className="grid grid-cols-2 gap-4">
-                                <SpecItem label="Performance" value="High-Grade" />
-                                <SpecItem label="Certification" value="Verified" />
-                                <SpecItem label="Warranty" value="Elite Cover" />
-                                <SpecItem label="Shipping" value="Priority" />
+                                {(() => {
+                                    let specs = null;
+                                    try {
+                                        if (product.specs) {
+                                            specs = JSON.parse(product.specs);
+                                        }
+                                    } catch { }
+
+                                    const iconMap: Record<string, any> = {
+                                        "CPU": Cpu,
+                                        "GPU": Zap,
+                                        "RAM": Layers,
+                                        "SSD": HardDrive,
+                                        "Motherboard": CircuitBoard,
+                                        "Case": Box,
+                                        "PSU": Zap,
+                                    };
+
+                                    if (specs && Object.keys(specs).length > 0) {
+                                        return Object.entries(specs).map(([key, value]) => {
+                                            const Icon = iconMap[key] || Component;
+                                            return (
+                                                <div key={key} className="p-4 bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-white/5 rounded-xl flex items-start gap-4 hover:border-blue-500/30 transition-colors group/spec">
+                                                    <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-600 dark:text-blue-400 group-hover/spec:scale-110 transition-transform">
+                                                        <Icon className="w-5 h-5" strokeWidth={1.5} />
+                                                    </div>
+                                                    <div>
+                                                        <span className="text-[10px] text-zinc-500 font-black uppercase tracking-widest block mb-1">{key}</span>
+                                                        <span className="text-sm font-bold text-zinc-900 dark:text-white leading-tight block">{String(value)}</span>
+                                                    </div>
+                                                </div>
+                                            );
+                                        });
+                                    }
+
+                                    return (
+                                        <>
+                                            <SpecItem label="Performance" value="High-Grade" />
+                                            <SpecItem label="Certification" value="Verified" />
+                                            <SpecItem label="Warranty" value="Elite Cover" />
+                                            <SpecItem label="Shipping" value="Priority" />
+                                        </>
+                                    );
+                                })()}
                             </div>
 
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 pt-8 border-t border-zinc-200 dark:border-white/5">

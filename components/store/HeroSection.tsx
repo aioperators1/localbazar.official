@@ -66,19 +66,19 @@ export function HeroSection() {
                     <div className={cn(
                         "absolute inset-0 z-10 hidden dark:block",
                         isAr
-                            ? "bg-gradient-to-l from-black via-black/80 to-transparent"
-                            : "bg-gradient-to-r from-black via-black/80 to-transparent"
+                            ? "bg-gradient-to-l from-zinc-950 via-zinc-950/90 to-transparent/20"
+                            : "bg-gradient-to-r from-zinc-950 via-zinc-950/90 to-transparent/20"
                     )} />
                     {/* Light Mode Subtle Gradient for text safety (optional, very minimal) */}
                     <div className="absolute inset-0 z-10 block dark:hidden bg-gradient-to-b from-white/30 via-transparent to-white/30" />
 
-                    <div className="absolute inset-0 z-20 bg-black/10 dark:bg-black/40" />
+                    <div className="absolute inset-0 z-20 bg-zinc-950/20 dark:bg-zinc-950/50" />
 
                     <Image
                         src={slide.image}
                         alt="Hero"
                         fill
-                        className="object-cover object-center opacity-100 dark:opacity-70"
+                        className="object-cover object-center opacity-100 dark:opacity-60"
                         priority
                     />
                 </motion.div>
@@ -100,13 +100,13 @@ export function HeroSection() {
                     className="max-w-5xl space-y-6"
                 >
                     {/* Text Container with Glass Effect for readability */}
-                    <div className="p-8 rounded-3xl bg-white/30 dark:bg-transparent backdrop-blur-sm border border-white/20 dark:border-none shadow-lg dark:shadow-none">
+                    <div className="p-8 pb-12 rounded-3xl bg-white/30 dark:bg-transparent backdrop-blur-none border-none shadow-none">
                         {/* Tagline */}
                         <motion.div
                             variants={{ hidden: { y: 20, opacity: 0 }, visible: { y: 0, opacity: 1 } }}
                             className={cn(
-                                "text-blue-700 dark:text-blue-500 font-black text-xs mb-4",
-                                isAr ? "font-bold" : "uppercase tracking-[0.4em]"
+                                "text-blue-600 dark:text-blue-400 font-black text-sm mb-6 uppercase tracking-[0.5em] text-glow",
+                                isAr ? "font-bold" : ""
                             )}
                         >
                             <span>&mdash; {tagline} &mdash;</span>
@@ -115,14 +115,14 @@ export function HeroSection() {
                         {/* Giant Typography */}
                         <motion.div variants={{ hidden: { y: 40, opacity: 0 }, visible: { y: 0, opacity: 1 } }} className="space-y-4">
                             <h1 className={cn(
-                                "font-black leading-[0.8] text-zinc-900 dark:text-white drop-shadow-md dark:drop-shadow-none",
-                                isAr ? "text-6xl md:text-8xl lg:text-9xl" : "text-5xl sm:text-6xl md:text-8xl lg:text-[140px] tracking-tighter uppercase"
+                                "font-black leading-[0.8] text-zinc-900 dark:text-white drop-shadow-2xl",
+                                isAr ? "text-6xl md:text-8xl lg:text-9xl" : "text-5xl sm:text-7xl md:text-9xl lg:text-[150px] tracking-tighter uppercase italic"
                             )}>
                                 {title}
                             </h1>
                             <h2 className={cn(
-                                "font-bold text-zinc-600 dark:text-zinc-500 tracking-tighter",
-                                isAr ? "text-3xl md:text-5xl" : "text-2xl sm:text-3xl md:text-6xl uppercase"
+                                "font-bold text-zinc-700 dark:text-zinc-400 tracking-tight",
+                                isAr ? "text-3xl md:text-5xl" : "text-2xl sm:text-3xl md:text-5xl uppercase"
                             )}>
                                 {subtitle}
                             </h2>
@@ -132,7 +132,7 @@ export function HeroSection() {
                     {/* Description */}
                     <motion.p
                         variants={{ hidden: { opacity: 0 }, visible: { opacity: 1 } }}
-                        className="text-zinc-600 dark:text-zinc-400 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed font-medium"
+                        className="text-zinc-700 dark:text-zinc-400 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed font-medium"
                     >
                         {desc}
                     </motion.p>
@@ -140,13 +140,14 @@ export function HeroSection() {
                     {/* CTA & Specs */}
                     <motion.div
                         variants={{ hidden: { y: 20, opacity: 0 }, visible: { y: 0, opacity: 1 } }}
-                        className="pt-12 flex flex-col items-center gap-10"
+                        className="pt-12 flex flex-col items-center gap-12"
                     >
                         <Link href="/shop" className={cn(
-                            "group relative px-12 py-5 bg-blue-600 text-white font-black hover:bg-blue-500 transition-all rounded-full shadow-2xl shadow-blue-600/20",
+                            "group relative px-14 py-6 bg-blue-600/90 text-white font-black hover:bg-blue-600 transition-all rounded-full border border-blue-400/30 hover:shadow-glow hover:scale-105 active:scale-95",
                             isAr ? "font-bold" : "uppercase tracking-widest text-sm"
                         )}>
-                            <span className="flex items-center gap-3">
+                            <div className="absolute inset-0 rounded-full blur opacity-40 bg-blue-400 group-hover:opacity-70 transition-opacity" />
+                            <span className="relative flex items-center gap-4 z-10">
                                 {t("hero.shopNow")}
                                 <ArrowRight className={cn(
                                     "w-5 h-5 transition-transform",
@@ -158,10 +159,10 @@ export function HeroSection() {
                         <div className="flex gap-6 overflow-x-auto pb-4 no-scrollbar">
                             {slide.metaKeys.map((key, i) => (
                                 <div key={i} className={cn(
-                                    "flex items-center gap-3 px-6 py-2 border border-zinc-200 dark:border-white/5 bg-white/50 dark:bg-white/5 backdrop-blur-md rounded-full text-[10px] font-bold text-zinc-600 dark:text-zinc-500",
+                                    "flex items-center gap-3 px-6 py-3 border border-zinc-200 dark:border-white/10 bg-white/50 dark:bg-zinc-900/50 backdrop-blur-md rounded-full text-[10px] font-bold text-zinc-600 dark:text-zinc-400 hover:border-blue-500/50 transition-colors",
                                     isAr ? "font-bold" : "uppercase tracking-widest"
                                 )}>
-                                    <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                                    <div className="w-1.5 h-1.5 rounded-full bg-blue-500 shadow-[0_0_10px_currentColor]" />
                                     {/* @ts-expect-error - dynamic key access */}
                                     {t(`slide${slide.id}.${key}`)}
                                 </div>

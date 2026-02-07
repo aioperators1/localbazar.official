@@ -81,12 +81,12 @@ export function ShopSidebar({ categories }: ShopSidebarProps) {
         <aside className="w-full lg:w-80 flex-shrink-0 hidden lg:block">
             <div className="sticky top-32 space-y-6">
                 {/* 🏳️‍🌈 PRO SIDEBAR CONTAINER (Solid High Contrast) */}
-                <div className="bg-card/50 backdrop-blur-xl border border-border/60 rounded-[24px] overflow-hidden shadow-lg transition-all duration-300">
+                <div className="bg-zinc-950/50 backdrop-blur-xl border border-white/10 rounded-[24px] overflow-hidden shadow-pro transition-all duration-300">
                     <Accordion type="multiple" defaultValue={["categories", "stock", "price"]} className="w-full">
 
                         {/* Categories Section */}
-                        <AccordionItem value="categories" className="border-b border-border/50 px-6">
-                            <AccordionTrigger className="hover:no-underline py-6 text-[10px] font-black uppercase tracking-[0.2em] text-foreground hover:text-primary transition-colors group">
+                        <AccordionItem value="categories" className="border-b border-white/5 px-6">
+                            <AccordionTrigger className="hover:no-underline py-6 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-100 hover:text-blue-500 hover:text-glow transition-colors group">
                                 <span className={`flex-1 ${isAr ? "text-right" : "text-left"}`}>{t("shop.sidebar.classification")}</span>
                             </AccordionTrigger>
                             <AccordionContent className="pb-6">
@@ -101,12 +101,12 @@ export function ShopSidebar({ categories }: ShopSidebarProps) {
                                                 className={cn(
                                                     "w-1.5 h-1.5 rounded-full transition-all duration-300",
                                                     !currentCategory
-                                                        ? "bg-blue-600 scale-150"
-                                                        : "bg-zinc-300 dark:bg-zinc-700 group-hover/item:bg-zinc-400"
+                                                        ? "bg-blue-500 scale-150 shadow-[0_0_10px_#3b82f6]"
+                                                        : "bg-zinc-700 group-hover/item:bg-zinc-500"
                                                 )}
                                             />
                                         </div>
-                                        <span className={cn("text-[10px] font-black uppercase tracking-widest transition-all duration-300", !currentCategory ? "text-blue-600" : "text-zinc-500 group-hover/item:text-foreground")}>
+                                        <span className={cn("text-[10px] font-black uppercase tracking-widest transition-all duration-300", !currentCategory ? "text-blue-500 text-glow" : "text-zinc-500 group-hover/item:text-white")}>
                                             {t("shop.title.fullCatalogue")}
                                         </span>
                                     </div>
@@ -125,13 +125,13 @@ export function ShopSidebar({ categories }: ShopSidebarProps) {
                                                             className={cn(
                                                                 "w-1.5 h-1.5 rounded-full transition-all duration-300",
                                                                 isActive
-                                                                    ? "bg-blue-600 scale-150"
-                                                                    : "bg-zinc-300 dark:bg-zinc-700 group-hover/item:bg-zinc-400"
+                                                                    ? "bg-blue-500 scale-150 shadow-[0_0_10px_#3b82f6]"
+                                                                    : "bg-zinc-700 group-hover/item:bg-zinc-500"
                                                             )}
                                                         />
                                                     </div>
                                                     <span
-                                                        className={cn("text-[10px] font-black uppercase tracking-widest transition-all duration-300", isActive ? "text-blue-600" : "text-zinc-500 group-hover/item:text-foreground")}
+                                                        className={cn("text-[10px] font-black uppercase tracking-widest transition-all duration-300", isActive ? "text-blue-500 text-glow" : "text-zinc-500 group-hover/item:text-white")}
                                                     >
                                                         {cat.name}
                                                     </span>

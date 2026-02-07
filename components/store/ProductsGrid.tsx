@@ -45,15 +45,15 @@ export function ProductsGrid({ products }: ProductsGridProps) {
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="flex flex-col items-center justify-center min-h-[400px] rounded-[40px] bg-muted/20 border border-dashed border-border/40 group"
+                className="flex flex-col items-center justify-center min-h-[400px] rounded-[40px] bg-zinc-950/50 border border-white/5 relative overflow-hidden group"
             >
-                <div className="relative mb-8">
-                    <div className="absolute inset-0 bg-primary/10 blur-3xl rounded-full scale-150 group-hover:scale-[2] transition-transform duration-1000" />
-                    <Filter className="w-12 h-12 text-muted-foreground relative z-10 transition-colors group-hover:text-primary" />
+                <div className="absolute inset-0 bg-blue-500/5 blur-3xl rounded-full scale-0 group-hover:scale-150 transition-transform duration-1000" />
+                <div className="relative mb-8 p-6 bg-zinc-900/80 rounded-full border border-white/10 shadow-glow">
+                    <Filter className="w-10 h-10 text-blue-500 relative z-10" />
                 </div>
-                <h3 className="text-xl font-black text-foreground uppercase tracking-widest mb-2">{t("shop.empty.title")}</h3>
-                <p className="text-[10px] text-muted-foreground font-mono uppercase tracking-[0.3em]">{t("shop.empty.desc")}</p>
-                <Button asChild variant="outline" className="mt-10 rounded-full border-border/20 text-muted-foreground hover:bg-foreground hover:text-background transition-all px-10 py-6 text-[9px] font-black uppercase tracking-widest">
+                <h3 className="text-xl font-black text-white uppercase tracking-widest mb-2 z-10">{t("shop.empty.title")}</h3>
+                <p className="text-[10px] text-zinc-500 font-mono uppercase tracking-[0.3em] z-10">{t("shop.empty.desc")}</p>
+                <Button asChild variant="outline" className="mt-10 rounded-full border-blue-500/20 text-blue-400 hover:bg-blue-600 hover:text-white hover:border-blue-500 hover:shadow-glow transition-all px-10 py-6 text-[9px] font-black uppercase tracking-widest z-10">
                     <Link href="/shop">{t("shop.empty.reset")}</Link>
                 </Button>
             </motion.div>
@@ -71,7 +71,8 @@ export function ProductsGrid({ products }: ProductsGridProps) {
                             slug: p.slug,
                             price: Number(p.price),
                             image: p.image || p.images || "",
-                            category: p.category?.name || "Series"
+                            category: p.category?.name || "Series",
+                            specs: typeof p.specs === 'string' ? p.specs : JSON.stringify(p.specs || {})
                         }}
                     />
                 </div>

@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { ArrowRight, ShoppingCart, MessageCircle } from "lucide-react";
+import { ArrowRight, ShoppingCart, MessageCircle, Cpu, Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCart } from "@/hooks/use-cart";
 import { useLanguage } from "@/components/providers/language-provider";
@@ -23,6 +23,7 @@ interface ProductProps {
             name: string | null;
             image: string | null;
         } | null;
+        specs?: string | null;
     }
     className?: string;
 }
@@ -133,6 +134,35 @@ export function ProductCard({ product, className }: ProductProps) {
                             {product.name}
                         </h3>
                     </Link>
+
+                    {/* Specs Preview */}
+                    {(() => {
+                        try {
+                            if (product.specs) {
+                                const specs = JSON.parse(product.specs);
+                                if (specs.CPU || specs.GPU) {
+                                    return (
+                                        <div className="flex gap-2 mb-2 flex-wrap">
+                                            {specs.CPU && (
+                                                <div className="flex items-center gap-1 bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded text-[9px] text-zinc-500 dark:text-zinc-400 font-medium whitespace-nowrap overflow-hidden text-ellipsis max-w-full">
+                                                    <Cpu className="w-2.5 h-2.5" />
+                                                    <span>{specs.CPU.split(' ').slice(0, 2).join(' ')}</span>
+                                                </div>
+                                            )}
+                                            {specs.GPU && (
+                                                <div className="flex items-center gap-1 bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded text-[9px] text-zinc-500 dark:text-zinc-400 font-medium whitespace-nowrap overflow-hidden text-ellipsis max-w-full">
+                                                    <Zap className="w-2.5 h-2.5" />
+                                                    <span>{specs.GPU.split(' ').slice(0, 2).join(' ')}</span>
+                                                </div>
+                                            )}
+                                        </div>
+                                    );
+                                }
+                            }
+                        } catch { }
+                        return null;
+                    })()}
+
                     <p className="text-lg font-black text-blue-600 dark:text-blue-500">
                         {formattedPrice}
                     </p>

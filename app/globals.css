@@ -81,9 +81,10 @@ body {
   font-family: var(--font-cairo), ui-sans-serif, system-ui, sans-serif !important;
 
   min-height: 100vh;
+
   /* Premium Zoomed Feel (approx 110% font base matches 125-140% UI scale feel) */
   @media (min-width: 1024px) {
-    font-size: 110%; 
+    font-size: 110%;
   }
 }
 
@@ -167,7 +168,16 @@ html {
 }
 
 @utility shadow-glow {
-  box-shadow: 0 0 30px -5px rgba(59, 130, 246, 0.5);
+  box-shadow: 0 0 30px -5px rgba(59, 130, 246, 0.3);
+}
+
+@utility border-glow {
+  border-color: rgba(59, 130, 246, 0.5);
+  box-shadow: 0 0 15px rgba(59, 130, 246, 0.2);
+}
+
+@utility text-glow {
+  text-shadow: 0 0 10px rgba(59, 130, 246, 0.6);
 }
 
 /* Marquee Animation */

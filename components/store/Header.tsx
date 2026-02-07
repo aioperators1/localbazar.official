@@ -65,7 +65,7 @@ export function Header() {
                 <div className={cn(
                     "pointer-events-auto transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] flex items-center justify-between px-4 md:px-8 relative z-50",
                     scrolled
-                        ? "w-[95%] md:w-[70%] bg-white/80 dark:bg-black/90 backdrop-blur-md shadow-2xl h-16 translate-y-4 rounded-full border border-zinc-200/50 dark:border-white/10"
+                        ? "w-[95%] md:w-[70%] bg-zinc-950/90 backdrop-blur-xl shadow-pro h-16 translate-y-4 rounded-full border border-white/10"
                         : "w-full max-w-[1400px] h-24 bg-transparent border-none"
                 )}>
                     {/* Logo & Brand Name */}
