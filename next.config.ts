@@ -1,9 +1,6 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // experimental: {
-  //   serverActions: true, // Enabled by default in Next.js 14+
-  // },
   images: {
     remotePatterns: [
       {
@@ -21,6 +18,15 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: 'setupgame.ma',
+      },
+      {
+        protocol: 'https',
+        hostname: 'assets2.razerzone.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'techspace.ma',
+        pathname: '/**',
       },
     ],
   },

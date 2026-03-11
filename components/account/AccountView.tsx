@@ -7,7 +7,7 @@ import SignOutButton from "@/components/auth/SignOutButton";
 import Link from "next/link";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { cn } from "@/lib/utils";
+import { cn, formatPrice } from "@/lib/utils";
 
 interface AccountViewProps {
     user: {
@@ -198,7 +198,7 @@ export default function AccountView({ user, orders }: AccountViewProps) {
                                                     <div className="text-right">
                                                         <p className="text-[10px] font-black text-zinc-600 uppercase tracking-widest mb-1">Value</p>
                                                         <p className="text-white font-black italic tracking-tighter">
-                                                            {new Intl.NumberFormat('en-MA', { style: 'currency', currency: 'MAD', maximumFractionDigits: 0 }).format(Number(order.total))}
+                                                            {formatPrice(order.total)}
                                                         </p>
                                                     </div>
                                                     <ChevronRight className="w-5 h-5 text-zinc-800 group-hover:text-blue-500 transition-colors" />

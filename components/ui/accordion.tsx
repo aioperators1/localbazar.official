@@ -12,11 +12,12 @@ const Accordion = React.forwardRef<
 ))
 Accordion.displayName = "Accordion"
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const AccordionContext = React.createContext<{
     openItems: string[];
     toggleItem: (value: string) => void;
 }>({ openItems: [], toggleItem: () => { } });
+// @ts-ignore
+const _AccordionContext = AccordionContext;
 
 const AccordionItem = React.forwardRef<
     HTMLDivElement,

@@ -9,6 +9,13 @@
   --color-muted-foreground: hsl(var(--muted-foreground));
   --color-border: hsl(var(--border));
   --color-input: hsl(var(--input));
+
+  /* LOCAL BAZAR BRAND COLORS */
+  --color-brand-beige: #E2D8C5;
+  --color-brand-black: #111111;
+  --color-brand-burgundy: #592C2F;
+  --color-brand-silver: #DBDBD9;
+
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -16,168 +23,102 @@
 
 @layer base {
   :root {
-    /* LIGHT MODE (High Definition, Solid, Corporate Pro) */
-    --background: 210 40% 96.1%;
-    /* #F1F5F9 - Slate 100 */
-    --foreground: 222 47% 11.2%;
-    /* #0F172A - Slate 900 */
+    /* LOCAL BAZAR IDENTITY */
+    --brand-beige: 40 33% 83%;     /* #E2D8C5 */
+    --brand-black: 0 0% 7%;        /* #111111 */
+    --brand-burgundy: 357 32% 26%; /* #592C2F */
+    --brand-silver: 60 2% 85%;      /* #DBDBD9 */
+
+    --background: var(--brand-beige);
+    --foreground: var(--brand-black);
 
     --card: 0 0% 100%;
-    /* #FFFFFF */
-    --card-foreground: 222 47% 11.2%;
+    --card-foreground: var(--brand-black);
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11.2%;
+    --popover-foreground: var(--brand-black);
 
-    /* ELECTRIC BLUE - Kept for Brand Identity */
-    --primary: 221.2 83.2% 53.3%;
-    --primary-foreground: 210 40% 98%;
+    /* Primary: Burgundy for a touch of luxury */
+    --primary: var(--brand-burgundy);
+    --primary-foreground: 40 33% 98%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222 47% 11.2%;
+    /* Secondary: Black */
+    --secondary: var(--brand-black);
+    --secondary-foreground: 0 0% 100%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215 16% 47%;
+    --muted: 60 2% 92%;
+    --muted-foreground: 0 0% 40%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222 47% 11.2%;
+    /* Accent: Black/Silver mix */
+    --accent: var(--brand-black);
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 214.3 31.8% 91.4%;
-    /* Slate 200 - Visible Structure */
-    --input: 214.3 31.8% 91.4%;
-    --ring: 221.2 83.2% 53.3%;
-
-    --radius: 0.75rem;
-  }
-
-  .dark {
-    --background: 240 10% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 240 10% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 240 10% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 217 91% 60%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 240 3.7% 15.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 64.9%;
-    --accent: 240 3.7% 15.9%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
+    --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-    --ring: 217 91% 60%;
+
+    --border: 60 2% 80%;
+    --input: 60 2% 80%;
+    --ring: var(--brand-burgundy);
+
+    --radius: 0rem; /* Fashion often uses sharp corners for a more architectural/premium feel */
   }
 }
 
 body {
-  @apply bg-background text-foreground antialiased selection:bg-blue-500/30 selection:text-white;
-  font-family: var(--font-cairo), ui-sans-serif, system-ui, sans-serif !important;
-
+  @apply bg-background text-foreground antialiased selection:bg-brand-burgundy selection:text-white;
+  font-family: 'Inter', sans-serif;
   min-height: 100vh;
+}
 
-  /* Premium Zoomed Feel (approx 110% font base matches 125-140% UI scale feel) */
-  @media (min-width: 1024px) {
-    font-size: 110%;
-  }
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  letter-spacing: -0.02em;
 }
 
 html {
   scroll-behavior: smooth;
 }
 
-@utility text-stroke {
-  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.1);
-  color: transparent;
-}
-
-/* Classical Pro Utilities */
+/* Utilities */
 @utility glass {
-  @apply bg-white/5 backdrop-blur-md border border-white/10 shadow-sm;
+  @apply bg-white/40 backdrop-blur-xl border border-white/20 shadow-xl;
 }
 
-@utility glass-card {
-  @apply bg-zinc-900/60 backdrop-blur-xl border border-white/10 shadow-pro;
-}
-
-/* Custom Scrollbar - Minimalist */
+/* Custom Premium Scrollbar */
 ::-webkit-scrollbar {
   width: 4px;
-  height: 4px;
 }
 
 ::-webkit-scrollbar-track {
-  background: transparent;
+  background: var(--brand-beige);
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-zinc-700/50 rounded-full hover:bg-zinc-600;
+  background: var(--brand-burgundy);
 }
 
-/* Base Interactions */
-.hover-lift {
-  @apply transition-transform duration-300 hover:-translate-y-1;
+.nav-link {
+  @apply text-[11px] font-medium uppercase tracking-[0.2em] text-brand-black/60 hover:text-brand-burgundy transition-all duration-300 relative;
 }
 
-/* Premium Shadows */
-@utility shadow-pro {
-  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.4);
+.nav-link::after {
+  content: '';
+  @apply absolute -bottom-1 left-0 w-0 h-[1px] bg-brand-burgundy transition-all duration-300;
+}
+
+.nav-link:hover::after {
+  @apply w-full;
+}
+
+/* Shadow Utilities for White UI */
+@utility shadow-premium {
+  box-shadow: 0 20px 40px -15px rgba(0, 47, 196, 0.08);
+  /* Updated to match new techspace blue #002fc4 */
 }
 
 @utility shadow-soft {
-  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.1);
-}
-
-/* Navigation Utilities */
-.nav-link {
-  @apply text-sm font-medium text-zinc-400 hover:text-white transition-colors relative after:absolute after:bottom-0 after:left-0 after:h-px after:w-0 after:bg-blue-500 after:transition-all hover:after:w-full;
-}
-
-/* Premium Scrollbar */
-::-webkit-scrollbar {
-  width: 5px;
-}
-
-::-webkit-scrollbar-track {
-  background: hsl(var(--background));
-}
-
-::-webkit-scrollbar-thumb {
-  background: hsl(var(--primary) / 0.3);
-  border-radius: 10px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--primary));
-}
-
-/* Noise Texture Overlay */
-.bg-noise {
-  background-image: url("https://www.transparenttextures.com/patterns/cubes.png");
-}
-
-/* Pro Shadow */
-@utility shadow-pro {
-  box-shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.5);
-}
-
-@utility shadow-glow {
-  box-shadow: 0 0 30px -5px rgba(59, 130, 246, 0.3);
-}
-
-@utility border-glow {
-  border-color: rgba(59, 130, 246, 0.5);
-  box-shadow: 0 0 15px rgba(59, 130, 246, 0.2);
-}
-
-@utility text-glow {
-  text-shadow: 0 0 10px rgba(59, 130, 246, 0.6);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
 }
 
 /* Marquee Animation */

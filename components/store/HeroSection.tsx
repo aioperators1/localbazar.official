@@ -1,199 +1,133 @@
 "use client";
 import Link from "next/link";
 import Image from "next/image";
-import { motion, AnimatePresence } from "framer-motion";
-import { ChevronRight, ChevronLeft, ArrowRight } from "lucide-react";
+import { ChevronRight, ChevronLeft } from "lucide-react";
 import { useState, useEffect } from "react";
-import { useLanguage } from "@/components/providers/language-provider";
-import { cn } from "@/lib/utils";
 
 const SLIDES = [
     {
         id: 1,
-        image: "https://images.unsplash.com/photo-1591488320449-011701bb6704?q=80&w=2000&auto=format&fit=crop",
-        metaKeys: ["meta1", "meta2", "meta3"]
+        subtitle: "L'ÉLÉGANCE REDÉFINIE",
+        title: "Collection Couture",
+        description: "Découvrez l'exclusivité de nos robes du soir, conçues pour les moments inoubliables.",
+        buttonText: "DÉCOUVRIR LA COLLECTION",
+        image: "https://images.unsplash.com/photo-1566174053879-31528523f8ae?q=80&w=1000",
+        bgColor: "bg-[#E2D8C5]",
+        textColor: "text-[#111111]",
+        link: "/shop?category=evening-wear"
     },
     {
         id: 2,
-        image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?q=80&w=2000&auto=format&fit=crop",
-        metaKeys: ["meta1", "meta2", "meta3"]
-    },
-    {
-        id: 3,
-        image: "https://images.unsplash.com/photo-1606144042614-b2417e99c4e3?q=80&w=2000&auto=format&fit=crop",
-        metaKeys: ["meta1", "meta2", "meta3"]
+        subtitle: "SUR-MESURE",
+        title: "L'Art du Tailleur",
+        description: "L'excellence du costume masculin. Une coupe parfaite, des tissus d'exception.",
+        buttonText: "VOIR LES COSTUMES",
+        image: "https://images.unsplash.com/photo-1593032465175-481ac7f401a0?q=80&w=1200",
+        bgColor: "bg-[#111111]",
+        textColor: "text-white",
+        link: "/shop?category=suits"
     }
 ];
 
-export function HeroSection() {
+export function HeroSection({ banners }: { banners?: any[] }) {
     const [current, setCurrent] = useState(0);
-    const { t, language } = useLanguage();
-    const isAr = language === "ar";
-    const dir = isAr ? "rtl" : "ltr";
 
-    const next = () => setCurrent((prev) => (prev + 1) % SLIDES.length);
-    const prev = () => setCurrent((prev) => (prev - 1 + SLIDES.length) % SLIDES.length);
+    const slides = banners && banners.length > 0 ? banners.map(b => ({
+        id: b.id,
+        subtitle: b.subtitle || "EXCLUSIVITÉ",
+        title: b.title,
+        description: b.link ? "Ne ratez pas nos offres à prix compétitifs" : "Découvrez nos offres exceptionnelles",
+        buttonText: "DÉCOUVRIR",
+        image: b.image,
+        bgColor: "bg-zinc-900", // Fallback, could be added to DB if needed
+        link: b.link || "/shop"
+    })) : SLIDES;
+
+    const next = () => setCurrent((prev) => (prev + 1) % slides.length);
+    const prev = () => setCurrent((prev) => (prev - 1 + slides.length) % slides.length);
 
     useEffect(() => {
-        const timer = setInterval(next, 6000);
+        const timer = setInterval(next, 8000);
         return () => clearInterval(timer);
-    }, []);
+    }, [slides.length]);
 
-    const slide = SLIDES[current];
-    // @ts-expect-error - dynamic keys
-    const tagline = t(`slide${slide.id}.tagline`);
-    // @ts-expect-error - dynamic keys
-    const title = t(`slide${slide.id}.title`);
-    // @ts-expect-error - dynamic keys
-    const subtitle = t(`slide${slide.id}.subtitle`);
-    // @ts-expect-error - dynamic keys
-    const desc = t(`slide${slide.id}.desc`);
+    const slide = slides[current] || SLIDES[0];
 
     return (
-        <section className="relative w-full h-screen bg-background text-foreground overflow-hidden" dir={dir}>
-
-            {/* Background Image Layer */}
-            <AnimatePresence mode="wait">
-                <motion.div
-                    key={current}
-                    className="absolute inset-0"
-                    initial={{ scale: 1.1, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 1.5 }}
-                >
-                    {/* Gradient Overlay - Dark Mode Only */}
-                    <div className={cn(
-                        "absolute inset-0 z-10 hidden dark:block",
-                        isAr
-                            ? "bg-gradient-to-l from-zinc-950 via-zinc-950/90 to-transparent/20"
-                            : "bg-gradient-to-r from-zinc-950 via-zinc-950/90 to-transparent/20"
-                    )} />
-                    {/* Light Mode Subtle Gradient for text safety (optional, very minimal) */}
-                    <div className="absolute inset-0 z-10 block dark:hidden bg-gradient-to-b from-white/30 via-transparent to-white/30" />
-
-                    <div className="absolute inset-0 z-20 bg-zinc-950/20 dark:bg-zinc-950/50" />
-
-                    <Image
-                        src={slide.image}
-                        alt="Hero"
-                        fill
-                        className="object-cover object-center opacity-100 dark:opacity-60"
-                        priority
-                    />
-                </motion.div>
-            </AnimatePresence>
-
-            {/* Content Content - Staggered */}
-            <div className="container mx-auto px-6 relative z-20 h-full flex flex-col items-center justify-center text-center">
-                <motion.div
-                    key={current + "text"}
-                    initial="hidden"
-                    animate="visible"
-                    variants={{
-                        hidden: { opacity: 0 },
-                        visible: {
-                            opacity: 1,
-                            transition: { staggerChildren: 0.15 }
-                        }
-                    }}
-                    className="max-w-5xl space-y-6"
-                >
-                    {/* Text Container with Glass Effect for readability */}
-                    <div className="p-8 pb-12 rounded-3xl bg-white/30 dark:bg-transparent backdrop-blur-none border-none shadow-none">
-                        {/* Tagline */}
-                        <motion.div
-                            variants={{ hidden: { y: 20, opacity: 0 }, visible: { y: 0, opacity: 1 } }}
-                            className={cn(
-                                "text-blue-600 dark:text-blue-400 font-black text-sm mb-6 uppercase tracking-[0.5em] text-glow",
-                                isAr ? "font-bold" : ""
-                            )}
-                        >
-                            <span>&mdash; {tagline} &mdash;</span>
-                        </motion.div>
-
-                        {/* Giant Typography */}
-                        <motion.div variants={{ hidden: { y: 40, opacity: 0 }, visible: { y: 0, opacity: 1 } }} className="space-y-4">
-                            <h1 className={cn(
-                                "font-black leading-[0.8] text-zinc-900 dark:text-white drop-shadow-2xl",
-                                isAr ? "text-6xl md:text-8xl lg:text-9xl" : "text-5xl sm:text-7xl md:text-9xl lg:text-[150px] tracking-tighter uppercase italic"
-                            )}>
-                                {title}
-                            </h1>
-                            <h2 className={cn(
-                                "font-bold text-zinc-700 dark:text-zinc-400 tracking-tight",
-                                isAr ? "text-3xl md:text-5xl" : "text-2xl sm:text-3xl md:text-5xl uppercase"
-                            )}>
-                                {subtitle}
-                            </h2>
-                        </motion.div>
-                    </div>
-
-                    {/* Description */}
-                    <motion.p
-                        variants={{ hidden: { opacity: 0 }, visible: { opacity: 1 } }}
-                        className="text-zinc-700 dark:text-zinc-400 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed font-medium"
-                    >
-                        {desc}
-                    </motion.p>
-
-                    {/* CTA & Specs */}
-                    <motion.div
-                        variants={{ hidden: { y: 20, opacity: 0 }, visible: { y: 0, opacity: 1 } }}
-                        className="pt-12 flex flex-col items-center gap-12"
-                    >
-                        <Link href="/shop" className={cn(
-                            "group relative px-14 py-6 bg-blue-600/90 text-white font-black hover:bg-blue-600 transition-all rounded-full border border-blue-400/30 hover:shadow-glow hover:scale-105 active:scale-95",
-                            isAr ? "font-bold" : "uppercase tracking-widest text-sm"
-                        )}>
-                            <div className="absolute inset-0 rounded-full blur opacity-40 bg-blue-400 group-hover:opacity-70 transition-opacity" />
-                            <span className="relative flex items-center gap-4 z-10">
-                                {t("hero.shopNow")}
-                                <ArrowRight className={cn(
-                                    "w-5 h-5 transition-transform",
-                                    isAr ? "rotate-180 group-hover:-translate-x-2" : "group-hover:translate-x-2"
-                                )} />
-                            </span>
-                        </Link>
-
-                        <div className="flex gap-6 overflow-x-auto pb-4 no-scrollbar">
-                            {slide.metaKeys.map((key, i) => (
-                                <div key={i} className={cn(
-                                    "flex items-center gap-3 px-6 py-3 border border-zinc-200 dark:border-white/10 bg-white/50 dark:bg-zinc-900/50 backdrop-blur-md rounded-full text-[10px] font-bold text-zinc-600 dark:text-zinc-400 hover:border-blue-500/50 transition-colors",
-                                    isAr ? "font-bold" : "uppercase tracking-widest"
-                                )}>
-                                    <div className="w-1.5 h-1.5 rounded-full bg-blue-500 shadow-[0_0_10px_currentColor]" />
-                                    {/* @ts-expect-error - dynamic key access */}
-                                    {t(`slide${slide.id}.${key}`)}
-                                </div>
-                            ))}
-                        </div>
-                    </motion.div>
-                </motion.div>
+        <section className={`relative w-full min-h-[460px] lg:h-[520px] overflow-hidden ${slide.bgColor} group cursor-default rounded-[12px]`}>
+            {/* Background Decorative Pattern (Simulation of brand motifs) */}
+            <div className="absolute inset-0 opacity-[0.03] pointer-events-none mix-blend-overlay">
+                <div className="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] repeat" />
+            </div>
+            <div className="absolute inset-0 opacity-10 pointer-events-none">
+                <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_20%_30%,_rgba(89,44,47,0.4),_transparent_50%)]" />
             </div>
 
-            {/* Slide Indicators */}
-            <div className="absolute bottom-12 left-0 right-0 z-30 flex justify-center gap-4">
-                {SLIDES.map((_, i) => (
-                    <button
-                        key={i}
-                        onClick={() => setCurrent(i)}
-                        className={`h-1 transition-all duration-500 ${current === i ? "w-16 bg-blue-500" : "w-4 bg-zinc-300 dark:bg-zinc-800"}`}
-                    />
-                ))}
+            <div className="container mx-auto h-full px-4 lg:px-20 relative z-10">
+                <div className="flex flex-col lg:flex-row items-center justify-between h-full py-12 lg:py-0">
+
+                    {/* Left Content */}
+                    <div className="flex flex-col items-center lg:items-start text-center lg:text-left max-w-2xl lg:pt-10">
+                        <span className="text-brand-burgundy font-bold text-[12px] md:text-[13px] tracking-[0.5em] uppercase mb-4 animate-in fade-in slide-in-from-left-4 duration-700">
+                            {slide.subtitle} — EST. 2013
+                        </span>
+                        <h1 className="text-white font-black text-[38px] md:text-[54px] lg:text-[68px] leading-[1.05] tracking-tight mb-8 animate-in fade-in slide-in-from-left-6 duration-1000 uppercase">
+                            {slide.title}
+                        </h1>
+                        <p className="text-white/60 text-[14px] md:text-[15px] max-w-md leading-relaxed mb-10 animate-in fade-in slide-in-from-left-8 duration-1000 delay-200 uppercase tracking-widest">
+                            {slide.description}
+                        </p>
+
+                        <Link
+                            href={slide.link}
+                            className="bg-white hover:bg-brand-burgundy text-[#111111] hover:text-white font-bold px-10 py-5 rounded-[2px] text-[12px] uppercase tracking-[0.3em] transition-all shadow-2xl hover:scale-105 active:scale-95 animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-500"
+                        >
+                            {slide.buttonText}
+                        </Link>
+                    </div>
+
+                    {/* Right Product Image (Stands out more) */}
+                    <div className="relative w-full lg:w-[45%] h-[300px] lg:h-[450px] mt-12 lg:mt-0 flex items-center justify-center animate-in fade-in zoom-in duration-1000">
+                        {/* Glow effect under product */}
+                        <div className="absolute w-[80%] h-[60%] bg-white opacity-10 blur-[120px] rounded-full z-0" />
+
+                        <div className="relative w-full h-full">
+                            <Image
+                                src={slide.image}
+                                alt={slide.title}
+                                fill
+                                className="object-contain drop-shadow-[0_25px_45px_rgba(0,0,0,0.5)] z-10 transition-transform duration-700 hover:scale-110"
+                                priority
+                                unoptimized
+                            />
+                        </div>
+                    </div>
+                </div>
             </div>
 
             {/* Nav Arrows */}
-            <div className={cn(
-                "absolute bottom-12 z-30 flex gap-2",
-                isAr ? "left-12" : "right-12"
-            )}>
-                <button onClick={prev} className="p-4 border border-zinc-200 dark:border-zinc-800 hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black text-zinc-900 dark:text-white transition-colors rounded-full group bg-white/50 dark:bg-black/50 backdrop-blur-sm">
-                    {isAr ? <ChevronRight className="w-6 h-6 group-hover:translate-x-1" /> : <ChevronLeft className="w-6 h-6 group-hover:-translate-x-1" />}
-                </button>
-                <button onClick={next} className="p-4 border border-zinc-200 dark:border-zinc-800 hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black text-zinc-900 dark:text-white transition-colors rounded-full group bg-white/50 dark:bg-black/50 backdrop-blur-sm">
-                    {isAr ? <ChevronLeft className="w-6 h-6 group-hover:-translate-x-1" /> : <ChevronRight className="w-6 h-6 group-hover:translate-x-1" />}
-                </button>
+            <button
+                onClick={(e) => { e.preventDefault(); prev(); }}
+                className="absolute left-6 top-1/2 -translate-y-1/2 z-30 w-12 h-12 bg-white/5 hover:bg-white/10 text-white flex items-center justify-center rounded-full opacity-0 group-hover:opacity-100 transition-all border border-white/10 backdrop-blur-sm"
+            >
+                <ChevronLeft className="w-6 h-6" />
+            </button>
+            <button
+                onClick={(e) => { e.preventDefault(); next(); }}
+                className="absolute right-6 top-1/2 -translate-y-1/2 z-30 w-12 h-12 bg-white/5 hover:bg-white/10 text-white flex items-center justify-center rounded-full opacity-0 group-hover:opacity-100 transition-all border border-white/10 backdrop-blur-sm"
+            >
+                <ChevronRight className="w-6 h-6" />
+            </button>
+
+            {/* Pagination Indicators Container */}
+            <div className="absolute bottom-8 left-0 right-0 z-30 flex justify-center gap-4">
+                {slides.map((_, i) => (
+                    <button
+                        key={i}
+                        onClick={() => setCurrent(i)}
+                        className={`transition-all duration-300 ${current === i ? "w-10 h-1.5 bg-[#592C2F] rounded-full" : "w-1.5 h-1.5 bg-white/30 rounded-full hover:bg-white/50"}`}
+                    />
+                ))}
             </div>
         </section>
     );

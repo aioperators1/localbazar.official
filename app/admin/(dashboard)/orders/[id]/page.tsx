@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Package, User, Calendar, CreditCard, ChevronLeft } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { formatPrice } from "@/lib/utils";
 
 interface AdminOrderDetailsPageProps {
     params: Promise<{
@@ -46,11 +47,11 @@ export default async function AdminOrderDetailsPage(props: AdminOrderDetailsPage
                     </Link>
                 </Button>
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight text-white flex items-center gap-3">
-                        Order #{order.id.slice(-6).toUpperCase()}
+                    <h1 className="text-3xl font-serif font-black tracking-widest text-white flex items-center gap-6 uppercase italic">
+                        Commande <span className="text-[#592C2F]">#{order.id.slice(-6).toUpperCase()}</span>
                         <OrderStatusSelect orderId={order.id} currentStatus={order.status} />
                     </h1>
-                    <p className="text-zinc-400">View details and communicate with customer.</p>
+                    <p className="text-zinc-500 text-[10px] font-bold uppercase tracking-[0.3em] mt-2">Protocole de gestion et correspondance prestige.</p>
                 </div>
             </div>
 
@@ -58,10 +59,10 @@ export default async function AdminOrderDetailsPage(props: AdminOrderDetailsPage
                 {/* Left Column: Order Details */}
                 <div className="lg:col-span-2 space-y-6">
                     {/* Items */}
-                    <Card className="bg-zinc-900/50 border-white/5">
-                        <CardHeader>
-                            <CardTitle className="text-white flex items-center gap-2">
-                                <Package className="w-4 h-4 text-zinc-500" /> Order Items
+                    <Card className="bg-[#111111] border-white/5 shadow-2xl">
+                        <CardHeader className="border-b border-white/5 bg-white/5 pb-6">
+                            <CardTitle className="text-white font-serif font-black uppercase text-xs tracking-[0.2em] flex items-center gap-3">
+                                <Package className="w-4 h-4 text-[#592C2F]" /> Détails des Pièces
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-4">
@@ -71,18 +72,18 @@ export default async function AdminOrderDetailsPage(props: AdminOrderDetailsPage
                                         <Package className="w-6 h-6" />
                                     </div>
                                     <div className="flex-1">
-                                        <h4 className="text-white font-medium">{item.product.name}</h4>
-                                        <p className="text-zinc-500 text-sm">Qty: {item.quantity}</p>
+                                        <h4 className="text-white font-bold uppercase text-xs tracking-wider">{item.product.name}</h4>
+                                        <p className="text-zinc-500 text-[10px] font-bold uppercase tracking-widest mt-1">Quantité: {item.quantity}</p>
                                     </div>
-                                    <div className="text-white font-medium">
-                                        {new Intl.NumberFormat('en-MA', { style: 'currency', currency: 'MAD' }).format(Number(item.price))}
+                                    <div className="text-white font-serif font-black">
+                                        {formatPrice(Number(item.price))}
                                     </div>
                                 </div>
                             ))}
                             <div className="flex justify-between items-center pt-4 border-t border-white/5 mt-4">
-                                <span className="text-zinc-400">Total</span>
-                                <span className="text-2xl font-bold text-white">
-                                    {new Intl.NumberFormat('en-MA', { style: 'currency', currency: 'MAD' }).format(Number(order.total))}
+                                <span className="text-zinc-500 uppercase text-[10px] font-black tracking-[0.3em]">Valeur Totale</span>
+                                <span className="text-3xl font-serif font-black text-white italic">
+                                    {formatPrice(Number(order.total))}
                                 </span>
                             </div>
                         </CardContent>
@@ -103,10 +104,10 @@ export default async function AdminOrderDetailsPage(props: AdminOrderDetailsPage
 
                 {/* Right Column: Customer & Info */}
                 <div className="space-y-6">
-                    <Card className="bg-zinc-900/50 border-white/5">
-                        <CardHeader>
-                            <CardTitle className="text-white flex items-center gap-2">
-                                <User className="w-4 h-4 text-zinc-500" /> Customer Profile
+                    <Card className="bg-[#111111] border-white/5 shadow-2xl">
+                        <CardHeader className="border-b border-white/5 bg-white/5 pb-6">
+                            <CardTitle className="text-white font-serif font-black uppercase text-xs tracking-[0.2em] flex items-center gap-3">
+                                <User className="w-4 h-4 text-[#592C2F]" /> Information Propriétaire
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-6">
@@ -136,26 +137,26 @@ export default async function AdminOrderDetailsPage(props: AdminOrderDetailsPage
                                 </div>
 
                                 <div>
-                                    <h5 className="text-zinc-500 text-[10px] uppercase tracking-widest font-bold mb-2 flex items-center gap-2">
-                                        <Package className="w-3 h-3" /> Shipping Address
+                                    <h5 className="text-zinc-500 text-[9px] uppercase tracking-[0.3em] font-black mb-3 flex items-center gap-2">
+                                        <Package className="w-3 h-3 text-[#592C2F]" /> Adresse d'Expédition Signature
                                     </h5>
-                                    <div className="text-sm text-zinc-300 bg-white/5 p-3 rounded leading-relaxed border border-white/5">
+                                    <div className="text-[12px] text-zinc-400 bg-white/5 p-4 rounded-[4px] leading-relaxed border border-white/5">
                                         {order.user?.addresses && order.user.addresses.length > 0 ? (
                                             <>
-                                                <p className="font-bold text-white mb-1">{order.user.name}</p>
+                                                <p className="font-bold text-white mb-2 uppercase tracking-wider">{order.user.name}</p>
                                                 <p>{order.user.addresses[0].street}</p>
                                                 <p>{order.user.addresses[0].city}, {order.user.addresses[0].zip}</p>
-                                                <p className="text-zinc-500 mt-1">{order.user.addresses[0].country}</p>
+                                                <p className="text-[#E2D8C5] font-black mt-2 uppercase tracking-[0.2em]">{order.user.addresses[0].country}</p>
                                             </>
                                         ) : (
                                             <>
-                                                <p className="font-bold text-white mb-1">{order.user?.name || "Guest"}</p>
+                                                <p className="font-bold text-white mb-2 uppercase tracking-wider">{order.user?.name || "Guest"}</p>
                                                 <p className="text-zinc-500 italic">No address provided</p>
                                             </>
                                         )}
 
-                                        <div className="mt-3 flex gap-2">
-                                            <span className="text-[9px] bg-indigo-500/10 text-indigo-400 px-2 py-0.5 rounded border border-indigo-500/20 uppercase tracking-wider">Standard Shipping</span>
+                                        <div className="mt-4 flex gap-2">
+                                            <span className="text-[9px] bg-[#592C2F]/20 text-[#E2D8C5] px-3 py-1 rounded-[2px] border border-[#592C2F]/50 uppercase font-black tracking-[0.2em]">Envoi Prioritaire Prestige</span>
                                         </div>
                                     </div>
                                 </div>
@@ -164,20 +165,15 @@ export default async function AdminOrderDetailsPage(props: AdminOrderDetailsPage
                     </Card>
 
                     <Card className="bg-zinc-900/50 border-white/5">
-                        <CardHeader>
-                            <CardTitle className="text-white flex items-center gap-2">
-                                <Calendar className="w-4 h-4 text-zinc-500" /> Timeline
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-6 relative">
+                        <CardContent className="space-y-8 relative">
                             {/* Timeline Line */}
-                            <div className="absolute left-[29px] top-6 bottom-6 w-[1px] bg-indigo-500/20" />
+                            <div className="absolute left-[29px] top-8 bottom-8 w-[1px] bg-[#592C2F]/30" />
 
                             <div className="relative flex items-center gap-4">
-                                <div className="w-3 h-3 rounded-full bg-indigo-500 border border-black z-10 shadow-[0_0_10px_rgba(99,102,241,0.5)]" />
+                                <div className="w-3 h-3 rounded-full bg-[#592C2F] border border-black z-10 shadow-[0_0_15px_rgba(89,44,47,1)]" />
                                 <div>
-                                    <p className="text-zinc-500 text-[10px] uppercase tracking-widest font-bold">Latest Update</p>
-                                    <p className="text-white text-xs font-mono">{new Date(order.updatedAt).toLocaleString()}</p>
+                                    <p className="text-zinc-500 text-[9px] uppercase tracking-[0.3em] font-black">Dernière Actualisation</p>
+                                    <p className="text-white text-xs font-mono font-bold mt-1 uppercase">{new Date(order.updatedAt).toLocaleString('fr-FR')}</p>
                                 </div>
                             </div>
 

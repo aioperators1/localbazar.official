@@ -57,63 +57,62 @@ async function main() {
         update: {},
         create: { name: 'Peripherals', slug: 'peripherals', image: 'https://images.unsplash.com/photo-1595225476474-87563907a212?q=80&w=1000' }
     })
+    const monitors = await prisma.category.upsert({
+        where: { slug: 'monitors' },
+        update: {},
+        create: { name: 'Monitors', slug: 'monitors', image: 'https://techspace.ma/cdn/shop/files/MSIMAG274QF_1000x.png' }
+    })
 
+    const pcgamer = await prisma.category.upsert({
+        where: { slug: 'pc-gamer' },
+        update: {},
+        create: { name: 'PC Gamer', slug: 'pc-gamer', image: 'https://techspace.ma/cdn/shop/files/PCGAMER01.10.2025_d84ff562-927d-4ea8-990f-3f64463a7b0c_1000x.png' }
+    })
     // 2. Create Products
     const products = [
         {
-            name: 'Razer Blade 16',
-            slug: 'razer-blade-16',
-            description: 'The world\'s first dual-mode mini-LED display. Equipped with RTX 4090.',
-            price: 32990,
-            stock: 10,
-            images: JSON.stringify(['https://images.unsplash.com/photo-1624705002806-5d72df19c2ba?q=80&w=1000']),
+            name: 'MSI Modern 14 C13M',
+            slug: 'msi-modern-14-c13m',
+            description: 'Compact et puissant, parfait pour la productivité. i5-1335U/8GB.',
+            price: 5490,
+            stock: 12,
+            images: JSON.stringify(['https://techspace.ma/cdn/shop/files/MSIModern14C13M-1450MA_b7e596e5-8d0f-4001-bc71-6826d299d563_1000x.png']),
             categoryId: laptops.id,
-            brand: 'Razer',
-            featured: true
-        },
-        {
-            name: 'MacBook Pro M3 Max',
-            slug: 'macbook-pro-m3-max',
-            description: 'Mind-blowing standard. M3 Max chip. Up to 22 hours battery life.',
-            price: 45900,
-            stock: 15,
-            images: JSON.stringify(['https://images.unsplash.com/photo-1517336714731-489689fd1ca8?q=80&w=1000']),
-            categoryId: laptops.id,
-            brand: 'Apple',
-            featured: true
-        },
-        {
-            name: 'RTX 4090 SUPRIM X',
-            slug: 'rtx-4090-suprim-x',
-            description: 'The ultimate consumer graphics card. 24GB G6X memory.',
-            price: 24900,
-            stock: 5,
-            images: JSON.stringify(['https://images.unsplash.com/photo-1591488320449-011701bb6704?q=80&w=1000']),
-            categoryId: components.id,
             brand: 'MSI',
             featured: true
         },
         {
-            name: 'Logitech G Pro X 2',
-            slug: 'logitech-g-pro-x-2',
-            description: 'The new standard for gaming audio. Graphene drivers.',
-            price: 1890,
-            stock: 50,
-            images: JSON.stringify(['https://images.unsplash.com/photo-1615663245857-ac93bb7c39e7?q=80&w=1000']),
-            categoryId: audio.id,
-            brand: 'Logitech',
-            featured: false
+            name: 'PC Gamer Techspace R7',
+            slug: 'pc-gamer-techspace-r7',
+            description: 'Une bête de course pour le gaming 4K. R7 5700X/512GB.',
+            price: 12990,
+            stock: 8,
+            images: JSON.stringify(['https://techspace.ma/cdn/shop/files/PCGAMER01.10.2025_d84ff562-927d-4ea8-990f-3f64463a7b0c_1000x.png']),
+            categoryId: pcgamer.id,
+            brand: 'Techspace',
+            featured: true
         },
         {
-            name: 'Keychron Q1 Pro',
-            slug: 'keychron-q1-pro',
-            description: 'Wireless QMK/VIA custom mechanical keyboard.',
-            price: 2200,
+            name: 'MSI MAG 274QF 2K',
+            slug: 'msi-mag-274qf-2k',
+            description: '27" Fast IPS 180Hz 2K pour une fluidité extrême.',
+            price: 4200,
             stock: 20,
-            images: JSON.stringify(['https://images.unsplash.com/photo-1595225476474-87563907a212?q=80&w=1000']),
-            categoryId: peripherals.id,
-            brand: 'Keychron',
-            featured: false
+            images: JSON.stringify(['https://techspace.ma/cdn/shop/files/MSIMAG274QF_1000x.png']),
+            categoryId: monitors.id,
+            brand: 'MSI',
+            featured: true
+        },
+        {
+            name: 'RTX 5070 WINDFORCE',
+            slug: 'rtx-5070-windforce',
+            description: 'La nouvelle génération de puissance graphique.',
+            price: 9900,
+            stock: 15,
+            images: JSON.stringify(['https://techspace.ma/cdn/shop/files/GigabyteGeForceRTX5070WINDFORCEOCSFF12G_EXCLUSIVITEWEB_1000x.png']),
+            categoryId: components.id,
+            brand: 'Gigabyte',
+            featured: true
         }
     ]
 

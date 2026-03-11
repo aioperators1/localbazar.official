@@ -39,49 +39,45 @@ export function ShopToolbar({ totalProducts }: ShopToolbarProps) {
     ];
 
     return (
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-12 gap-6 border-b border-border/40 pb-8 relative z-30">
-            <div className="space-y-1">
-                <span className="text-[10px] text-zinc-500 font-black uppercase tracking-[0.4em]">Index Discovery</span>
-                <p className="text-sm font-light text-zinc-600 dark:text-zinc-400">
-                    Showing <span className="text-black dark:text-white font-bold">{totalProducts}</span> available units
-                </p>
+        <div className="flex flex-col sm:flex-row justify-between items-center mb-6 py-3 border-y border-zinc-200">
+            <div className="text-[13px] text-zinc-500 font-medium">
+                Affiche 1 - {totalProducts} de {totalProducts} produits
             </div>
 
-            <div className="flex items-center gap-6">
-                <div className="flex items-center gap-4">
-                    <span className="text-[10px] text-zinc-500 font-black uppercase tracking-[0.3em] hidden sm:inline-block">Filter_By:</span>
+            <div className="flex items-center gap-6 mt-4 sm:mt-0 text-[13px] text-zinc-600">
+                <div className="hidden sm:flex items-center gap-2 font-medium">
+                    <span>Afficher:</span>
+                    <span className="font-bold flex items-center gap-1 cursor-pointer hover:text-[var(--color-brand-blue)] transition-colors">
+                        24 par page <ChevronDown className="w-3 h-3" />
+                    </span>
+                </div>
 
+                <div className="flex items-center gap-2 font-medium">
+                    <span>Trier par:</span>
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <Button variant="outline" className="rounded-full border-border/40 bg-background/50 backdrop-blur-xl px-6 gap-3 font-bold uppercase text-[9px] tracking-widest hover:bg-foreground hover:text-background transition-all">
-                                {sortOptions.find(o => o.value === currentSort)?.label || "Sort By"}
-                                <ChevronDown className="w-3 h-3 opacity-50" />
-                            </Button>
+                            <span className="font-bold cursor-pointer hover:text-[var(--color-brand-blue)] transition-colors outline-none flex items-center gap-1">
+                                {sortOptions.find(o => o.value === currentSort)?.label || "En vedette"}
+                                <ChevronDown className="w-3 h-3" />
+                            </span>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-[200px] p-2 bg-popover/95 backdrop-blur-3xl border-border rounded-2xl">
+                        <DropdownMenuContent align="end" className="w-[180px] p-0 bg-white border border-zinc-200 shadow-lg rounded-[4px] overflow-hidden">
                             {sortOptions.map((option) => (
                                 <DropdownMenuItem
                                     key={option.value}
                                     onClick={() => updateSort(option.value)}
-                                    className="flex items-center justify-between cursor-pointer rounded-xl py-3 px-4 focus:bg-accent focus:text-accent-foreground text-[10px] font-bold uppercase tracking-widest"
+                                    className="px-4 py-2.5 text-[13px] font-medium text-zinc-600 hover:bg-[#f3f5f6] hover:text-[var(--color-brand-blue)] cursor-pointer"
                                 >
-                                    <span>{option.label}</span>
-                                    {currentSort === option.value && <Check className="w-3 h-3 text-primary" />}
+                                    {option.label}
                                 </DropdownMenuItem>
                             ))}
                         </DropdownMenuContent>
                     </DropdownMenu>
                 </div>
 
-                <div className="h-4 w-px bg-border hidden sm:block" />
-
-                <div className="flex items-center gap-2 border border-border/40 bg-muted/20 rounded-full p-1 shadow-inner">
-                    <Button variant="ghost" size="icon" className="h-10 w-10 rounded-full bg-primary text-primary-foreground shadow-[0_0_20px_rgba(99,102,241,0.3)]">
-                        <LayoutGrid className="w-4 h-4" />
-                    </Button>
-                    <Button variant="ghost" size="icon" className="h-10 w-10 rounded-full text-muted-foreground hover:text-foreground">
-                        <List className="w-4 h-4" />
-                    </Button>
+                <div className="flex items-center gap-3 border-l border-zinc-200 pl-6 h-5">
+                    <button className="text-[var(--color-brand-blue)] hover:text-[#002090] transition-colors"><LayoutGrid className="w-4 h-4" fill="currentColor" /></button>
+                    <button className="text-zinc-400 hover:text-zinc-900 transition-colors"><List className="w-4 h-4" /></button>
                 </div>
             </div>
         </div>

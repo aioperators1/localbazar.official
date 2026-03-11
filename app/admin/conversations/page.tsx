@@ -109,7 +109,7 @@ export default async function AdminConversationsPage() {
                                     <div className="min-w-0 flex-1">
                                         <p className="text-[10px] font-bold text-indigo-500 uppercase tracking-tight truncate mb-0.5">Product: {conv.product.name}</p>
                                         <p className="text-sm text-zinc-500 dark:text-zinc-400 truncate italic">
-                                            "{lastMessage ? lastMessage.content : "Awaiting first message..."}"
+                                            &quot;{lastMessage ? lastMessage.content : "Awaiting first message..."}&quot;
                                         </p>
                                     </div>
                                 </div>

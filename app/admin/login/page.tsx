@@ -4,7 +4,9 @@ import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { ShieldAlert, Fingerprint } from "lucide-react";
+import { ShieldAlert, ArrowRight, Lock, UserCircle } from "lucide-react";
+import { motion } from "framer-motion";
+import Image from "next/image";
 
 export default function AdminLoginPage() {
     const router = useRouter();
@@ -26,85 +28,128 @@ export default function AdminLoginPage() {
             });
 
             if (res?.error) {
-                setError("Invalid username or password.");
+                setError("Invalid credentials. Please try again.");
                 setLoading(false);
             } else {
                 router.push("/admin");
                 router.refresh();
             }
         } catch {
-            setError("Something went wrong");
+            setError("A critical error occurred.");
             setLoading(false);
         }
     };
 
     return (
-        <div className="flex min-h-screen items-center justify-center bg-zinc-950 p-4 relative overflow-hidden">
-            {/* Background Effects */}
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-900/20 via-zinc-950 to-zinc-950" />
-
-            <div className="w-full max-w-md space-y-8 rounded-2xl bg-zinc-900/50 p-10 border border-white/5 backdrop-blur-xl shadow-2xl relative z-10">
-
-                <div className="text-center space-y-2">
-                    <div className="w-16 h-16 bg-zinc-800 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-white/5 shadow-inner">
-                        <Fingerprint className="w-8 h-8 text-primary" />
+        <div className="flex min-h-screen items-center justify-center bg-[#F1F1F1] p-6 font-sans">
+            <motion.div 
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.4 }}
+                className="w-full max-w-[400px] space-y-8"
+            >
+                <div className="text-center space-y-4">
+                    {/* Logo Section */}
+                    <div className="flex flex-col items-center gap-2">
+                        <div className="w-12 h-12 bg-[#303030] rounded-[10px] flex items-center justify-center mb-2 shadow-sm">
+                            <span className="text-white font-bold text-xl">LB</span>
+                        </div>
+                        <h1 className="text-[20px] font-bold text-[#303030]">Log in to Local Bazar</h1>
                     </div>
-                    <h2 className="text-3xl font-bold tracking-tight text-white">Admin Access</h2>
-                    <p className="text-sm text-zinc-400">Restricted area. Authorized personnel only.</p>
                 </div>
 
-                <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-                    <div className="space-y-4">
-                        <div>
-                            <label htmlFor="username" className="block text-xs font-medium uppercase tracking-wider text-zinc-500 mb-1.5">
-                                Username
-                            </label>
-                            <input
-                                id="username"
-                                name="username"
-                                type="text"
-                                autoComplete="username"
-                                required
-                                value={username}
-                                onChange={(e) => setUsername(e.target.value)}
-                                className="block w-full rounded-lg bg-black/50 border border-white/10 px-4 py-3 text-white placeholder-zinc-600 focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-all sm:text-sm"
-                                placeholder="enter your username"
-                            />
+                <div className="bg-white rounded-[12px] border border-[#E3E3E3] shadow-sm p-6 space-y-6">
+                    <form className="space-y-4" onSubmit={handleSubmit}>
+                        <div className="space-y-4">
+                            <div className="space-y-2">
+                                <div className="flex items-center justify-between">
+                                    <label htmlFor="username" className="text-[13px] font-medium text-[#303030]">
+                                        Username
+                                    </label>
+                                </div>
+                                <div className="relative group">
+                                    <input
+                                        id="username"
+                                        name="username"
+                                        type="text"
+                                        required
+                                        value={username}
+                                        onChange={(e) => setUsername(e.target.value)}
+                                        className="block w-full rounded-[8px] bg-white border border-[#D2D2D2] px-3 py-2 text-[#303030] text-[13px] placeholder-[#616161] focus:border-black focus:ring-1 focus:ring-black outline-none transition-all"
+                                        placeholder="Admin username"
+                                    />
+                                </div>
+                            </div>
+                            <div className="space-y-2">
+                                <div className="flex items-center justify-between">
+                                    <label htmlFor="password" className="text-[13px] font-medium text-[#303030]">
+                                        Password
+                                    </label>
+                                    <button type="button" className="text-[#005BD3] text-[12px] hover:underline">Forgot?</button>
+                                </div>
+                                <div className="relative group">
+                                    <input
+                                        id="password"
+                                        name="password"
+                                        type="password"
+                                        required
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        className="block w-full rounded-[8px] bg-white border border-[#D2D2D2] px-3 py-2 text-[#303030] text-[13px] placeholder-[#616161] focus:border-black focus:ring-1 focus:ring-black outline-none transition-all"
+                                        placeholder="••••••••"
+                                    />
+                                </div>
+                            </div>
                         </div>
-                        <div>
-                            <label htmlFor="password" className="block text-xs font-medium uppercase tracking-wider text-zinc-500 mb-1.5">
-                                Password
-                            </label>
-                            <input
-                                id="password"
-                                name="password"
-                                type="password"
-                                autoComplete="current-password"
-                                required
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                className="block w-full rounded-lg bg-black/50 border border-white/10 px-4 py-3 text-white placeholder-zinc-600 focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-all sm:text-sm"
-                                placeholder="••••••••"
-                            />
+
+                        {error && (
+                            <div className="flex items-center gap-2.5 p-3 rounded-[8px] bg-[#FDEDE8] border border-[#f8d7da] text-[#E51C00] text-[13px] font-medium animate-in fade-in slide-in-from-top-1">
+                                <ShieldAlert className="w-4 h-4 shrink-0" />
+                                {error}
+                            </div>
+                        )}
+
+                        <Button
+                            type="submit"
+                            disabled={loading}
+                            className="w-full h-10 bg-black text-white hover:bg-[#303030] font-bold rounded-[8px] transition-all"
+                        >
+                            {loading ? "Logging in..." : "Log in"}
+                        </Button>
+                    </form>
+
+                    <div className="pt-4 flex flex-col items-center gap-4 text-[12px] text-[#616161]">
+                        <div className="flex items-center gap-4 w-full">
+                            <div className="flex-1 h-[1px] bg-[#E3E3E3]" />
+                            <span>Or</span>
+                            <div className="flex-1 h-[1px] bg-[#E3E3E3]" />
                         </div>
+                        <button className="flex items-center justify-center gap-2 w-full h-10 border border-[#D2D2D2] rounded-[8px] bg-white text-[#303030] font-bold hover:bg-[#F9F9F9] transition-all">
+                            <Image src="/google.svg" alt="Google" width={16} height={16} unoptimized className="opacity-80" />
+                            Log in with Google
+                        </button>
                     </div>
+                </div>
 
-                    {error && (
-                        <div className="flex items-center gap-2 p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm animate-shake">
-                            <ShieldAlert className="w-4 h-4" />
-                            {error}
-                        </div>
-                    )}
-
-                    <Button
-                        type="submit"
-                        disabled={loading}
-                        className="w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-lg shadow-lg hover:shadow-primary/20 transition-all"
-                    >
-                        {loading ? "Authenticating..." : "Login"}
-                    </Button>
-                </form>
+                <div className="flex flex-col items-center gap-4 pt-4">
+                    <div className="flex gap-4 text-[12px] text-[#616161] font-medium">
+                        <Link href="/privacy" className="hover:underline">Privacy</Link>
+                        <Link href="/terms" className="hover:underline">Terms</Link>
+                    </div>
+                </div>
+            </motion.div>
+            
+            {/* Shopify-like Footer */}
+            <div className="fixed bottom-6 w-full text-center pointer-events-none">
+                <p className="text-[12px] text-[#616161] font-medium">
+                    Help • Legal • Privacy
+                </p>
             </div>
         </div>
     );
+}
+
+// Minimal Link component for the demo logic
+function Link({ href, children, className }: { href: string, children: React.ReactNode, className?: string }) {
+    return <a href={href} className={className}>{children}</a>;
 }

@@ -65,7 +65,7 @@ function CategoryCard({
     };
 
     const colors = {
-        blue: "#3b82f6",
+        blue: "var(--color-brand-charcoal)",
         zinc: "#71717a",
         slate: "#64748b"
     };
@@ -108,7 +108,7 @@ function CategoryCard({
                         )}>
                             <Activity className="w-3 h-3" /> {t("spec.sysLink")}
                         </span>
-                        <div className="h-px w-16 bg-blue-600/30" />
+                        <div className="h-px w-16 bg-[var(--color-brand-charcoal)]/30" />
                     </div>
 
                     <div className="p-3 rounded-lg border border-black/5 dark:border-white/5 bg-background/50 backdrop-blur-xl transition-all duration-500">
@@ -147,8 +147,8 @@ function CategoryCard({
                         </div>
                     ))}
                     <div className="ms-auto mt-auto">
-                        <div className="flex items-center gap-2 px-3 py-1 bg-blue-600/5 border border-blue-600/10 rounded-full">
-                            <Target className="w-2.5 h-2.5 text-blue-600" />
+                        <div className="flex items-center gap-2 px-3 py-1 bg-[var(--color-brand-charcoal)]/5 border border-blue-600/10 rounded-full">
+                            <Target className="w-2.5 h-2.5 text-[var(--color-brand-charcoal)]" />
                             <span className={cn(
                                 "font-black text-foreground",
                                 isAr ? "text-[10px]" : "text-[8px] tracking-widest uppercase"
@@ -173,7 +173,7 @@ export function CategoryGrid() {
                     <motion.div
                         initial={{ opacity: 0, y: 10 }}
                         whileInView={{ opacity: 1, y: 0 }}
-                        className="flex items-center gap-4 text-blue-600"
+                        className="flex items-center gap-4 text-[var(--color-brand-charcoal)]"
                     >
                         <Shield className="w-5 h-5" />
                         <span className="text-[10px] font-black uppercase tracking-[0.5em]">{t("home.hardwarePriority")}</span>
@@ -188,7 +188,7 @@ export function CategoryGrid() {
                 </div>
                 <div className="p-8 bg-card border border-black/5 dark:border-white/5 backdrop-blur-3xl rounded-xl space-y-4 max-w-md shadow-pro">
                     <div className="flex items-center gap-3">
-                        <Zap className="w-4 h-4 text-blue-600" />
+                        <Zap className="w-4 h-4 text-[var(--color-brand-charcoal)]" />
                         <span className={cn(
                             "font-black text-muted-foreground",
                             isAr ? "text-[10px]" : "text-[8px] uppercase tracking-widest"
@@ -206,7 +206,7 @@ export function CategoryGrid() {
                 <CategoryCard
                     href="/shop?category=laptops"
                     title={t("cat.laptops")}
-                    image="https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?q=80&w=1000"
+                    image="https://techspace.ma/cdn/shop/files/pcportablegamer_bee81797-73fa-4158-9ee9-11cd5be35e7f_1000x.png"
                     icon={Monitor}
                     className="md:col-span-3 lg:col-span-8 lg:row-span-2"
                     accentColor="blue"
@@ -221,7 +221,7 @@ export function CategoryGrid() {
                 <CategoryCard
                     href="/shop?category=components"
                     title={t("cat.components")}
-                    image="https://images.unsplash.com/photo-1591488320449-011701bb6704?q=80&w=1000"
+                    image="https://techspace.ma/cdn/shop/files/GigabyteGeForceRTX5070WINDFORCEOCSFF12G_EXCLUSIVITEWEB_1000x.png"
                     icon={Cpu}
                     className="md:col-span-3 lg:col-span-4 lg:row-span-2"
                     accentColor="zinc"
@@ -235,7 +235,7 @@ export function CategoryGrid() {
                 <CategoryCard
                     href="/shop?category=peripherals"
                     title={t("cat.peripherals")}
-                    image="https://images.unsplash.com/photo-1595225476474-87563907a212?q=80&w=1000"
+                    image="https://techspace.ma/cdn/shop/files/ZOTACGAMINGGeForceRTX5060Ti16GBTwinEdge_1000x.png"
                     icon={Keyboard}
                     className="md:col-span-3 lg:col-span-6"
                     accentColor="blue"
@@ -249,7 +249,7 @@ export function CategoryGrid() {
                 <CategoryCard
                     href="/shop?category=audio"
                     title={t("cat.audio")}
-                    image="https://images.unsplash.com/photo-1618366712010-f4ae9c647dcb?q=80&w=1000"
+                    image="https://techspace.ma/cdn/shop/files/RedragonH260HylasWiredGamingHeadset_1024x.png"
                     icon={Headphones}
                     className="md:col-span-3 lg:col-span-6"
                     accentColor="slate"

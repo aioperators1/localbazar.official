@@ -1,180 +1,152 @@
 "use client";
-import Link from "next/link";
-import Image from "next/image";
-import { usePathname } from "next/navigation";
-import {
-    LayoutDashboard,
-    Package,
+
+import { 
+    Home,
     ShoppingCart,
+    Tag,
     Users,
+    BarChart2,
     Settings,
+    Menu,
+    X,
     LogOut,
     Store,
-    MessageSquare,
-    Menu,
-    X
+    Megaphone,
+    Percent,
+    Monitor,
+    Layout
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useSession, signOut } from "next-auth/react";
+import { signOut } from "next-auth/react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { Button } from "@/components/ui/button";
 
-const sidebarLinks = [
-    { name: "Overview", href: "/admin", icon: LayoutDashboard },
-    { name: "Products", href: "/admin/products", icon: Package },
-    { name: "Marketplace", href: "/admin/marketplace", icon: Store },
-    { name: "Messages", href: "/admin/conversations", icon: MessageSquare },
+const menuItems = [
+    { name: "Home", href: "/admin", icon: Home },
     { name: "Orders", href: "/admin/orders", icon: ShoppingCart },
+    { name: "Products", href: "/admin/products", icon: Tag },
+    { name: "Categories", href: "/admin/categories", icon: Layout },
     { name: "Customers", href: "/admin/customers", icon: Users },
+    { name: "Banners", href: "/admin/banners", icon: Megaphone },
 ];
 
 const SidebarContent = ({
-    session,
-    pathname,
     setIsMobileOpen
 }: {
-    session: any,
-    pathname: string,
     setIsMobileOpen: (open: boolean) => void
-}) => (
-    <>
-        <div className="p-6 relative">
-            {/* Glow effect under logo */}
-            <div className="absolute top-0 left-0 w-full h-32 bg-blue-500/10 blur-[50px] pointer-events-none" />
-
-            <Link href="/" className="flex items-center gap-3 group relative z-10 text-decoration-none">
-                <div className="relative">
-                    <div className="absolute inset-0 bg-blue-600 blur-md opacity-20 group-hover:opacity-40 transition-opacity" />
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center text-white font-black shadow-lg shadow-blue-500/20 group-hover:scale-105 transition-transform duration-300 border border-blue-400/20">
-                        E
+}) => {
+    const pathname = usePathname();
+    
+    return (
+        <div className="bg-[#EBEBEB] h-full flex flex-col py-6 overflow-hidden border-r border-[#D2D2D2]">
+            <div className="px-5 mb-8 flex items-center gap-3">
+                <div className="relative group">
+                    <div className="absolute -inset-1 bg-gradient-to-r from-[#303030] to-[#616161] rounded-lg blur opacity-25" />
+                    <div className="relative w-9 h-9 bg-[#303030] rounded-lg flex items-center justify-center border border-white/10 shadow-lg">
+                        <span className="text-white font-black text-sm tracking-tighter">LB</span>
                     </div>
                 </div>
                 <div className="flex flex-col">
-                    <span className="text-xl font-black tracking-tight text-white leading-none group-hover:text-blue-400 transition-colors">ELECTRO</span>
-                    <span className="text-[10px] font-bold tracking-[0.2em] text-zinc-500 uppercase mt-0.5 group-hover:text-zinc-400 transition-colors">Admin Panel</span>
+                    <span className="text-[#303030] font-black text-sm uppercase tracking-tight">Local Bazar</span>
+                    <span className="text-[#616161] text-[10px] font-bold uppercase tracking-widest leading-none">Command Center</span>
                 </div>
-            </Link>
-        </div>
-
-        <nav className="flex-1 px-3 space-y-1 block overflow-y-auto py-4">
-            <div className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest mb-2 px-4 mt-2 font-mono">
-                Main Menu
             </div>
-            {sidebarLinks.map((link) => {
-                const Icon = link.icon;
-                const isActive = pathname === link.href;
 
-                return (
+            <nav className="flex-1 px-3 space-y-1 overflow-y-auto custom-scrollbar">
+                {menuItems.map((item) => {
+                    const isActive = pathname === item.href || (item.href !== '/admin' && pathname.startsWith(item.href));
+                    return (
+                        <Link
+                            key={item.href}
+                            href={item.href}
+                            onClick={() => setIsMobileOpen(false)}
+                            className={cn(
+                                "flex items-center gap-3 px-3 py-2 rounded-lg text-[13px] font-bold transition-all duration-200 group relative",
+                                isActive 
+                                    ? "bg-white text-[#303030] shadow-[0_2px_8px_rgba(0,0,0,0.08)]" 
+                                    : "text-[#616161] hover:bg-white/50 hover:text-[#303030]"
+                            )}
+                        >
+                            <item.icon className={cn(
+                                "w-4 h-4 shrink-0 transition-transform group-hover:scale-110",
+                                isActive ? "text-[#303030]" : "text-[#616161]"
+                            )} />
+                            <span className="flex-1 truncate uppercase tracking-tight">{item.name}</span>
+                            {isActive && (
+                                <div className="absolute left-0 w-1 h-4 bg-[#303030] rounded-full" />
+                            )}
+                        </Link>
+                    );
+                })}
+
+                <div className="pt-4 pb-2">
+                    <div className="px-2 mb-1">
+                        <span className="text-[11px] font-bold text-[#616161] uppercase tracking-tight px-1">Sales channels</span>
+                    </div>
                     <Link
-                        key={link.href}
-                        href={link.href}
-                        onClick={() => setIsMobileOpen(false)}
-                        className={cn(
-                            "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-300 group relative overflow-hidden",
-                            isActive
-                                ? "text-white shadow-lg shadow-blue-500/10"
-                                : "text-zinc-500 hover:text-white hover:bg-white/5"
-                        )}
+                        href="/"
+                        target="_blank"
+                        className="flex items-center gap-2.5 px-2 py-1.5 rounded-[6px] text-[13px] font-semibold text-[#616161] hover:bg-[#E3E3E3] hover:text-[#303030] transition-colors group"
                     >
-                        {isActive && (
-                            <div className="absolute inset-0 bg-blue-600/10 border border-blue-500/20 rounded-xl" />
-                        )}
-
-                        <Icon className={cn(
-                            "w-5 h-5 relative z-10 transition-colors duration-300",
-                            isActive ? "text-blue-400 drop-shadow-[0_0_8px_rgba(96,165,250,0.5)]" : "text-zinc-600 group-hover:text-zinc-300"
-                        )} />
-                        <span className="relative z-10">{link.name}</span>
-
-                        {isActive && (
-                            <div className="absolute right-3 w-1.5 h-1.5 rounded-full bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,1)] animate-pulse" />
-                        )}
+                        <Monitor className="w-4 h-4 shrink-0" />
+                        <span className="flex-1 truncate">Online Store</span>
                     </Link>
-                );
-            })}
-        </nav>
-
-        <div className="p-4 border-t border-white/5 mt-auto relative z-10">
-            <div className="bg-gradient-to-t from-white/5 to-transparent rounded-2xl p-4 border border-white/5 hover:border-white/10 transition-colors group">
-                <div className="flex items-center gap-3 mb-3">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-600 to-indigo-700 flex items-center justify-center text-white border border-white/20 group-hover:border-indigo-400/50 transition-all duration-500 shadow-lg shadow-indigo-500/20">
-                        <span className="font-black text-xs tracking-tighter">IS</span>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                        <p className="text-sm font-black text-white truncate group-hover:text-indigo-400 transition-colors uppercase italic tracking-tight">{session?.user?.name || "Admin"}</p>
-                        <p className="text-[10px] font-bold text-zinc-500 truncate uppercase tracking-widest">Administrator</p>
-                    </div>
                 </div>
+            </nav>
 
-                <button
+            <div className="p-2 border-t border-[#D2D2D2]">
+                <button 
                     onClick={() => signOut({ callbackUrl: '/admin/login' })}
-                    className="w-full flex items-center justify-center gap-2 text-xs font-semibold text-zinc-400 hover:text-white bg-white/5 hover:bg-red-500/20 hover:border-red-500/20 border border-transparent rounded-lg py-2 transition-all duration-300"
+                    className="w-full flex items-center gap-2.5 px-2 py-1.5 text-[13px] font-semibold text-rose-600 hover:bg-rose-50 rounded-[6px] transition-colors"
                 >
-                    <LogOut className="w-3.5 h-3.5" />
-                    Sign Out
+                    <LogOut className="w-4 h-4 shrink-0" />
+                    Logout
                 </button>
             </div>
         </div>
-    </>
-);
+    );
+};
 
 export function AdminSidebar() {
-    const pathname = usePathname();
-    const { data: session } = useSession();
     const [isMobileOpen, setIsMobileOpen] = useState(false);
 
     return (
-        <>
-            {/* Mobile Header Toggle */}
-            <div className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-black/80 backdrop-blur-xl border-b border-white/5 z-50 flex items-center justify-between px-6">
-                <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center text-white font-black shadow-lg shadow-blue-500/20 border border-blue-400/20 text-xs">
-                        E
-                    </div>
-                    <span className="font-black text-lg tracking-tight text-white uppercase">ELECTRO<span className="text-blue-500">ADMIN</span></span>
-                </div>
-                <button
-                    onClick={() => setIsMobileOpen(true)}
-                    className="p-2 text-zinc-400 hover:text-white transition-colors bg-white/5 rounded-lg border border-white/10"
-                >
-                    <Menu className="w-5 h-5" />
-                </button>
-            </div>
+        <div>
+            {/* Mobile Toggle */}
+            <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setIsMobileOpen(true)}
+                className="lg:hidden fixed bottom-4 right-4 z-[60] bg-white border border-[#E3E3E3] shadow-md rounded-full h-10 w-10 text-[#616161]"
+            >
+                <Menu className="w-5 h-5" />
+            </Button>
 
             {/* Desktop Sidebar */}
-            <aside className="hidden lg:flex w-64 bg-black/40 backdrop-blur-xl border-r border-white/5 h-screen sticky top-0 flex-col z-50">
-                <SidebarContent session={session} pathname={pathname} setIsMobileOpen={setIsMobileOpen} />
+            <aside className="hidden lg:flex w-60 h-screen sticky top-0 flex-col z-50 shrink-0">
+                <SidebarContent setIsMobileOpen={() => {}} />
             </aside>
 
             {/* Mobile Drawer */}
-            <AnimatePresence>
-                {isMobileOpen && (
-                    <>
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
+            {isMobileOpen && (
+                <div className="fixed inset-0 z-[70] lg:hidden">
+                    <div
+                        onClick={() => setIsMobileOpen(false)}
+                        className="absolute inset-0 bg-[#303030]/20 backdrop-blur-sm"
+                    />
+                    <aside className="absolute inset-y-0 left-0 w-64 bg-[#EBEBEB] flex flex-col shadow-2xl transition-transform transform translate-x-0">
+                        <button
                             onClick={() => setIsMobileOpen(false)}
-                            className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 lg:hidden"
-                        />
-                        <motion.aside
-                            initial={{ x: "-100%" }}
-                            animate={{ x: 0 }}
-                            exit={{ x: "-100%" }}
-                            transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                            className="fixed inset-y-0 left-0 w-72 bg-zinc-950 border-r border-white/10 z-50 lg:hidden flex flex-col shadow-2xl"
+                            className="absolute top-2 right-2 p-1.5 text-[#616161] hover:text-[#303030] transition-all"
                         >
-                            <button
-                                onClick={() => setIsMobileOpen(false)}
-                                className="absolute top-4 right-4 p-2 text-zinc-400 hover:text-white bg-white/5 rounded-lg border border-white/5 hover:bg-white/10 transition-all z-20"
-                            >
-                                <X className="w-5 h-5" />
-                            </button>
-                            <SidebarContent session={session} pathname={pathname} setIsMobileOpen={setIsMobileOpen} />
-                        </motion.aside>
-                    </>
-                )}
-            </AnimatePresence>
-        </>
+                            <X className="w-5 h-5" />
+                        </button>
+                        <SidebarContent setIsMobileOpen={setIsMobileOpen} />
+                    </aside>
+                </div>
+            )}
+        </div>
     );
 }

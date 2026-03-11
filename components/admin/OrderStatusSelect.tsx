@@ -10,6 +10,7 @@ import {
 import { updateOrderStatus } from "@/lib/actions/admin";
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface OrderStatusSelectProps {
     orderId: string;
@@ -25,24 +26,28 @@ export function OrderStatusSelect({ orderId, currentStatus }: OrderStatusSelectP
         setLoading(false);
     };
 
+    const statusStyles: Record<string, string> = {
+        PENDING: "bg-[#FFE0B2] text-[#6D4C41]",
+        SHIPPED: "bg-[#E3F2FD] text-[#0D47A1]",
+        DELIVERED: "bg-[#008060]/10 text-[#008060]",
+        CANCELLED: "bg-[#F1F1F1] text-[#616161]",
+    };
+
     return (
         <div className="flex items-center gap-2">
-            {loading && <Loader2 className="w-3 h-3 animate-spin text-zinc-500" />}
+            {loading && <Loader2 className="w-3 h-3 animate-spin text-[#616161]" />}
             <Select defaultValue={currentStatus} onValueChange={handleStatusChange} disabled={loading}>
-                <SelectTrigger className={`w-[130px] h-8 text-xs font-bold uppercase tracking-wider border-0 ring-1 ring-white/10
-            ${currentStatus === 'DELIVERED' ? 'bg-emerald-500/10 text-emerald-500 ring-emerald-500/20' :
-                        currentStatus === 'SHIPPED' ? 'bg-blue-500/10 text-blue-500 ring-blue-500/20' :
-                            currentStatus === 'CANCELLED' ? 'bg-red-500/10 text-red-500 ring-red-500/20' :
-                                'bg-orange-500/10 text-orange-500 ring-orange-500/20'
-                    }
-        `}>
+                <SelectTrigger className={cn(
+                    "w-[120px] h-7 text-[11px] font-bold rounded-full border-none shadow-none ring-0 focus:ring-0 px-2",
+                    statusStyles[currentStatus] || "bg-[#F1F1F1] text-[#616161]"
+                )}>
                     <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="bg-zinc-900 border-zinc-800">
-                    <SelectItem value="PENDING" className="text-orange-500">Pending</SelectItem>
-                    <SelectItem value="SHIPPED" className="text-blue-500">Shipped</SelectItem>
-                    <SelectItem value="DELIVERED" className="text-emerald-500">Delivered</SelectItem>
-                    <SelectItem value="CANCELLED" className="text-red-500">Cancelled</SelectItem>
+                <SelectContent className="bg-white border-[#E3E3E3]">
+                    <SelectItem value="PENDING" className="text-[#6D4C41] text-[12px]">Pending</SelectItem>
+                    <SelectItem value="SHIPPED" className="text-[#0D47A1] text-[12px]">Shipped</SelectItem>
+                    <SelectItem value="DELIVERED" className="text-[#008060] text-[12px]">Delivered</SelectItem>
+                    <SelectItem value="CANCELLED" className="text-[#616161] text-[12px]">Cancelled</SelectItem>
                 </SelectContent>
             </Select>
         </div>

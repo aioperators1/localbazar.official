@@ -1,12 +1,12 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { TrendingUp, Users, ShieldCheck, Zap, MessageCircle } from "lucide-react";
+import { TrendingUp, Users, ShieldCheck, MessageCircle } from "lucide-react";
 import { useLanguage } from "@/components/providers/language-provider";
 import { cn } from "@/lib/utils";
 
 export function MarketplaceStats() {
-    const { t, language } = useLanguage();
+    const { language } = useLanguage();
     const isAr = language === "ar";
 
     const STATS = [
@@ -14,8 +14,8 @@ export function MarketplaceStats() {
             label: isAr ? "الأكثر تداولاً" : "Trending Now",
             value: "RTX 40 Series",
             icon: TrendingUp,
-            color: "text-blue-500",
-            bg: "bg-blue-500/10"
+            color: "text-[var(--color-brand-charcoal)]",
+            bg: "bg-[var(--color-brand-charcoal)]/10"
         },
         {
             label: isAr ? "مستخدم نشط" : "Active Users",
@@ -51,7 +51,7 @@ export function MarketplaceStats() {
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ delay: i * 0.1 }}
-                            className="group relative p-6 rounded-2xl bg-zinc-50/50 dark:bg-white/[0.03] border border-zinc-200 dark:border-white/5 hover:border-blue-500/20 dark:hover:border-white/10 transition-all duration-300 backdrop-blur-sm shadow-sm"
+                            className="group relative p-6 rounded-2xl bg-zinc-50/50 dark:bg-white/[0.03] border border-zinc-200 dark:border-white/5 hover:border-[var(--color-brand-charcoal)]/20 dark:hover:border-white/10 transition-all duration-300 backdrop-blur-sm shadow-sm"
                         >
                             <div className="flex items-center gap-4">
                                 <div className={cn("p-3 rounded-xl", stat.bg, stat.color)}>

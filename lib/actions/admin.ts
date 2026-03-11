@@ -14,6 +14,7 @@ type ProductInput = {
     image: string;
     brand: string;
     sku: string;
+    specs?: string;
 };
 
 export async function getDashboardStats() {
@@ -63,6 +64,7 @@ export async function createProduct(data: ProductInput) {
                 images: JSON.stringify([data.image]), // Simplification for now
                 brand: data.brand,
                 sku: data.sku,
+                specs: data.specs,
             }
         });
         revalidatePath('/admin/products');
@@ -76,8 +78,8 @@ export async function createProduct(data: ProductInput) {
 export async function updateProduct(id: string, data: Partial<ProductInput>) {
     try {
         // Destructure image specifically to handle the mapping to 'images'
-         
-        const { image, price, stock, ...rest } = data;
+
+        const { image, price, stock, specs, ...rest } = data;
 
         const updateData: Record<string, unknown> = {
             ...rest,
@@ -94,6 +96,10 @@ export async function updateProduct(id: string, data: Partial<ProductInput>) {
         // Map 'image' input to 'images' database field
         if (image) {
             updateData.images = JSON.stringify([image]);
+        }
+
+        if (specs !== undefined) {
+            updateData.specs = specs;
         }
 
         await prisma.product.update({
@@ -226,5 +232,183 @@ export async function getMonthlyRevenue() {
     } catch (error) {
         console.error("Revenue Error:", error);
         return [];
+    }
+}
+
+// --- BANNER MANAGEMENT ---
+export async function getAdminBanners() {
+    try {
+        const prismaAny = prisma as any;
+        const banners = await prismaAny.banner.findMany({
+            orderBy: { order: 'asc' }
+        });
+        return banners.map((banner: any) => ({
+            ...banner,
+            createdAt: banner.createdAt.toISOString(),
+            updatedAt: banner.updatedAt.toISOString(),
+        }));
+    } catch (error) {
+        console.error("Get Banners Error:", error);
+        return [];
+    }
+}
+
+export async function createBanner(data: { title: string, subtitle?: string, image: string, link?: string, active?: boolean, order?: number }) {
+    try {
+        const prismaAny = prisma as any;
+        await prismaAny.banner.create({
+            data: {
+                title: data.title,
+                subtitle: data.subtitle,
+                image: data.image,
+                link: data.link,
+                active: data.active ?? true,
+                order: data.order ?? 0,
+            }
+        });
+        revalidatePath('/'); // Revalidate homepage where banners are shown
+        revalidatePath('/admin/banners');
+        return { success: true };
+    } catch (error) {
+        return { success: false, error: String(error) };
+    }
+}
+
+export async function updateBanner(id: string, data: Partial<{ title: string, subtitle: string, image: string, link: string, active: boolean, order: number }>) {
+    try {
+        const prismaAny = prisma as any;
+        await prismaAny.banner.update({
+            where: { id },
+            data
+        });
+        revalidatePath('/');
+        revalidatePath('/admin/banners');
+        return { success: true };
+    } catch (error) {
+        return { success: false, error: String(error) };
+    }
+}
+
+export async function deleteBanner(id: string) {
+    try {
+        const prismaAny = prisma as any;
+        await prismaAny.banner.delete({ where: { id } });
+        revalidatePath('/');
+        revalidatePath('/admin/banners');
+        return { success: true };
+    } catch (error) {
+        return { success: false, error: String(error) };
+    }
+}
+
+// --- SETTINGS MANAGEMENT ---
+export async function getAdminSettings() {
+    try {
+        const prismaAny = prisma as any;
+        const settings = await prismaAny.setting.findMany();
+        return settings.reduce((acc: any, setting: any) => {
+            acc[setting.key] = setting.value;
+            return acc;
+        }, {});
+    } catch (error) {
+        console.error("Get Settings Error:", error);
+        return {};
+    }
+}
+
+export async function updateAdminSettings(data: Record<string, string>) {
+    try {
+        const prismaAny = prisma as any;
+        // Use a transaction to update all settings
+        const updates = Object.entries(data).map(([key, value]) => {
+            return prismaAny.setting.upsert({
+                where: { key },
+                update: { value },
+                create: { key, value }
+            });
+        });
+
+        await prismaAny.$transaction(updates);
+        revalidatePath('/');
+        revalidatePath('/admin/settings');
+        return { success: true };
+    } catch (error) {
+        console.error("Update Settings Error:", error);
+        return { success: false, error: String(error) };
+    }
+}
+
+// --- CATEGORY MANAGEMENT ---
+export async function getAdminCategories() {
+    try {
+        const categories = await prisma.category.findMany({
+            include: {
+                parent: true,
+                _count: { select: { products: true } }
+            },
+            orderBy: { name: 'asc' }
+        });
+
+        return categories.map(cat => ({
+            ...cat,
+            createdAt: cat.createdAt.toISOString(),
+            parent: cat.parent ? {
+                ...cat.parent,
+                createdAt: cat.parent.createdAt.toISOString()
+            } : null
+        }));
+    } catch (error) {
+        console.error("Get Categories Error:", error);
+        return [];
+    }
+}
+
+export async function createCategory(data: { name: string, slug: string, image?: string, parentId?: string }) {
+    try {
+        await prisma.category.create({
+            data: {
+                name: data.name,
+                slug: data.slug,
+                image: data.image,
+                parentId: data.parentId || null
+            }
+        });
+        revalidatePath('/admin/categories');
+        revalidatePath('/shop');
+        return { success: true };
+    } catch (error) {
+        console.error("Create Category Error:", error);
+        return { success: false, error: String(error) };
+    }
+}
+
+export async function updateCategory(id: string, data: Partial<{ name: string, slug: string, image: string, parentId: string }>) {
+    try {
+        const { parentId, ...rest } = data;
+        await prisma.category.update({
+            where: { id },
+            data: {
+                ...rest,
+                parentId: parentId || null
+            }
+        });
+        revalidatePath('/admin/categories');
+        revalidatePath('/shop');
+        return { success: true };
+    } catch (error) {
+        console.error("Update Category Error:", error);
+        return { success: false, error: String(error) };
+    }
+}
+
+export async function deleteCategory(id: string) {
+    try {
+        await prisma.category.delete({ where: { id } });
+        revalidatePath('/admin/categories');
+        revalidatePath('/shop');
+        return { success: true };
+    } catch (error) {
+        console.error("Delete Category Error:", error);
+        return { success: false, error: String(error) };
     }
 }

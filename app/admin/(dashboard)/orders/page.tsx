@@ -2,17 +2,8 @@ import { getAdminOrders } from "@/lib/actions/admin";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { OrderStatusSelect } from "@/components/admin/OrderStatusSelect";
 import Link from "next/link";
-
-interface Order {
-    id: string;
-    createdAt: Date;
-    status: string;
-    total: { toNumber: () => number } | number | string; // Handle Prisma Decimal
-    user: {
-        name: string | null;
-        email: string | null;
-    } | null;
-}
+import { ShoppingBag } from "lucide-react";
+import { formatPrice } from "@/lib/utils";
 
 export default async function AdminOrdersPage() {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -20,67 +11,59 @@ export default async function AdminOrdersPage() {
 
     return (
         <div className="space-y-6">
-            <div>
-                <h1 className="text-3xl font-bold tracking-tight text-white mb-2">Orders</h1>
-                <p className="text-zinc-400">Manage and track customer orders.</p>
+            <div className="flex flex-col gap-4">
+                <div className="flex items-center justify-between">
+                    <h1 className="text-xl font-bold text-[#303030]">Orders</h1>
+                </div>
             </div>
 
-            <Card className="bg-zinc-900/50 border-white/5 backdrop-blur-sm overflow-hidden">
-                <CardHeader>
-                    <CardTitle className="text-white">Recent Orders</CardTitle>
-                </CardHeader>
-                <CardContent className="p-0">
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-sm text-left">
-                            <thead className="bg-white/5 text-zinc-400 font-medium border-b border-white/5">
-                                <tr>
-                                    <th className="px-6 py-4">Order ID</th>
-                                    <th className="px-6 py-4">Customer</th>
-                                    <th className="px-6 py-4">Status</th>
-                                    <th className="px-6 py-4">Date</th>
-                                    <th className="px-6 py-4 text-right">Total</th>
+            <div className="bg-white rounded-[12px] border border-[#E3E3E3] shadow-sm overflow-hidden">
+                <table className="w-full text-left text-[13px] border-collapse">
+                    <thead className="bg-[#f6f6f6] border-b border-[#E3E3E3]">
+                        <tr>
+                            <th className="p-3 pl-4 font-semibold text-[#303030]">Order</th>
+                            <th className="p-3 font-semibold text-[#303030]">Customer</th>
+                            <th className="p-3 font-semibold text-[#303030]">Status</th>
+                            <th className="p-3 font-semibold text-[#303030]">Date</th>
+                            <th className="p-3 text-right pr-4 font-semibold text-[#303030]">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody className="divide-y divide-[#E3E3E3]">
+                        {orders.length === 0 ? (
+                            <tr>
+                                <td colSpan={5} className="p-12 text-center text-[#616161] font-medium">
+                                    No orders found.
+                                </td>
+                            </tr>
+                        ) : (
+                            orders.map((order) => (
+                                <tr key={order.id} className="group hover:bg-[#F9F9F9] transition-colors">
+                                    <td className="p-3 pl-4">
+                                        <Link href={`/admin/orders/${order.id}`} className="font-bold text-[#005BD3] hover:underline">
+                                            #{order.id.slice(-6).toUpperCase()}
+                                        </Link>
+                                    </td>
+                                    <td className="p-3">
+                                        <div className="flex flex-col">
+                                            <span className="text-[#303030] font-bold">{order.user?.name || 'Guest Customer'}</span>
+                                            <span className="text-[#616161] text-[11px]">{order.user?.email}</span>
+                                        </div>
+                                    </td>
+                                    <td className="p-3">
+                                        <OrderStatusSelect orderId={order.id} currentStatus={order.status} />
+                                    </td>
+                                    <td className="p-3 text-[#616161]">
+                                        {new Date(order.createdAt).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })}
+                                    </td>
+                                    <td className="p-3 text-right pr-4 font-bold text-[#303030]">
+                                        {formatPrice(order.total)}
+                                    </td>
                                 </tr>
-                            </thead>
-                            <tbody className="divide-y divide-white/5">
-                                {orders.length === 0 ? (
-                                    <tr>
-                                        <td colSpan={5} className="px-6 py-8 text-center text-zinc-500">
-                                            No orders found.
-                                        </td>
-                                    </tr>
-                                ) : (
-                                    orders.map((order) => (
-                                        <tr key={order.id} className="group hover:bg-white/5 transition-colors">
-                                            <td className="px-6 py-4 font-mono text-zinc-300">
-                                                <Link href={`/admin/orders/${order.id}`} className="hover:text-primary hover:underline transition-colors">
-                                                    #{order.id.slice(-6).toUpperCase()}
-                                                </Link>
-                                            </td>
-                                            <td className="px-6 py-4">
-                                                <div className="flex flex-col">
-                                                    <span className="text-white font-medium">{order.user?.name || 'Guest'}</span>
-                                                    <span className="text-zinc-500 text-xs">{order.user?.email}</span>
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-4">
-                                                <OrderStatusSelect orderId={order.id} currentStatus={order.status} />
-                                            </td>
-                                            <td className="px-6 py-4 text-zinc-400">
-                                                {new Date(order.createdAt).toLocaleDateString()}
-                                            </td>
-                                            <td className="px-6 py-4 text-right font-medium text-white">
-                                                {new Intl.NumberFormat('en-MA', { style: 'currency', currency: 'MAD' }).format(
-                                                    typeof order.total === 'object' && 'toNumber' in order.total ? order.total.toNumber() : Number(order.total)
-                                                )}
-                                            </td>
-                                        </tr>
-                                    ))
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
-                </CardContent>
-            </Card>
+                            ))
+                        )}
+                    </tbody>
+                </table>
+            </div>
         </div>
     );
 }

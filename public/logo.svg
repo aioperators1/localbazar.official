@@ -1,0 +1,10 @@
+<svg width="240" height="60" viewBox="0 0 240 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- LOCAL text in high-contrast serif -->
+  <text x="0" y="45" font-family="'Playfair Display', serif" font-size="42" font-weight="700" fill="#111111" style="letter-spacing: 0.1em;">LOC<tspan x="105" y="45" style="letter-spacing: 0;">A</tspan>L</text>
+  <!-- Vertical BAZAR text -->
+  <g transform="translate(220, 10)">
+    <text x="0" y="0" font-family="'Inter', sans-serif" font-size="10" font-weight="400" fill="#111111" transform="rotate(90)" style="letter-spacing: 0.5em;">BAZAR</text>
+  </g>
+  <!-- Stylized flipped 'A' crossbar - approximate visual reconstruction -->
+  <path d="M128 32 L138 42" stroke="#111111" stroke-width="2" />
+</svg>

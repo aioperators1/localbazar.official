@@ -30,17 +30,6 @@ export const authOptions: NextAuthOptions = {
                         return null;
                     }
 
-                    // TEMPORARY BYPASS FOR DEBUGGING
-                    if (credentials.username === "admin" && credentials.password === "electrolwfjwn12381nd") {
-                        console.log("[Auth] Bypassing database check for admin user");
-                        return {
-                            id: "admin-id",
-                            email: "admin@electro-islam.com",
-                            name: "Admin User",
-                            role: "ADMIN",
-                        };
-                    }
-
                     // Attempt to find user by username OR email
                     const user = await prisma.user.findFirst({
                         where: {

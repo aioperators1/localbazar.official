@@ -6,7 +6,7 @@ import { CheckCircle2, Truck, Clock, Copy, PackageCheck, MessageSquare, MapPin, 
 import { Button } from "@/components/ui/button";
 import { OrderChat } from "@/components/order/OrderChat";
 import { motion } from "framer-motion";
-import { cn } from "@/lib/utils";
+import { cn, formatPrice } from "@/lib/utils";
 import { toast } from "sonner";
 
 interface OrderTrackingClientProps {
@@ -138,7 +138,7 @@ export default function OrderTrackingClient({ order }: OrderTrackingClientProps)
                                         <div className="flex-1 min-w-0">
                                             <h4 className="text-white font-bold truncate pr-4 text-sm md:text-base">{item.product.name}</h4>
                                             <p className="text-zinc-500 text-[10px] mt-1 font-mono uppercase">
-                                                Unit: {new Intl.NumberFormat('en-MA', { style: 'currency', currency: 'MAD', maximumFractionDigits: 0 }).format(Number(item.price))}
+                                                Unit: {formatPrice(Number(item.price))}
                                             </p>
                                         </div>
                                         <div className="text-right pl-4 border-l border-white/5">
@@ -185,7 +185,7 @@ export default function OrderTrackingClient({ order }: OrderTrackingClientProps)
                             <div className="space-y-3 pt-4 border-t border-white/5">
                                 <div className="flex justify-between items-center text-zinc-400">
                                     <span>Subtotal</span>
-                                    <span className="text-white font-mono">{new Intl.NumberFormat('en-MA', { style: 'currency', currency: 'MAD', maximumFractionDigits: 0 }).format(Number(order.total))}</span>
+                                    <span className="text-white font-mono">{formatPrice(order.total)}</span>
                                 </div>
                                 <div className="flex justify-between items-center text-zinc-400">
                                     <span>Shipping</span>
@@ -202,7 +202,7 @@ export default function OrderTrackingClient({ order }: OrderTrackingClientProps)
                             <div className="flex flex-col gap-1 items-end">
                                 <span className="text-zinc-500 font-bold uppercase text-[10px] tracking-widest">Total Amount</span>
                                 <span className="text-3xl lg:text-4xl font-black text-white tracking-tighter break-all text-right leading-none">
-                                    {new Intl.NumberFormat('en-MA', { style: 'currency', currency: 'MAD', maximumFractionDigits: 0 }).format(Number(order.total))}
+                                    {formatPrice(order.total)}
                                 </span>
                             </div>
                         </div>

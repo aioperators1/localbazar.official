@@ -9,13 +9,15 @@ export interface CartItem {
     image: string
     quantity: number
     category?: string
+    size?: string | null
+    color?: string | null
 }
 
 interface CartStore {
     items: CartItem[]
     addItem: (item: CartItem) => void
-    removeItem: (id: string) => void
-    decreaseItem: (id: string) => void
+    removeItem: (id: string, size?: string | null, color?: string | null) => void
+    decreaseItem: (id: string, size?: string | null, color?: string | null) => void
     clearCart: () => void
     totalItems: () => number
     totalPrice: () => number
@@ -27,61 +29,60 @@ export const useCart = create<CartStore>()(
             items: [],
             addItem: (item) => {
                 const currentItems = get().items
-                const existingItem = currentItems.find((i) => i.id === item.id)
-
-                // Sanitize name on add
-                const cleanName = item.name.replace(/Setup Game/gi, '').replace(/- Setup Game/gi, '').trim()
-                const cleanItem = { ...item, name: cleanName }
+                const existingItem = currentItems.find((i) => 
+                    i.id === item.id && 
+                    i.size === item.size && 
+                    i.color === item.color
+                )
 
                 if (existingItem) {
                     set({
                         items: currentItems.map((i) =>
-                            i.id === item.id ? { ...i, quantity: i.quantity + 1, name: cleanName } : i
+                            (i.id === item.id && i.size === item.size && i.color === item.color)
+                                ? { ...i, quantity: i.quantity + (item.quantity || 1) } 
+                                : i
                         ),
                     })
                 } else {
-                    set({ items: [...currentItems, { ...cleanItem, quantity: 1 }] })
+                    set({ items: [...currentItems, { ...item, quantity: item.quantity || 1 }] })
                 }
             },
-            decreaseItem: (id) => {
+            decreaseItem: (id, size, color) => {
                 const currentItems = get().items
-                const existingItem = currentItems.find((i) => i.id === id)
+                const existingItem = currentItems.find((i) => 
+                    i.id === id && i.size === size && i.color === color
+                )
 
                 if (existingItem && existingItem.quantity > 1) {
                     set({
                         items: currentItems.map((i) =>
-                            i.id === id ? { ...i, quantity: i.quantity - 1 } : i
+                            (i.id === id && i.size === size && i.color === color)
+                                ? { ...i, quantity: i.quantity - 1 } 
+                                : i
                         ),
                     })
                 } else {
-                    set({ items: currentItems.filter((i) => i.id !== id) })
+                    set({ 
+                        items: currentItems.filter((i) => 
+                            !(i.id === id && i.size === size && i.color === color)
+                        ) 
+                    })
                 }
             },
-            removeItem: (id) => {
-                set({ items: get().items.filter((i) => i.id !== id) })
+            removeItem: (id, size, color) => {
+                set({ 
+                    items: get().items.filter((i) => 
+                        !(i.id === id && i.size === size && i.color === color)
+                    ) 
+                })
             },
             clearCart: () => set({ items: [] }),
             totalItems: () => get().items.reduce((total, item) => total + item.quantity, 0),
             totalPrice: () => get().items.reduce((total, item) => total + (item.price * item.quantity), 0),
         }),
         {
-            name: 'electro-cart-storage',
+            name: 'localbazar-cart-storage',
             storage: createJSONStorage(() => localStorage),
-            onRehydrateStorage: () => (state) => {
-                if (state) {
-                    // Sanitize all items on load
-                    state.items = state.items.map(item => ({
-                        ...item,
-                        name: item.name
-                            .replace(/Setup Game/gi, '')
-                            .replace(/SetupGame/gi, '')
-                            .replace(/Prix Maroc/gi, '')
-                            .replace(/- Setup Game/gi, '')
-                            .replace(/Gaming Maroc/gi, '')
-                            .trim()
-                    }));
-                }
-            }
         }
     )
 )

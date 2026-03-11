@@ -2,9 +2,10 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Facebook, Twitter, Instagram, Youtube, Truck, ShieldCheck, CreditCard, Headphones, MessageCircle, Phone } from "lucide-react";
+import { Facebook, Instagram, Twitter, Truck, ShieldCheck, CreditCard, Headphones, MapPin, Phone, Mail } from "lucide-react";
 import { useLanguage } from "@/components/providers/language-provider";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 
 export function Footer() {
     const pathname = usePathname();
@@ -14,111 +15,93 @@ export function Footer() {
     if (pathname.startsWith("/admin")) return null;
 
     return (
-        <footer className="relative z-10 bg-black text-zinc-500 border-t border-white/5 font-medium" dir={isAr ? "rtl" : "ltr"}>
-
-            {/* Trust Bar (Service Pillars) */}
-            <div className="bg-zinc-950 border-b border-white/5">
-                <div className="container mx-auto px-6 py-12">
-                    <div className="grid grid-cols-2 md:grid-cols-5 gap-12">
-                        {TRUST_ITEMS.map((item, idx) => (
-                            <div key={idx} className="flex flex-col items-center text-center gap-4 group">
-                                <div className="p-4 rounded-xl bg-zinc-900/50 border border-white/5 group-hover:border-blue-500/50 group-hover:text-blue-500 transition-all duration-500">
-                                    <item.icon className="w-6 h-6" strokeWidth={1} />
-                                </div>
-                                <div className="space-y-1">
-                                    <h4 className="text-white font-black text-[10px] uppercase tracking-widest">{t(`footer.trust.${item.key}.title` as any) || item.title}</h4>
-                                    <p className="text-[9px] text-zinc-600 font-bold uppercase tracking-tighter">{t(`footer.trust.${item.key}.desc` as any) || item.desc}</p>
-                                </div>
+        <footer className="bg-[#111111] text-white pt-24 pb-12" dir={isAr ? "rtl" : "ltr"}>
+            <div className="container mx-auto px-4 lg:px-20">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-16 lg:gap-12">
+                    {/* Brand & Concept */}
+                    <div className="space-y-8">
+                        <Link href="/" className="flex flex-col items-start group">
+                            <div className="relative w-[180px] h-[40px]">
+                                <Image 
+                                    src="/logo.svg" 
+                                    alt="Local Bazar Logo" 
+                                    fill 
+                                    className="object-contain brightness-0 invert" 
+                                />
                             </div>
-                        ))}
-                    </div>
-                </div>
-            </div>
-
-            <div className="container mx-auto px-6 py-24">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-16">
-
-                    {/* Brand */}
-                    <div className="space-y-8 text-center md:text-start">
-                        <Link href="/" className="block">
-                            <span className="text-xl font-black tracking-tighter text-white uppercase">ELECTRO<span className="text-blue-600">ISLAM</span></span>
+                            <span className="text-white/40 font-medium text-[9px] tracking-[0.5em] uppercase mt-2">
+                                EST. 2013 — QATAR
+                            </span>
                         </Link>
-                        <p className="text-sm leading-relaxed max-w-xs mx-auto md:mx-0">
-                            {t("footer.about") || "Morocco's premier destination for high-end technology and professional grade hardware."}
+                        <p className="text-[12px] text-white/50 leading-loose font-medium max-w-xs uppercase tracking-widest">
+                            L'excellence de la mode et des senteurs d'Orient. Une signature d'élégance masculine depuis 2013.
                         </p>
-                        <div className="flex justify-center md:justify-start gap-4">
-                            <SocialIcon icon={Facebook} href="https://www.facebook.com/share/176iWLN9yf/?mibextid=wwXIfr" />
-                            <SocialIcon icon={Instagram} href="https://www.instagram.com/soufiane_laptop_store?igsh=eXU1NG9kOTkxc2Mw&utm_source=qr" />
-                            <SocialIcon icon={Phone} href="tel:0669859084" />
+                        <div className="flex gap-6 pt-2">
+                            <SocialIcon icon={Facebook} href="#" />
+                            <SocialIcon icon={Instagram} href="https://instagram.com/localbazar.qtr" />
+                            <SocialIcon icon={Twitter} href="#" />
                         </div>
                     </div>
 
-                    {/* Quick Links */}
-                    <div className="space-y-8">
-                        <h4 className="text-white font-black text-[11px] uppercase tracking-widest">&mdash; {t("footer.catalog") || "Catalog"}</h4>
-                        <div className="flex flex-col gap-3 text-sm">
-                            <FooterLink href="/shop">{t("footer.allProducts") || "All Products"}</FooterLink>
-                            <FooterLink href="/shop?category=laptops">{t("nav.laptops")}</FooterLink>
-                            <FooterLink href="/shop?category=components">{t("nav.components")}</FooterLink>
-                            <FooterLink href="/marketplace">{t("nav.marketplace")}</FooterLink>
-                            <FooterLink href="/deals" className="text-blue-500 font-bold">{t("nav.deals")}</FooterLink>
-                        </div>
+                    {/* Collections */}
+                    <div>
+                        <h4 className="text-white font-bold text-[11px] uppercase mb-8 tracking-[0.2em]">Collections</h4>
+                        <ul className="space-y-4">
+                            <FooterLink href="/shop?category=evening-wear">Couture du Soir</FooterLink>
+                            <FooterLink href="/shop?category=suits">L'Art du Tailleur</FooterLink>
+                            <FooterLink href="/shop?category=traditional">Héritage</FooterLink>
+                            <FooterLink href="/shop?category=accessories">Accessoires</FooterLink>
+                            <FooterLink href="/shop?category=new-arrivals">Nouveautés</FooterLink>
+                        </ul>
                     </div>
 
-                    {/* My Account */}
-                    <div className="space-y-8">
-                        <h4 className="text-white font-black text-[11px] uppercase tracking-widest">&mdash; {t("footer.service") || "Service"}</h4>
-                        <div className="flex flex-col gap-3 text-sm">
-                            <FooterLink href="/account">{t("footer.accountCenter") || "Account Center"}</FooterLink>
-                            <FooterLink href="/orders">{t("footer.trackShipment") || "Track Shipment"}</FooterLink>
-                            <FooterLink href="/support">{t("footer.techSupport") || "Technical Support"}</FooterLink>
-                            <FooterLink href="/contact">{t("footer.location") || "Location"}</FooterLink>
-                        </div>
+                    {/* Boutique */}
+                    <div>
+                        <h4 className="text-white font-bold text-[11px] uppercase mb-8 tracking-[0.2em]">L'Univers</h4>
+                        <ul className="space-y-4">
+                            <FooterLink href="/about">Notre Histoire</FooterLink>
+                            <FooterLink href="/contact">Contact</FooterLink>
+                            <FooterLink href="/shipping">Livraison & Retours</FooterLink>
+                            <FooterLink href="/terms">CGV</FooterLink>
+                            <FooterLink href="/privacy">Confidentialité</FooterLink>
+                        </ul>
                     </div>
 
                     {/* Newsletter */}
                     <div className="space-y-8">
-                        <h4 className="text-white font-black text-[11px] uppercase tracking-widest">&mdash; {t("footer.connection") || "Connection"}</h4>
-                        <p className="text-xs">{t("footer.subscribe") || "Subscribe to our weekly inventory updates."}</p>
-                        <form
-                            className="flex flex-col gap-3"
-                            onSubmit={(e) => {
-                                e.preventDefault();
-                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                const email = (e.currentTarget.elements as any)[0].value;
-                                if (email) {
-                                    import("sonner").then(({ toast }) => toast.success("Connected to newsletter!"));
-                                    (e.target as HTMLFormElement).reset();
-                                }
-                            }}
-                        >
-                            <div className="relative">
-                                <input
-                                    type="email"
-                                    required
-                                    placeholder="operative@domain.com"
-                                    className={cn(
-                                        "bg-zinc-900 border border-white/5 text-white text-xs py-4 rounded-xl outline-none focus:border-blue-500/50 w-full transition-all",
-                                        isAr ? "pr-5 pl-24" : "pl-5 pr-24"
-                                    )}
-                                />
-                                <button type="submit" className={cn(
-                                    "absolute top-2 bottom-2 bg-blue-600 text-white font-black uppercase text-[9px] px-6 rounded-lg hover:bg-blue-500 transition-colors",
-                                    isAr ? "left-2" : "right-2"
-                                )}>
-                                    {t("footer.join") || "Join"}
-                                </button>
-                            </div>
+                        <h4 className="text-white font-bold text-[11px] uppercase tracking-[0.2em]">Newsletter</h4>
+                        <p className="text-[11px] text-white/50 leading-relaxed font-medium uppercase tracking-widest">
+                            Inscrivez-vous pour recevoir nos actualités et invitations exclusives.
+                        </p>
+                        <form className="flex flex-col gap-4" onSubmit={(e) => e.preventDefault()}>
+                            <input
+                                type="email"
+                                placeholder="VOTRE ADRESSE EMAIL"
+                                className="bg-transparent border-b border-white/20 text-[10px] py-3 outline-none focus:border-white transition-colors font-medium tracking-widest text-white placeholder:text-white/30"
+                            />
+                            <button className="text-white text-[10px] font-bold uppercase py-4 border border-white/20 hover:bg-white hover:text-black transition-all tracking-[0.3em]">
+                                S'abonner
+                            </button>
                         </form>
                     </div>
                 </div>
 
-                <div className="mt-24 pt-12 border-t border-white/5 text-[9px] font-bold uppercase tracking-[0.2em] text-zinc-700 flex flex-col md:flex-row justify-between items-center gap-8 text-center md:text-start">
-                    <p>&copy; 2026 ELECTROISLAM PREMIUM. {t("footer.rights") || "ALL RIGHTS RESERVED."}</p>
-                    <div className="flex gap-8 grayscale opacity-20">
-                        <CreditCard className="w-5 h-5" />
-                        <ShieldCheck className="w-5 h-5" />
-                        <Truck className="w-5 h-5" />
+                <div className="mt-24 pt-10 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-8 text-[9px] text-white/30 font-medium uppercase tracking-[0.3em]">
+                    <div className="flex flex-col md:flex-row gap-8 items-center">
+                        <p>&copy; 2026 LOCAL BAZAR. TOUS DROITS RÉSERVÉS.</p>
+                        <div className="flex items-center gap-2">
+                            <Phone className="w-3 h-3" />
+                            <span>+974 5055 8884</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <Mail className="w-3 h-3" />
+                            <span>LOCALBAZAR.QTR@GMAIL.COM</span>
+                        </div>
+                    </div>
+                    <div className="flex gap-8 items-center text-white/20">
+                        <CreditCard className="w-4 h-4" />
+                        <Truck className="w-4 h-4" />
+                        <ShieldCheck className="w-4 h-4" />
                     </div>
                 </div>
             </div>
@@ -127,30 +110,25 @@ export function Footer() {
 }
 
 const TRUST_ITEMS = [
-    { key: "delivery", icon: Truck, title: "EXPRESS DELIVERY", desc: "Regional Distribution" },
-    { key: "warranty", icon: ShieldCheck, title: "OFFICIAL WARRANTY", desc: "Certified Hardware Only" },
-    { key: "commerce", icon: CreditCard, title: "SECURE COMMERCE", desc: "Multiple Payment Options" },
-    { key: "support", icon: Headphones, title: "PREMIUM SUPPORT", desc: "Technical Assistance" },
-    { key: "consultation", icon: MessageCircle, title: "LIVE CONSULTATION", desc: "Direct Inquiries" },
+    { icon: Truck, title: "LIVRAISON RAPIDE", desc: "Partout à Qatar" },
+    { icon: ShieldCheck, title: "GARANTIE OFFICIELLE", desc: "Produits 100% Authentiques" },
+    { icon: CreditCard, title: "PAIEMENT SÉCURISÉ", desc: "CB ou Cash à la livraison" },
+    { icon: Headphones, title: "SERVICE CLIENT 24/7", desc: "Support technique expert" },
 ];
 
-interface FooterLinkProps {
-    href: string;
-    children: React.ReactNode;
-    className?: string;
-}
-
-function FooterLink({ href, children, className }: FooterLinkProps) {
+function FooterLink({ href, children }: { href: string; children: React.ReactNode }) {
     return (
-        <Link href={href} className={cn("hover:text-white transition-all flex items-center gap-3 transition-colors", className)}>
-            <div className="w-1.5 h-1.5 rounded-full bg-zinc-800" /> {children}
-        </Link>
+        <li>
+            <Link href={href} className="text-white/50 hover:text-white text-[11px] font-medium uppercase tracking-widest transition-colors">
+                {children}
+            </Link>
+        </li>
     );
 }
 
-function SocialIcon({ icon: Icon, href }: { icon: React.ElementType, href: string }) {
+function SocialIcon({ icon: Icon, href }: { icon: any; href: string }) {
     return (
-        <a href={href} target="_blank" rel="noopener noreferrer" className="w-12 h-12 bg-zinc-900 border border-white/5 rounded-2xl flex items-center justify-center text-zinc-500 hover:bg-white hover:text-black hover:border-white transition-all duration-500 hover:-translate-y-1">
+        <a href={href} className="text-white/40 hover:text-white transition-colors">
             <Icon className="w-5 h-5" />
         </a>
     );

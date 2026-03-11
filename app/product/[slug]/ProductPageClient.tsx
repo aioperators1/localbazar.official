@@ -1,216 +1,277 @@
 "use client";
 
-import { motion, Variants } from "framer-motion";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useCart } from "@/hooks/use-cart";
+import { motion, AnimatePresence } from "framer-motion";
 import { AddToCart } from "@/components/store/AddToCart";
 import { ProductGallery } from "@/components/store/ProductGallery";
-import { Star, Truck, ShieldCheck, ArrowLeft, Cpu, Zap, Layers, Monitor, ChevronRight, MessageCircle, Database, HardDrive, Box, CircuitBoard, Component } from "lucide-react";
+import { ProductCarousel } from "@/components/store/ProductCarousel";
+import { Star, Truck, ShieldCheck, ArrowLeft, Minus, Plus, Heart, Share2, Ruler, Info, ChevronDown, ChevronRight } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
+import { cn, formatPrice } from "@/lib/utils";
 
 interface ProductPageClientProps {
     product: any;
     images: string[];
+    similarProducts?: any[];
 }
 
-export default function ProductPageClient({ product, images }: ProductPageClientProps) {
-    const containerVariants: Variants = {
-        hidden: { opacity: 0 },
-        visible: {
-            opacity: 1,
-            transition: { staggerChildren: 0.1, delayChildren: 0.2 }
+export default function ProductPageClient({ product, images, similarProducts }: ProductPageClientProps) {
+    const router = useRouter();
+    const addItem = useCart(state => state.addItem);
+    const [quantity, setQuantity] = useState(1);
+    const [selectedSize, setSelectedSize] = useState<string | null>(null);
+    const [selectedColor, setSelectedColor] = useState<any>(null);
+    const [activeSection, setActiveSection] = useState<string>("details");
+
+    const categoryName = typeof product.category === 'object' ? product.category?.name : product.category;
+
+    // Parse sizes and colors
+    const sizes = product.sizes ? JSON.parse(product.sizes) : [];
+    const colors = product.colors ? JSON.parse(product.colors) : [];
+
+    useEffect(() => {
+        if (colors.length > 0 && !selectedColor) {
+            setSelectedColor(colors[0]);
         }
+    }, [colors]);
+
+    const handleBuyNow = () => {
+        if (sizes.length > 0 && !selectedSize) {
+            alert("Veuillez sélectionner une taille");
+            return;
+        }
+        addItem({
+            id: product.id,
+            name: product.name,
+            price: Number(product.price),
+            image: images[0],
+            category: categoryName || "Fashion",
+            quantity: quantity,
+            size: selectedSize,
+            color: selectedColor?.name
+        });
+        router.push("/checkout");
     };
 
-    const itemVariants: Variants = {
-        hidden: { opacity: 0, y: 15 },
-        visible: {
-            opacity: 1,
-            y: 0,
-            transition: {
-                duration: 0.8,
-                ease: [0.22, 1, 0.36, 1]
-            }
-        }
-    };
+    const increaseQty = () => setQuantity(prev => prev + 1);
+    const decreaseQty = () => setQuantity(prev => (prev > 1 ? prev - 1 : 1));
 
     return (
-        <div className="bg-background min-h-screen pb-32 pt-32 relative overflow-hidden text-foreground">
-            <div className="fixed inset-0 pointer-events-none z-0">
-                <div className="absolute top-0 right-0 w-[800px] h-[600px] bg-blue-600/5 blur-[120px] rounded-full" />
-            </div>
+        <div className="bg-white min-h-screen pb-32 pt-6 text-[#111111]">
+            <div className="container mx-auto px-4 lg:px-20 max-w-[1500px]">
+                {/* Breadcrumbs - Minimalist */}
+                <div className="flex items-center gap-2 mb-12 text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400">
+                    <Link href="/" className="hover:text-[#111111] transition-colors">Accueil</Link>
+                    <ChevronRight className="w-3 h-3" />
+                    <Link href="/shop" className="hover:text-[#111111] transition-colors">Collections</Link>
+                    <ChevronRight className="w-3 h-3" />
+                    <span className="text-[#111111]">{categoryName}</span>
+                </div>
 
-            <motion.div
-                variants={containerVariants}
-                initial="hidden"
-                animate="visible"
-                className="container mx-auto px-6 relative z-10"
-            >
-                {/* Navigation Toolbar */}
-                <motion.div variants={itemVariants} className="flex items-center gap-4 mb-20 text-[10px] font-black uppercase tracking-widest text-zinc-500">
-                    <Link href="/shop" className="hover:text-blue-500 transition-colors flex items-center gap-2">
-                        <ArrowLeft className="w-3.5 h-3.5" />
-                        CATALOGUE
-                    </Link>
-                    <span className="text-zinc-300 dark:text-zinc-800">/</span>
-                    <span className="text-zinc-400 dark:text-zinc-400">{product.category.name}</span>
-                </motion.div>
-
-                <div className="grid lg:grid-cols-12 gap-16 lg:gap-24">
-                    {/* Image Gallery */}
-                    <motion.div variants={itemVariants} className="lg:col-span-6 xl:col-span-7">
+                {/* Main Product Layout */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-24 mb-24">
+                    
+                    {/* LEFT COLUMN: Premium Gallery */}
+                    <div className="lg:col-span-7">
                         <ProductGallery images={images} name={product.name} />
-                    </motion.div>
+                    </div>
 
-                    {/* Product Info */}
-                    <div className="lg:col-span-6 xl:col-span-5 space-y-12">
-                        <motion.div variants={itemVariants} className="space-y-8">
-                            <div className="flex items-center gap-4">
-                                <div className="h-[2px] w-8 bg-blue-600" />
-                                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-blue-500">
-                                    {product.category.name}
+                    {/* RIGHT COLUMN: Product Info */}
+                    <div className="lg:col-span-5 flex flex-col">
+                        {/* Brand & Title */}
+                        <div className="mb-10 text-center lg:text-left">
+                            <span className="text-[11px] font-bold uppercase tracking-[0.4em] text-zinc-400 mb-4 block">
+                                {product.brand || "LOCAL BAZAR COUTURE"}
+                            </span>
+                            <h1 className="text-[32px] lg:text-[42px] font-black text-[#111111] leading-[1.1] tracking-tight font-serif mb-6">
+                                {product.name}
+                            </h1>
+                            <div className="flex items-center justify-center lg:justify-start gap-4">
+                                <span className="text-[22px] lg:text-[26px] font-medium text-[#111111]">
+                                    {formatPrice(product.price)}
                                 </span>
                             </div>
+                        </div>
 
-                            <div className="space-y-4">
-                                <h1 className="text-5xl lg:text-7xl font-black text-zinc-900 dark:text-white uppercase tracking-tighter leading-none">
-                                    {product.name}
-                                </h1>
-                                <div className="flex items-center gap-1.5 text-blue-500">
-                                    {[...Array(5)].map((_, i) => <Star key={i} className="w-3 h-3 fill-current" />)}
-                                    <span className="ml-3 text-[10px] font-black text-zinc-500 uppercase tracking-widest">Verified Hardware</span>
+                        {/* Color Selection */}
+                        {colors.length > 0 && (
+                            <div className="mb-10">
+                                <span className="text-[10px] font-bold uppercase tracking-[0.2em] mb-4 block text-zinc-500">
+                                    Couleur: <span className="text-[#111111]">{selectedColor?.name}</span>
+                                </span>
+                                <div className="flex gap-4">
+                                    {colors.map((color: any, idx: number) => (
+                                        <button
+                                            key={idx}
+                                            onClick={() => setSelectedColor(color)}
+                                            className={cn(
+                                                "w-8 h-8 rounded-full border border-zinc-200 p-0.5 transition-all duration-300",
+                                                selectedColor?.name === color.name ? "ring-1 ring-[#111111] scale-110" : "hover:scale-105"
+                                            )}
+                                        >
+                                            <div 
+                                                className="w-full h-full rounded-full" 
+                                                style={{ backgroundColor: color.hex }}
+                                            />
+                                        </button>
+                                    ))}
                                 </div>
                             </div>
-                        </motion.div>
+                        )}
 
-                        {/* Purchase Section */}
-                        <motion.div variants={itemVariants} className="p-10 rounded-xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-white/5 relative group">
-                            <div className="flex flex-col gap-10 relative z-10">
-                                <div className="space-y-2">
-                                    <span className="text-[10px] text-zinc-500 font-black uppercase tracking-[0.3em]">Direct Price</span>
-                                    <div className="text-5xl font-black text-zinc-900 dark:text-white tracking-tighter">
-                                        {new Intl.NumberFormat('en-MA', {
-                                            style: 'currency',
-                                            currency: 'MAD',
-                                            minimumFractionDigits: 0
-                                        }).format(Number(product.price))}
-                                    </div>
+                        {/* Size Selection */}
+                        {sizes.length > 0 && (
+                            <div className="mb-12">
+                                <div className="flex justify-between items-center mb-4">
+                                    <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500">Choisir la taille</span>
+                                    <button className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.1em] text-zinc-400 hover:text-[#111111] transition-colors">
+                                        <Ruler className="w-3.5 h-3.5" />
+                                        Guide des tailles
+                                    </button>
                                 </div>
+                                <div className="flex flex-wrap gap-2">
+                                    {sizes.map((size: string) => (
+                                        <button
+                                            key={size}
+                                            onClick={() => setSelectedSize(size)}
+                                            className={cn(
+                                                "min-w-12 h-12 border text-[11px] font-bold tracking-widest transition-all duration-300 flex items-center justify-center px-4",
+                                                selectedSize === size 
+                                                    ? "bg-[#111111] border-[#111111] text-white" 
+                                                    : "bg-white border-zinc-200 text-[#111111] hover:border-[#111111]"
+                                            )}
+                                        >
+                                            {size}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
 
-                                <div className="space-y-6">
-                                    <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-widest">
-                                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                                        <span className="text-zinc-500 dark:text-zinc-400">Status:</span>
-                                        <span className="text-emerald-600 dark:text-emerald-500">Available in Stock</span>
-                                    </div>
+                        {/* Action Buttons */}
+                        <div className="space-y-4 mb-12">
+                            <AddToCart
+                                product={{
+                                    id: product.id,
+                                    name: product.name,
+                                    price: Number(product.price),
+                                    image: images[0],
+                                    size: selectedSize,
+                                    color: selectedColor?.name
+                                }}
+                                quantity={quantity}
+                                className="h-16 w-full bg-[#111111] text-white font-bold text-[12px] uppercase tracking-[0.3em] hover:bg-zinc-800 transition-all rounded-none"
+                            />
+                            <button
+                                onClick={handleBuyNow}
+                                className="h-16 w-full bg-white border border-[#111111] text-[#111111] font-bold text-[12px] uppercase tracking-[0.3em] hover:bg-[#111111] hover:text-white transition-all rounded-none"
+                            >
+                                Acheter Maintenant
+                            </button>
+                        </div>
 
-                                    <div className="group/btn relative h-16 w-full flex items-center justify-center overflow-hidden rounded-lg bg-blue-600 hover:bg-blue-500 transition-all shadow-pro">
-                                        <AddToCart
-                                            product={{
-                                                id: product.id,
-                                                name: product.name,
-                                                price: Number(product.price),
-                                                image: images[0]
-                                            }}
-                                        />
-                                    </div>
+                        {/* Product Utility Links */}
+                        <div className="flex items-center justify-center lg:justify-start gap-8 border-b border-zinc-100 pb-10 mb-10">
+                            <button className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.15em] text-zinc-400 hover:text-[#111111] transition-colors">
+                                <Heart className="w-4 h-4" />
+                                Wishlist
+                            </button>
+                            <button className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.15em] text-zinc-400 hover:text-[#111111] transition-colors">
+                                <Share2 className="w-4 h-4" />
+                                Partager
+                            </button>
+                        </div>
 
-                                    {/* Marketplace Interaction: Message Seller */}
-                                    {product.sellerId && (
-                                        <form action={async () => {
-                                            const { startConversation } = await import("@/lib/actions/marketplace");
-                                            try {
-                                                await startConversation(product.id);
-                                            } catch (e: any) {
-                                                alert(e.message);
-                                            }
-                                        }}>
-                                            <button
-                                                type="submit"
-                                                className="w-full h-16 rounded-lg border border-zinc-300 dark:border-white/10 text-[10px] font-black uppercase tracking-widest text-zinc-500 dark:text-zinc-400 hover:text-black dark:hover:text-white hover:border-blue-500/30 transition-all flex items-center justify-center gap-3 group/msg"
-                                            >
-                                                <MessageCircle className="w-4 h-4 transition-transform group-hover/msg:scale-110" />
-                                                Inquire Information
-                                            </button>
-                                        </form>
+                        {/* Accordion Details */}
+                        <div className="space-y-6">
+                            <AccordionItem 
+                                title="Description & Détails" 
+                                isOpen={activeSection === "details"}
+                                onClick={() => setActiveSection(activeSection === "details" ? "" : "details")}
+                            >
+                                <div className="space-y-4 text-[13px] text-zinc-600 leading-relaxed font-medium">
+                                    <p>{product.description}</p>
+                                    {product.materials && (
+                                        <p><strong className="text-[#111111] lowercase first-letter:uppercase font-bold">Matière:</strong> {product.materials}</p>
                                     )}
+                                    <p><strong className="text-[#111111] lowercase first-letter:uppercase font-bold">Saison:</strong> Nouvelle Collection {new Date().getFullYear()}</p>
+                                    <p><strong className="text-[#111111] lowercase first-letter:uppercase font-bold">Référence:</strong> {product.id?.slice(0, 8).toUpperCase()}</p>
                                 </div>
-                            </div>
-                        </motion.div>
+                            </AccordionItem>
 
-                        <motion.div variants={itemVariants} className="space-y-12">
-                            <p className="text-zinc-600 dark:text-zinc-400 text-sm font-medium leading-relaxed tracking-wide">
-                                {product.description}
-                            </p>
+                            <AccordionItem 
+                                title="Conseils d'Entretien" 
+                                isOpen={activeSection === "care"}
+                                onClick={() => setActiveSection(activeSection === "care" ? "" : "care")}
+                            >
+                                <p className="text-[13px] text-zinc-600 leading-relaxed font-medium capitalize first-letter:uppercase">
+                                    {product.careInstructions || "Nettoyage professionnel recommandé pour préserver la qualité des fibres."}
+                                </p>
+                            </AccordionItem>
 
-                            <div className="grid grid-cols-2 gap-4">
-                                {(() => {
-                                    let specs = null;
-                                    try {
-                                        if (product.specs) {
-                                            specs = JSON.parse(product.specs);
-                                        }
-                                    } catch { }
-
-                                    const iconMap: Record<string, any> = {
-                                        "CPU": Cpu,
-                                        "GPU": Zap,
-                                        "RAM": Layers,
-                                        "SSD": HardDrive,
-                                        "Motherboard": CircuitBoard,
-                                        "Case": Box,
-                                        "PSU": Zap,
-                                    };
-
-                                    if (specs && Object.keys(specs).length > 0) {
-                                        return Object.entries(specs).map(([key, value]) => {
-                                            const Icon = iconMap[key] || Component;
-                                            return (
-                                                <div key={key} className="p-4 bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-white/5 rounded-xl flex items-start gap-4 hover:border-blue-500/30 transition-colors group/spec">
-                                                    <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-600 dark:text-blue-400 group-hover/spec:scale-110 transition-transform">
-                                                        <Icon className="w-5 h-5" strokeWidth={1.5} />
-                                                    </div>
-                                                    <div>
-                                                        <span className="text-[10px] text-zinc-500 font-black uppercase tracking-widest block mb-1">{key}</span>
-                                                        <span className="text-sm font-bold text-zinc-900 dark:text-white leading-tight block">{String(value)}</span>
-                                                    </div>
-                                                </div>
-                                            );
-                                        });
-                                    }
-
-                                    return (
-                                        <>
-                                            <SpecItem label="Performance" value="High-Grade" />
-                                            <SpecItem label="Certification" value="Verified" />
-                                            <SpecItem label="Warranty" value="Elite Cover" />
-                                            <SpecItem label="Shipping" value="Priority" />
-                                        </>
-                                    );
-                                })()}
-                            </div>
-
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 pt-8 border-t border-zinc-200 dark:border-white/5">
-                                <div className="flex items-center gap-4">
-                                    <Truck className="w-5 h-5 text-blue-500" strokeWidth={1.5} />
-                                    <span className="text-[10px] text-zinc-500 font-black uppercase tracking-widest">Global Logistics Available</span>
-                                </div>
-                                <div className="flex items-center gap-4">
-                                    <ShieldCheck className="w-5 h-5 text-blue-500" strokeWidth={1.5} />
-                                    <span className="text-[10px] text-zinc-500 font-black uppercase tracking-widest">Secure Payment Gateway</span>
-                                </div>
-                            </div>
-                        </motion.div>
+                            <AccordionItem 
+                                title="Livraison & Retours" 
+                                isOpen={activeSection === "shipping"}
+                                onClick={() => setActiveSection(activeSection === "shipping" ? "" : "shipping")}
+                            >
+                                <ul className="text-[13px] text-zinc-600 leading-relaxed font-medium space-y-2">
+                                    <li className="flex items-center gap-3">
+                                        <Truck className="w-4 h-4 text-[#111111]" />
+                                        <span>Livraison express offerte à Qatar</span>
+                                    </li>
+                                    <li className="flex items-center gap-3">
+                                        <ShieldCheck className="w-4 h-4 text-[#111111]" />
+                                        <span>Retours gratuits sous 7 jours</span>
+                                    </li>
+                                </ul>
+                            </AccordionItem>
+                        </div>
                     </div>
                 </div>
-            </motion.div>
+
+                {/* Suggestions Section */}
+                {similarProducts && similarProducts.length > 0 && (
+                    <div className="mt-32 pt-24 border-t border-zinc-100">
+                        <div className="text-center mb-16">
+                            <span className="text-[11px] font-bold uppercase tracking-[0.4em] text-zinc-400 mb-4 block">Suggestions</span>
+                            <h2 className="text-[28px] lg:text-[36px] font-black text-[#111111] font-serif uppercase tracking-tight">Vous Aimerez Aussi</h2>
+                        </div>
+                        <ProductCarousel products={similarProducts} title="" />
+                    </div>
+                )}
+            </div>
         </div>
     );
 }
 
-function SpecItem({ label, value }: { label: string, value: string }) {
+function AccordionItem({ title, children, isOpen, onClick }: { title: string, children: React.ReactNode, isOpen: boolean, onClick: () => void }) {
     return (
-        <div className="p-5 bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-white/5 rounded-lg space-y-2">
-            <span className="text-[8px] text-zinc-500 font-black uppercase tracking-[0.3em] block">{label}</span>
-            <span className="text-sm font-black text-zinc-900 dark:text-white uppercase tracking-widest block">{value}</span>
+        <div className="border-b border-zinc-100 last:border-0 pb-6">
+            <button 
+                onClick={onClick}
+                className="w-full flex justify-between items-center text-[11px] font-bold uppercase tracking-[0.2em] text-[#111111] py-2 hover:opacity-70 transition-opacity"
+            >
+                {title}
+                {isOpen ? <Minus className="w-3.5 h-3.5" /> : <Plus className="w-3.5 h-3.5" />}
+            </button>
+            <AnimatePresence>
+                {isOpen && (
+                    <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.3, ease: "easeInOut" }}
+                        className="overflow-hidden"
+                    >
+                        <div className="pt-6">
+                            {children}
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 }

@@ -15,9 +15,9 @@ export function ListingReviewCard({ product }: { product: any }) {
         setLoading('approve');
         try {
             const res = await approveListing(product.id);
-            if (res?.success) toast.success("Product approved and listed");
-            else toast.error("Failed to approve product");
-        } catch (error) { toast.error("An error occurred"); }
+            if (res?.success) toast.success("Pièce certifiée et mise en ligne");
+            else toast.error("Échec de la certification");
+        } catch (error) { toast.error("Une erreur est survenue"); }
         finally { setLoading(null); }
     };
 
@@ -25,9 +25,9 @@ export function ListingReviewCard({ product }: { product: any }) {
         setLoading('reject');
         try {
             const res = await rejectListing(product.id);
-            if (res?.success) toast.success("Product rejected and removed");
-            else toast.error("Failed to reject product");
-        } catch (error) { toast.error("An error occurred"); }
+            if (res?.success) toast.success("Pièce révoquée du catalogue");
+            else toast.error("Échec de la révocation");
+        } catch (error) { toast.error("Une erreur est survenue"); }
         finally { setLoading(null); }
     };
 
@@ -45,7 +45,7 @@ export function ListingReviewCard({ product }: { product: any }) {
         <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="group bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/5 rounded-xl overflow-hidden shadow-pro hover:border-blue-500/30 transition-all flex flex-col h-full"
+            className="group bg-[#111111] border border-white/5 rounded-xl overflow-hidden shadow-2xl hover:border-[#592C2F]/50 transition-all flex flex-col h-full"
         >
             {/* Image Section */}
             <div className="relative h-48 w-full overflow-hidden bg-zinc-100 dark:bg-zinc-950">
@@ -72,9 +72,9 @@ export function ListingReviewCard({ product }: { product: any }) {
                         <h3 className="text-lg font-black text-zinc-900 dark:text-white truncate tracking-tight uppercase">
                             {product.name}
                         </h3>
-                        <div className="flex items-center gap-2 text-zinc-400">
+                        <div className="flex items-center gap-2 text-zinc-500">
                             <MapPin className="w-3 h-3" />
-                            <span className="text-[9px] uppercase font-bold tracking-widest">{specs.location || "CASABLANCA, MA"}</span>
+                            <span className="text-[9px] uppercase font-bold tracking-[0.3em]">DOHA, QATAR</span>
                         </div>
                     </div>
                 </div>
@@ -89,9 +89,9 @@ export function ListingReviewCard({ product }: { product: any }) {
                         <Calendar className="w-3 h-3 text-zinc-400" />
                         <span className="text-[9px] font-black text-zinc-500 uppercase tracking-wider">{new Date(product.createdAt).toLocaleDateString()}</span>
                     </div>
-                    <div className="px-3 py-2 bg-zinc-50 dark:bg-white/5 rounded-lg border border-zinc-100 dark:border-white/5 flex items-center gap-2">
-                        <div className="w-1 h-1 rounded-full bg-blue-500" />
-                        <span className="text-[9px] font-black text-zinc-500 uppercase tracking-wider">{specs.condition || "Grade A"}</span>
+                    <div className="px-3 py-2 bg-white/5 rounded-lg border border-white/5 flex items-center gap-2">
+                        <div className="w-1 h-1 rounded-full bg-[#592C2F]" />
+                        <span className="text-[9px] font-black text-zinc-500 uppercase tracking-wider">{specs.condition || "Pièce Neuve"}</span>
                     </div>
                 </div>
 
@@ -102,9 +102,9 @@ export function ListingReviewCard({ product }: { product: any }) {
                             <User className="w-4 h-4 text-zinc-500" />
                         </div>
                         <div className="min-w-0">
-                            <p className="text-[10px] font-black text-zinc-900 dark:text-zinc-100 truncate uppercase leading-none mb-1">{product.seller?.name || "Verified Member"}</p>
-                            <p className="text-[10px] font-bold text-zinc-500 truncate tracking-tight">
-                                {product.price.toLocaleString()} MAD
+                            <p className="text-[10px] font-black text-zinc-200 truncate uppercase leading-none mb-1">{product.seller?.name || "Membre Certifié"}</p>
+                            <p className="text-[10px] font-bold text-[#592C2F] truncate tracking-tight">
+                                {Number(product.price).toLocaleString()} QAR
                             </p>
                         </div>
                     </div>
@@ -120,10 +120,10 @@ export function ListingReviewCard({ product }: { product: any }) {
                         <button
                             onClick={handleApprove}
                             disabled={loading !== null}
-                            className="h-9 px-4 rounded-lg bg-blue-600 text-[10px] font-black uppercase tracking-widest text-white hover:bg-blue-500 transition-all disabled:opacity-50 flex items-center gap-2"
+                            className="h-9 px-4 rounded-lg bg-[#592C2F] text-[10px] font-black uppercase tracking-widest text-white hover:bg-white hover:text-[#592C2F] transition-all disabled:opacity-50 flex items-center gap-2"
                         >
                             {loading === 'approve' ? <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <Check className="w-3.5 h-3.5" />}
-                            Verify
+                            Certifier
                         </button>
                     </div>
                 </div>

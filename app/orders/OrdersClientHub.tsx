@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { cn } from "@/lib/utils";
+import { cn, formatPrice } from "@/lib/utils";
 
 interface OrdersClientHubProps {
     initialOrders: any[];
@@ -37,8 +37,8 @@ export default function OrdersClientHub({ initialOrders, isGuest }: OrdersClient
                 </h1>
                 <p className="text-zinc-500 max-w-lg">
                     {isGuest
-                        ? "Enter your tracking ID below to monitor your hardware shipment in real-time."
-                        : "Manage your acquisition history and track active hardware transmissions."}
+                        ? "Enter your tracking ID below to monitor your order shipment in real-time."
+                        : "Manage your acquisition history and track active order transmissions."}
                 </p>
             </div>
 
@@ -153,7 +153,7 @@ export default function OrdersClientHub({ initialOrders, isGuest }: OrdersClient
                                             <div className="text-right">
                                                 <p className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest mb-0.5">Total Value</p>
                                                 <p className="text-xl font-black text-white italic tracking-tighter">
-                                                    {new Intl.NumberFormat('en-MA', { style: 'currency', currency: 'MAD', maximumFractionDigits: 0 }).format(order.total)}
+                                                    {formatPrice(order.total)}
                                                 </p>
                                             </div>
                                             <div className="w-10 h-10 rounded-full border border-white/5 flex items-center justify-center group-hover:bg-white group-hover:border-white transition-all">

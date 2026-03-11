@@ -78,149 +78,115 @@ export function ShopSidebar({ categories }: ShopSidebarProps) {
     };
 
     return (
-        <aside className="w-full lg:w-80 flex-shrink-0 hidden lg:block">
-            <div className="sticky top-32 space-y-6">
-                {/* 🏳️‍🌈 PRO SIDEBAR CONTAINER (Solid High Contrast) */}
-                <div className="bg-zinc-950/50 backdrop-blur-xl border border-white/10 rounded-[24px] overflow-hidden shadow-pro transition-all duration-300">
-                    <Accordion type="multiple" defaultValue={["categories", "stock", "price"]} className="w-full">
+        <aside className="w-full hidden lg:block">
+            <div className="bg-white p-6 shadow-sm border border-zinc-100 rounded-[4px]">
+                <h3 className="text-[#592C2F] text-[17px] font-bold mb-6">Filtres</h3>
 
-                        {/* Categories Section */}
-                        <AccordionItem value="categories" className="border-b border-white/5 px-6">
-                            <AccordionTrigger className="hover:no-underline py-6 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-100 hover:text-blue-500 hover:text-glow transition-colors group">
-                                <span className={`flex-1 ${isAr ? "text-right" : "text-left"}`}>{t("shop.sidebar.classification")}</span>
-                            </AccordionTrigger>
-                            <AccordionContent className="pb-6">
-                                <div className="space-y-1">
-                                    {/* All Products Option */}
-                                    <div
-                                        className="flex items-center gap-4 group/item cursor-pointer py-2"
+                <Accordion type="multiple" defaultValue={["categories", "price"]} className="w-full space-y-4">
+                    {/* Categories Section */}
+                    <AccordionItem value="categories" className="border-b-0">
+                        <AccordionTrigger className="hover:no-underline py-2 text-[12px] font-bold text-[#592C2F] uppercase tracking-wide group flex justify-between">
+                            <span className={`text-left`}>Catégories</span>
+                        </AccordionTrigger>
+                        <AccordionContent className="pb-4 pt-2">
+                            <ul className="space-y-3 pl-1">
+                                <li className="text-[13px]">
+                                    <button
                                         onClick={() => updateCategory(null)}
+                                        className={cn("flex items-center gap-2 hover:text-[#592C2F] transition-colors w-full text-left font-medium", !currentCategory ? "text-[#592C2F] font-bold" : "text-zinc-600")}
                                     >
-                                        <div className="relative flex items-center justify-center w-5 h-5">
-                                            <div
-                                                className={cn(
-                                                    "w-1.5 h-1.5 rounded-full transition-all duration-300",
-                                                    !currentCategory
-                                                        ? "bg-blue-500 scale-150 shadow-[0_0_10px_#3b82f6]"
-                                                        : "bg-zinc-700 group-hover/item:bg-zinc-500"
-                                                )}
-                                            />
+                                        <div className={cn("w-3 h-3 border rounded-sm flex-shrink-0 flex items-center justify-center transition-colors", !currentCategory ? "border-[#592C2F] bg-[#592C2F]" : "border-zinc-300")}>
+                                            {!currentCategory && <Check className="w-2.5 h-2.5 text-white" />}
                                         </div>
-                                        <span className={cn("text-[10px] font-black uppercase tracking-widest transition-all duration-300", !currentCategory ? "text-blue-500 text-glow" : "text-zinc-500 group-hover/item:text-white")}>
-                                            {t("shop.title.fullCatalogue")}
-                                        </span>
-                                    </div>
-
-                                    {/* Mapped Categories */}
-                                    {categories.map((cat) => {
-                                        const isActive = currentCategory === cat.slug;
-                                        return (
-                                            <div key={cat.id} className="space-y-1">
-                                                <div
-                                                    className="flex items-center gap-4 group/item cursor-pointer py-2"
-                                                    onClick={() => updateCategory(cat.slug)}
-                                                >
-                                                    <div className="relative flex items-center justify-center w-5 h-5">
-                                                        <div
-                                                            className={cn(
-                                                                "w-1.5 h-1.5 rounded-full transition-all duration-300",
-                                                                isActive
-                                                                    ? "bg-blue-500 scale-150 shadow-[0_0_10px_#3b82f6]"
-                                                                    : "bg-zinc-700 group-hover/item:bg-zinc-500"
-                                                            )}
-                                                        />
-                                                    </div>
-                                                    <span
-                                                        className={cn("text-[10px] font-black uppercase tracking-widest transition-all duration-300", isActive ? "text-blue-500 text-glow" : "text-zinc-500 group-hover/item:text-white")}
-                                                    >
-                                                        {cat.name}
-                                                    </span>
+                                        {t("shop.title.fullCatalogue")}
+                                    </button>
+                                </li>
+                                {categories.map((cat) => {
+                                    const isActive = currentCategory === cat.slug;
+                                    return (
+                                        <li key={cat.id} className="text-[13px]">
+                                            <button
+                                                onClick={() => updateCategory(cat.slug)}
+                                                className={cn("flex items-center gap-2 hover:text-[#592C2F] transition-colors w-full text-left font-medium", isActive ? "text-[#592C2F] font-bold" : "text-zinc-600")}
+                                            >
+                                                <div className={cn("w-3 h-3 border rounded-sm flex-shrink-0 flex items-center justify-center transition-colors", isActive ? "border-[#592C2F] bg-[#592C2F]" : "border-zinc-300")}>
+                                                    {isActive && <Check className="w-2.5 h-2.5 text-white" />}
                                                 </div>
-                                            </div>
-                                        );
-                                    })}
-                                </div>
-                            </AccordionContent>
-                        </AccordionItem>
+                                                {cat.name}
+                                            </button>
+                                        </li>
+                                    );
+                                })}
+                            </ul>
+                        </AccordionContent>
+                    </AccordionItem>
 
-                        {/* Stock Status */}
-                        <AccordionItem value="stock" className="border-b border-border/50 px-6">
-                            <AccordionTrigger className="hover:no-underline py-6 text-[10px] font-black uppercase tracking-[0.2em] text-foreground hover:text-primary transition-colors">
-                                <span className={`flex-1 ${isAr ? "text-right" : "text-left"}`}>{t("shop.sidebar.allocationStatus")}</span>
-                            </AccordionTrigger>
-                            <AccordionContent className="pb-6">
-                                <div className="space-y-1">
-                                    <div
-                                        onClick={() => updateFilter("instock")}
-                                        className="flex items-center gap-4 group/item cursor-pointer py-2"
-                                    >
-                                        <div className="relative flex items-center justify-center w-5 h-5">
-                                            <div className={cn(
-                                                "w-1.5 h-1.5 rounded-full transition-all duration-300",
-                                                currentFilter === "instock"
-                                                    ? "bg-emerald-500"
-                                                    : "bg-zinc-300 dark:bg-zinc-700 group-hover/item:bg-zinc-400"
-                                            )} />
-                                        </div>
-                                        <span className={cn("text-[10px] font-black uppercase tracking-widest transition-all duration-300", currentFilter === "instock" ? "text-emerald-500" : "text-zinc-500 group-hover/item:text-foreground")}>
-                                            {t("shop.sidebar.readyForDispatch")}
-                                        </span>
+                    <div className="w-full h-px bg-zinc-100 my-2" />
+
+                    {/* Stock Status */}
+                    <AccordionItem value="stock" className="border-b-0">
+                        <AccordionTrigger className="hover:no-underline py-2 text-[12px] font-bold text-[#592C2F] uppercase tracking-wide">
+                            <span className="text-left">Disponibilité</span>
+                        </AccordionTrigger>
+                        <AccordionContent className="pb-4 pt-2">
+                            <div className="space-y-3 pl-1">
+                                <button
+                                    onClick={() => updateFilter("instock")}
+                                    className="flex items-center gap-2 hover:text-[#592C2F] transition-colors w-full text-left font-medium text-[13px] text-zinc-600"
+                                >
+                                    <div className={cn("w-3 h-3 border rounded-sm flex-shrink-0 flex items-center justify-center transition-colors", currentFilter === "instock" ? "border-[#592C2F] bg-[#592C2F]" : "border-zinc-300")}>
+                                        {currentFilter === "instock" && <Check className="w-2.5 h-2.5 text-white" />}
+                                    </div>
+                                    <span className={cn(currentFilter === "instock" && "text-[#592C2F] font-bold")}>En stock</span>
+                                </button>
+                            </div>
+                        </AccordionContent>
+                    </AccordionItem>
+
+                    <div className="w-full h-px bg-zinc-100 my-2" />
+
+                    {/* Price Range */}
+                    <AccordionItem value="price" className="border-b-0">
+                        <AccordionTrigger className="hover:no-underline py-2 text-[12px] font-bold text-[#592C2F] uppercase tracking-wide flex justify-between">
+                            <span className="text-left">Prix</span>
+                        </AccordionTrigger>
+                        <AccordionContent className="pb-4 pt-4 px-1">
+                            <div className="space-y-6">
+                                <Slider
+                                    defaultValue={[0, 75000]}
+                                    value={priceRange}
+                                    max={75000}
+                                    step={50}
+                                    minStepsBetweenThumbs={1}
+                                    onValueChange={handlePriceChange}
+                                    onValueCommit={commitPriceChange}
+                                    className="py-1"
+                                />
+                                <div className="flex items-center gap-2">
+                                    <div className="flex-1 bg-white border border-zinc-200 rounded-[3px] flex items-center px-3 py-2">
+                                        <input
+                                            type="text"
+                                            value={priceRange[0]}
+                                            className="w-full bg-transparent text-[13px] font-medium focus:outline-none text-zinc-900"
+                                            readOnly
+                                        />
+                                        <span className="text-[11px] text-zinc-500 font-bold ml-1">QAR</span>
+                                    </div>
+                                    <span className="text-zinc-400">-</span>
+                                    <div className="flex-1 bg-white border border-zinc-200 rounded-[3px] flex items-center px-3 py-2">
+                                        <input
+                                            type="text"
+                                            value={priceRange[1]}
+                                            className="w-full bg-transparent text-[13px] font-medium focus:outline-none text-zinc-900"
+                                            readOnly
+                                        />
+                                        <span className="text-[11px] text-zinc-500 font-bold ml-1">QAR</span>
                                     </div>
                                 </div>
-                            </AccordionContent>
-                        </AccordionItem>
-
-                        {/* Price Range */}
-                        <AccordionItem value="price" className="px-6 border-none">
-                            <AccordionTrigger className="hover:no-underline py-6 text-[10px] font-black uppercase tracking-[0.2em] text-foreground hover:text-primary transition-colors">
-                                <span className={`flex-1 ${isAr ? "text-right" : "text-left"}`}>{t("shop.sidebar.valueRange")}</span>
-                            </AccordionTrigger>
-                            <AccordionContent className="pb-8">
-                                <div className="space-y-8">
-                                    <Slider
-                                        defaultValue={[0, 75000]}
-                                        value={priceRange}
-                                        max={75000}
-                                        step={500}
-                                        minStepsBetweenThumbs={1}
-                                        onValueChange={handlePriceChange}
-                                        onValueCommit={commitPriceChange}
-                                        className="py-4"
-                                    />
-                                    <div className="flex items-center gap-3">
-                                        <div className="flex-1 bg-muted/40 border border-border rounded-lg flex items-center px-4 py-3">
-                                            <span className="text-[8px] text-muted-foreground font-black mr-2">MAD</span>
-                                            <input
-                                                type="text"
-                                                value={priceRange[0].toLocaleString()}
-                                                className="w-full bg-transparent text-xs font-mono focus:outline-none text-right text-foreground font-bold"
-                                                readOnly
-                                            />
-                                        </div>
-                                        <div className="w-4 h-[1px] bg-border" />
-                                        <div className="flex-1 bg-muted/40 border border-border rounded-lg flex items-center px-4 py-3">
-                                            <span className="text-[8px] text-muted-foreground font-black mr-2">MAD</span>
-                                            <input
-                                                type="text"
-                                                value={priceRange[1].toLocaleString()}
-                                                className="w-full bg-transparent text-xs font-mono focus:outline-none text-right text-foreground font-bold"
-                                                readOnly
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
-                            </AccordionContent>
-                        </AccordionItem>
-                    </Accordion>
-                </div>
-
-                <div className="p-8 rounded-[24px] bg-muted/30 border border-border text-center relative overflow-hidden">
-                    <p className="text-[8px] font-black text-primary mb-3 uppercase tracking-[0.4em]">{t("shop.sidebar.protocolSupport")}</p>
-                    <p className="text-sm font-bold text-foreground mb-6 uppercase tracking-widest leading-relaxed">{t("shop.sidebar.speakArchitect")}</p>
-                    <Button variant="outline" size="sm" className="w-full rounded-full border-border bg-card hover:bg-foreground hover:text-background transition-all duration-300 uppercase text-[9px] font-black tracking-widest py-6 shadow-sm">
-                        {t("shop.sidebar.initiateContact")}
-                    </Button>
-                </div>
+                            </div>
+                        </AccordionContent>
+                    </AccordionItem>
+                </Accordion>
             </div>
         </aside>
     );

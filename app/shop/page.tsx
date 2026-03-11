@@ -7,68 +7,85 @@ import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 
 export const metadata = {
-    title: "Shop | Premium Inventory",
-    description: "Explore our collection of high-performance gear.",
+    title: "Collections | Local Bazar",
+    description: "Découvrez nos collections exclusives de haute couture et prêt-à-porter de luxe.",
 };
 
 export default async function ShopPage({
     searchParams,
 }: {
-    searchParams: Promise<{ category?: string; sort?: string; filter?: string; minPrice?: string; maxPrice?: string }>;
+    searchParams: Promise<{ category?: string; sort?: string; filter?: string; minPrice?: string; maxPrice?: string; search?: string; }>;
 }) {
     const params = await searchParams;
 
     const minPrice = params.minPrice ? parseInt(params.minPrice) : undefined;
     const maxPrice = params.maxPrice ? parseInt(params.maxPrice) : undefined;
 
-    const products = await getAllProducts(params.category, params.sort, params.filter, minPrice, maxPrice);
+    // Parallelize fetches for better performance
+    const [products, initialCategories] = await Promise.all([
+        getAllProducts(params.category, params.search, params.filter, minPrice, maxPrice, params.sort),
+        getCategories()
+    ]);
 
-    // Fallback categories if database is empty
-    let categories = await getCategories();
-    if (categories.length === 0) {
-        categories = [
-            { id: '1', name: 'Laptops', slug: 'laptops', image: null, createdAt: new Date().toISOString(), parentId: null },
-            { id: '2', name: 'Audio', slug: 'audio', image: null, createdAt: new Date().toISOString(), parentId: null },
-            { id: '3', name: 'Accessories', slug: 'accessories', image: null, createdAt: new Date().toISOString(), parentId: null },
-            { id: '4', name: 'Gaming', slug: 'gaming', image: null, createdAt: new Date().toISOString(), parentId: null },
-            { id: '5', name: 'Components', slug: 'components', image: null, createdAt: new Date().toISOString(), parentId: null },
-        ];
-    }
+    let categories = initialCategories;
 
+    const catDescriptions: Record<string, string> = {
+        'evening-wear': "Notre collection Couture incarne l'élégance absolue. Des robes de soirée aux silhouettes sophistiquées, confectionnées dans les soies les plus fines pour vos moments d'exception.",
+        'suits': "L'art du Tailleur Local Bazar. Des coupes impeccables et des matières nobles pour une allure structurée et moderne, que ce soit pour le business ou les grandes occasions.",
+        'traditional': "Héritage célèbre le savoir-faire ancestral revisité. Des pièces uniques mêlant broderies artisanales et designs contemporains pour un style intemporel.",
+        'accessories': "Les essentiels du luxe. Découvrez notre sélection de maroquinerie, étoles en cachemire et accessoires raffinés pour parfaire votre silhouette.",
+        'new-arrivals': "Les dernières tendances de la saison. Explorez nos nouveautés et soyez les premiers à adopter les pièces maîtresses de nos nouvelles collections."
+    };
+
+    const categorySl = params.category?.toLowerCase() || '';
     const currentCategoryName = params.category
-        ? categories.find(c => c.slug === params.category)?.name || "Category"
-        : "Full Catalogue";
+        ? categories.find(c => c.slug === params.category)?.name || "Toutes les Collections"
+        : "Toutes les Collections";
+
+    const descText = catDescriptions[categorySl] || "Découvrez l'univers Local Bazar : une sélection rigoureuse de pièces de luxe alliant tradition et modernité.";
 
     return (
-        <div className="bg-background min-h-screen pb-32 pt-24 relative overflow-hidden selection:bg-indigo-500/30">
-            {/* Clean Background Architecture */}
-            <div className="fixed inset-0 pointer-events-none z-0">
-                <div className="absolute inset-0 bg-background" />
-            </div>
+        <div className="bg-white min-h-screen pb-32 pt-10">
+            <main className="container mx-auto px-4 lg:px-20">
+                {/* Breadcrumbs */}
+                <div className="text-[12px] text-zinc-500 font-medium mb-6 flex items-center gap-2">
+                    <Link href="/" className="hover:text-[#592C2F] transition-colors">Accueil</Link>
+                    <span>/</span>
+                    <span className="text-zinc-900 capitalize">{currentCategoryName === "Full Catalogue" ? "Boutique" : currentCategoryName}</span>
+                </div>
 
-            <main className="relative z-10 container mx-auto px-6 lg:px-12">
-                {/* Discovery Header */}
-                <ShopHeader
-                    categoryName={currentCategoryName}
-                    productCount={products.length}
-                />
+                <div className="flex flex-col lg:flex-row gap-8 items-start">
+                    {/* Sidebar */}
+                    <div className="w-full lg:w-64 flex-shrink-0">
+                        <ShopSidebar categories={categories} />
+                    </div>
 
-                <div className="flex flex-col lg:flex-row gap-16 mt-16">
-                    {/* Tactical Sidebar */}
-                    <ShopSidebar categories={categories} />
+                    {/* Catalog Content Area */}
+                    <div className="flex-1 min-w-0">
+                        {/* Header Box */}
+                        <div className="bg-white p-6 md:p-8 rounded-[4px] shadow-sm mb-6 border border-zinc-100">
+                            <ShopHeader
+                                categoryName={currentCategoryName}
+                                productCount={products.length}
+                            />
+                            <p className="text-[#677279] text-[13px] leading-relaxed max-w-4xl mt-4">
+                                {descText}
+                            </p>
+                        </div>
 
-                    {/* Catalog Feed */}
-                    <div className="flex-1">
                         <ShopToolbar totalProducts={products.length} />
 
-                        <ProductsGrid products={products} />
-
-                        {/* Pagination Unit */}
-                        <div className="mt-24 flex justify-center">
-                            <button className="px-12 py-5 text-[9px] font-black text-foreground border border-border/40 hover:border-indigo-500/50 hover:bg-indigo-500/5 transition-all rounded-full uppercase tracking-[0.4em] bg-card/40 backdrop-blur-xl">
-                                Request Further Data
-                            </button>
-                        </div>
+                        {products.length === 0 ? (
+                            <div className="bg-white p-12 text-center rounded-[4px] shadow-sm border border-zinc-100 mt-6 flex flex-col items-center">
+                                <span className="text-2xl font-bold text-zinc-900 mb-2">Aucun produit trouvé</span>
+                                <p className="text-zinc-500 text-sm mb-6">Essayez de modifier vos filtres ou de chercher autre chose.</p>
+                                <Link href="/shop" className="bg-[#592C2F] text-white px-6 py-2.5 rounded-[4px] text-xs font-bold uppercase hover:bg-black transition-colors">
+                                    Réinitialiser les filtres
+                                </Link>
+                            </div>
+                        ) : (
+                            <ProductsGrid products={products} />
+                        )}
                     </div>
                 </div>
             </main>

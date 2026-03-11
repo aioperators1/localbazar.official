@@ -1,89 +1,57 @@
 "use client";
 
-import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis, CartesianGrid } from "recharts";
+import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis, CartesianGrid } from "recharts";
 
-interface OverviewProps {
-    data: {
-        name: string;
-        total: number;
-    }[];
-}
+const data = [
+    { name: "Lun", sales: 12400 },
+    { name: "Mar", sales: 15600 },
+    { name: "Mer", sales: 13800 },
+    { name: "Jeu", sales: 18200 },
+    { name: "Ven", sales: 21000 },
+    { name: "Sam", sales: 19500 },
+    { name: "Dim", sales: 23400 },
+];
 
-export function Overview({ data }: OverviewProps) {
+export function Overview() {
     return (
-        <div className="h-[400px] w-full mt-6">
+        <div className="h-[300px] w-full mt-4">
             <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={data} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                    <defs>
-                        <linearGradient id="colorTotal" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor="#6366f1" stopOpacity={0.25} />
-                            <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
-                        </linearGradient>
-                    </defs>
-                    <CartesianGrid
-                        vertical={false}
-                        strokeDasharray="4 4"
-                        stroke="#27272a"
-                        opacity={0.4}
+                <LineChart data={data}>
+                    <CartesianGrid vertical={false} stroke="#E3E3E3" strokeDasharray="3 3" />
+                    <XAxis 
+                        dataKey="name" 
+                        stroke="#616161" 
+                        fontSize={12} 
+                        tickLine={false} 
+                        axisLine={false} 
+                        dy={10}
                     />
-                    <XAxis
-                        dataKey="name"
-                        stroke="#71717a"
-                        fontSize={10}
-                        fontWeight={600}
-                        tickLine={false}
+                    <YAxis 
+                        stroke="#616161" 
+                        fontSize={10} 
+                        tickLine={false} 
                         axisLine={false}
-                        dy={15}
-                        className="uppercase tracking-widest"
+                        tickFormatter={(value) => `${value / 1000}k`}
                     />
-                    <YAxis
-                        stroke="#71717a"
-                        fontSize={10}
-                        fontWeight={600}
-                        tickLine={false}
-                        axisLine={false}
-                        tickFormatter={(value) => `${value >= 1000 ? (value / 1000).toFixed(0) + 'K' : value}`}
-                        dx={-5}
-                        className="tracking-tighter"
-                    />
-                    <Tooltip
-                        contentStyle={{
-                            backgroundColor: "#09090b",
-                            border: "1px solid #ffffff10",
-                            borderRadius: "16px",
-                            boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.5)",
-                            padding: "16px",
-                            backdropFilter: "blur(12px)"
+                    <Tooltip 
+                        contentStyle={{ 
+                            backgroundColor: '#FFFFFF', 
+                            border: '1px solid #E3E3E3',
+                            borderRadius: '8px',
+                            boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
+                            fontSize: '12px'
                         }}
-                        itemStyle={{ color: "#6366f1", fontWeight: "900", fontSize: "14px" }}
-                        labelStyle={{ color: "#a1a1aa", marginBottom: "8px", fontSize: "10px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.1em" }}
-                        formatter={(value: any) => [
-                            new Intl.NumberFormat('en-MA', {
-                                style: 'currency',
-                                currency: 'MAD',
-                                maximumFractionDigits: 0
-                            }).format(Number(value)),
-                            "REVENUE"
-                        ]}
-                        cursor={{ stroke: "#ffffff20", strokeWidth: 1 }}
+                        itemStyle={{ color: '#303030', fontWeight: 'bold' }}
                     />
-                    <Area
-                        type="monotone"
-                        dataKey="total"
-                        stroke="#818cf8"
-                        strokeWidth={3}
-                        fillOpacity={1}
-                        fill="url(#colorTotal)"
-                        animationDuration={2500}
-                        activeDot={{
-                            r: 6,
-                            fill: "#6366f1",
-                            stroke: "#09090b",
-                            strokeWidth: 3,
-                            className: "shadow-2xl"
-                        }}
+                    <Line 
+                        type="monotone" 
+                        dataKey="sales" 
+                        stroke="#005BD3" 
+                        strokeWidth={2} 
+                        dot={{ r: 4, fill: "#005BD3", strokeWidth: 2, stroke: "#FFF" }}
+                        activeDot={{ r: 6, strokeWidth: 0 }}
                     />
-                </AreaChart>
+                </LineChart>
             </ResponsiveContainer>
         </div>
     );

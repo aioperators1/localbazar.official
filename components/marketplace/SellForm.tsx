@@ -30,7 +30,7 @@ export function SellForm({ categories }: { categories: Category[] }) {
                 setSubmitted(true);
                 toast.success(isAr ? "تم إرسال طلبك بنجاح!" : "Listing submitted for review!");
             } else {
-                toast.error(res?.error || "Failed to submit listing");
+                toast.error((res as any)?.error || "Failed to submit listing");
                 setLoading(false);
             }
         } catch (error) {

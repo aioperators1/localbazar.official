@@ -1,13 +1,13 @@
 "use client";
 
-import { Pencil, Trash } from "lucide-react";
+import { Pencil, Trash, MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { deleteProduct } from "@/lib/actions/admin";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-
 import Image from "next/image";
 import Link from "next/link";
+import { cn, formatPrice } from "@/lib/utils";
 
 interface AdminProduct {
     id: string;
@@ -22,103 +22,141 @@ export function ProductList({ products }: { products: AdminProduct[] }) {
     const router = useRouter();
 
     const handleDelete = async (id: string) => {
-        if (!confirm("Are you sure you want to delete this product?")) return;
+        if (!confirm("Remove this product from the catalog?")) return;
 
         const res = await deleteProduct(id);
         if (res.success) {
-            toast.success("Product deleted successfully");
+            toast.success("Product removed");
             router.refresh();
         } else {
-            toast.error("Failed to delete product");
+            toast.error("Failed to remove product");
         }
     };
 
     return (
-        <div className="bg-zinc-950/50 backdrop-blur-xl border border-white/5 rounded-xl overflow-hidden shadow-2xl relative">
-            {/* Tech Deco Lines */}
-            <div className="absolute top-0 left-0 w-20 h-1 bg-indigo-500/50" />
-            <div className="absolute bottom-0 right-0 w-20 h-1 bg-indigo-500/50" />
-
-            <table className="w-full text-left text-sm">
-                <thead className="bg-white/5 border-b border-white/10 text-zinc-400 font-bold uppercase tracking-wider text-[10px]">
+        <div className="overflow-x-auto w-full bg-white rounded-xl border border-[#E3E3E3] shadow-sm overflow-hidden">
+            <table className="w-full text-left text-[12px] border-collapse">
+                <thead className="bg-[#F9F9F9] border-b border-[#E3E3E3] sticky top-0 z-10">
                     <tr>
-                        <th className="p-4 pl-6">Product</th>
-                        <th className="p-4">Category</th>
-                        <th className="p-4">Price</th>
-                        <th className="p-4">Stock</th>
-                        <th className="p-4">Status</th>
-                        <th className="p-4 text-right pr-6">Actions</th>
+                        <th className="p-4 pl-6 font-black text-[#616161] uppercase tracking-widest w-[40px]">
+                            <input type="checkbox" className="rounded-[4px] border-[#D2D2D2]" />
+                        </th>
+                        <th className="p-4 font-black text-[#616161] uppercase tracking-widest">Product Entity</th>
+                        <th className="p-4 font-black text-[#616161] uppercase tracking-widest text-center">Status</th>
+                        <th className="p-4 font-black text-[#616161] uppercase tracking-widest text-center">Availability</th>
+                        <th className="p-4 font-black text-[#616161] uppercase tracking-widest">Class</th>
+                        <th className="p-4 font-black text-[#616161] uppercase tracking-widest">Value</th>
+                        <th className="p-4 text-right pr-6 font-black text-[#616161] uppercase tracking-widest">Operations</th>
                     </tr>
                 </thead>
-                <tbody className="divide-y divide-white/5">
+                <tbody className="divide-y divide-[#E3E3E3]">
                     {products.map((product) => {
                         let imageUrl = "https://placehold.co/100x100";
                         try {
-                            const parsed = JSON.parse(product.images);
-                            imageUrl = Array.isArray(parsed) ? (parsed[0] || imageUrl) : (parsed || imageUrl);
+                            if (product.images) {
+                                const parsed = JSON.parse(product.images);
+                                const first = Array.isArray(parsed) ? parsed[0] : parsed;
+                                if (first && typeof first === 'string' && first.trim() !== '') {
+                                    imageUrl = first;
+                                } else if (typeof product.images === 'string' && product.images.trim() !== '') {
+                                    imageUrl = product.images;
+                                }
+                            }
                         } catch {
-                            imageUrl = product.images || imageUrl;
+                            if (product.images && typeof product.images === 'string' && product.images.trim() !== '') {
+                                imageUrl = product.images;
+                            }
                         }
 
+                        if (!imageUrl || (!imageUrl.startsWith('/') && !imageUrl.startsWith('http'))) {
+                            imageUrl = "https://placehold.co/100x100";
+                        }
+
+                        const isDraft = product.stock <= 0;
+
                         return (
-                            <tr key={product.id} className="group hover:bg-white/5 transition-all duration-300">
+                            <tr key={product.id} className="group hover:bg-[#F9F9F9] transition-all duration-200">
                                 <td className="p-4 pl-6">
+                                    <input type="checkbox" className="rounded-[4px] border-[#D2D2D2]" />
+                                </td>
+                                <td className="p-4">
                                     <div className="flex items-center gap-4">
-                                        <div className="relative w-12 h-12 rounded-lg bg-black/50 overflow-hidden border border-white/10 group-hover:border-indigo-500/50 transition-colors">
+                                        <div className="relative w-12 h-12 rounded-lg bg-white border border-[#E3E3E3] overflow-hidden shrink-0 shadow-sm group-hover:scale-105 transition-transform">
                                             <Image
                                                 src={imageUrl}
                                                 alt={product.name}
                                                 fill
-                                                className="object-cover opacity-80 group-hover:opacity-100 transition-opacity"
+                                                className="object-contain p-1.5"
+                                                unoptimized
                                             />
                                         </div>
-                                        <span className="font-bold text-white group-hover:text-indigo-400 transition-colors">{product.name}</span>
+                                        <div className="flex flex-col gap-0.5">
+                                            <span className="font-black text-[#303030] text-[13px] uppercase tracking-tight line-clamp-1">{product.name}</span>
+                                            <span className="text-[10px] text-[#616161] font-bold uppercase tracking-widest opacity-60">ID: {product.id.slice(-8)}</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td className="p-4 text-center">
+                                    <span className={cn(
+                                        "inline-flex items-center px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest",
+                                        isDraft 
+                                            ? "bg-rose-50 text-rose-600 border border-rose-100" 
+                                            : "bg-emerald-50 text-emerald-600 border border-emerald-100"
+                                    )}>
+                                        {isDraft ? "Draft" : "Active"}
+                                    </span>
+                                </td>
+                                <td className="p-4 text-center">
+                                    <div className="flex flex-col items-center">
+                                        <span className={cn(
+                                            "text-[13px] font-black",
+                                            product.stock < 5 ? "text-rose-600" : "text-[#303030]"
+                                        )}>
+                                            {product.stock}
+                                        </span>
+                                        <div className="w-12 h-1.5 bg-[#F1F1F1] rounded-full mt-1 overflow-hidden">
+                                            <div 
+                                                className={cn("h-full rounded-full transition-all", product.stock < 5 ? "bg-rose-500" : "bg-[#303030]")}
+                                                style={{ width: `${Math.min(100, (product.stock / 50) * 100)}%` }}
+                                            />
+                                        </div>
                                     </div>
                                 </td>
                                 <td className="p-4">
-                                    <span className="inline-flex items-center px-2 py-1 rounded border border-white/10 bg-white/5 text-[10px] font-mono text-zinc-400 uppercase">
-                                        {product.category.name}
+                                    <span className="text-[#616161] font-bold uppercase tracking-tight">{product.category.name}</span>
+                                </td>
+                                <td className="p-4">
+                                    <span className="text-[#303030] font-black italic tracking-tighter text-[14px]">
+                                        {formatPrice(product.price)}
                                     </span>
                                 </td>
-                                <td className="p-4 text-white font-black tracking-tight">
-                                    {new Intl.NumberFormat('en-MA', { style: 'currency', currency: 'MAD' }).format(Number(product.price))}
-                                </td>
-                                <td className="p-4 text-zinc-500 font-mono text-xs">{product.stock} Units</td>
-                                <td className="p-4">
-                                    {product.stock > 0 ? (
-                                        <div className="inline-flex items-center gap-2">
-                                            <span className="relative flex h-2 w-2">
-                                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                                                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                                            </span>
-                                            <span className="text-emerald-500 text-xs font-bold uppercase tracking-wider text-shadow-glow">Active</span>
-                                        </div>
-                                    ) : (
-                                        <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded bg-red-500/10 text-red-500 text-[10px] font-bold uppercase tracking-wider border border-red-500/20">
-                                            Out of Stock
-                                        </span>
-                                    )}
-                                </td>
-                                <td className="p-4 pr-6 flex gap-2 justify-end">
-                                    <Button variant="ghost" size="icon" asChild className="h-8 w-8 text-zinc-500 hover:text-white hover:bg-white/10 rounded-full">
-                                        <Link href={`/admin/products/${product.id}`}>
-                                            <Pencil className="w-3 h-3" />
-                                        </Link>
-                                    </Button>
-                                    <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        onClick={() => handleDelete(product.id)}
-                                        className="h-8 w-8 text-zinc-500 hover:text-red-500 hover:bg-red-500/10 rounded-full"
-                                    >
-                                        <Trash className="w-3 h-3" />
-                                    </Button>
+                                <td className="p-4 pr-6 text-right">
+                                    <div className="flex gap-2 justify-end opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <Button variant="ghost" size="icon" asChild className="h-9 w-9 text-[#303030] hover:bg-white hover:shadow-md rounded-lg transition-all">
+                                            <Link href={`/admin/products/${product.id}`}>
+                                                <Pencil className="w-4 h-4" />
+                                            </Link>
+                                        </Button>
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            onClick={() => handleDelete(product.id)}
+                                            className="h-9 w-9 text-[#616161] hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all"
+                                        >
+                                            <Trash className="w-4 h-4" />
+                                        </Button>
+                                    </div>
                                 </td>
                             </tr>
                         );
                     })}
                 </tbody>
             </table>
+            {products.length === 0 && (
+                <div className="py-20 text-center text-[#616161] font-medium bg-white">
+                    No products found. Start by adding a new one.
+                </div>
+            )}
         </div>
     );
 }
