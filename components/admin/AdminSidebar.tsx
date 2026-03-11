@@ -113,7 +113,15 @@ export function AdminSidebar() {
     const [isMobileOpen, setIsMobileOpen] = useState(false);
 
     return (
-        <div>
+        <>
+            {/* Desktop Sidebar */}
+            <aside
+                className="hidden lg:flex flex-col shrink-0 h-screen sticky top-0 z-50"
+                style={{ width: '240px', background: '#EBEBEB', borderRight: '1px solid #D2D2D2' }}
+            >
+                <SidebarContent setIsMobileOpen={() => {}} />
+            </aside>
+
             {/* Mobile Toggle */}
             <Button
                 variant="ghost"
@@ -124,11 +132,6 @@ export function AdminSidebar() {
                 <Menu className="w-5 h-5" />
             </Button>
 
-            {/* Desktop Sidebar */}
-            <aside className="hidden lg:flex w-60 h-screen sticky top-0 flex-col z-50 shrink-0">
-                <SidebarContent setIsMobileOpen={() => {}} />
-            </aside>
-
             {/* Mobile Drawer */}
             {isMobileOpen && (
                 <div className="fixed inset-0 z-[70] lg:hidden">
@@ -136,7 +139,7 @@ export function AdminSidebar() {
                         onClick={() => setIsMobileOpen(false)}
                         className="absolute inset-0 bg-[#303030]/20 backdrop-blur-sm"
                     />
-                    <aside className="absolute inset-y-0 left-0 w-64 bg-[#EBEBEB] flex flex-col shadow-2xl transition-transform transform translate-x-0">
+                    <aside className="absolute inset-y-0 left-0 w-64 bg-[#EBEBEB] flex flex-col shadow-2xl">
                         <button
                             onClick={() => setIsMobileOpen(false)}
                             className="absolute top-2 right-2 p-1.5 text-[#616161] hover:text-[#303030] transition-all"
@@ -147,6 +150,6 @@ export function AdminSidebar() {
                     </aside>
                 </div>
             )}
-        </div>
+        </>
     );
 }

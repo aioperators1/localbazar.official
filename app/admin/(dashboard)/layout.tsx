@@ -7,11 +7,11 @@ export default function AdminLayout({
     children: React.ReactNode;
 }) {
     return (
-        <div className="h-screen w-full overflow-hidden bg-[#F1F1F1] text-[#303030] font-sans text-sm grid grid-cols-[auto,1fr]">
+        <div className="flex h-screen w-full overflow-hidden" style={{ background: '#F1F1F1', color: '#303030' }}>
             <AdminSidebar />
-            <div className="flex flex-col min-h-0 min-w-0 overflow-hidden h-full">
+            <div className="flex flex-col flex-1 min-w-0 h-full overflow-hidden" style={{ background: '#F1F1F1' }}>
                 <AdminHeader />
-                <main className="flex-1 overflow-y-auto w-full">
+                <main className="flex-1 overflow-y-auto" style={{ background: '#F1F1F1' }}>
                     <div className="max-w-[1200px] mx-auto p-4 md:p-6 lg:p-8 space-y-6 pb-32">
                         {children}
                     </div>

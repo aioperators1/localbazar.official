@@ -12,8 +12,8 @@ export function Providers({ children }: { children: React.ReactNode }) {
             <LanguageProvider>
                 <NextThemesProvider
                     attribute="class"
-                    defaultTheme="dark"
-                    enableSystem
+                    defaultTheme="light"
+                    enableSystem={false}
                     disableTransitionOnChange
                 >
                     {children}
