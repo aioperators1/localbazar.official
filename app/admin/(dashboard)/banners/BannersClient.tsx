@@ -30,6 +30,7 @@ export default function BannersClient({ initialBanners }: { initialBanners: Bann
     const [formData, setFormData] = useState({
         title: "",
         subtitle: "",
+        description: "",
         image: "",
         link: "",
         active: true,
@@ -37,7 +38,7 @@ export default function BannersClient({ initialBanners }: { initialBanners: Bann
     });
 
     const resetForm = () => {
-        setFormData({ title: "", subtitle: "", image: "", link: "", active: true, order: 0 });
+        setFormData({ title: "", subtitle: "", description: "", image: "", link: "", active: true, order: 0 });
         setIsEditing(null);
         setIsCreating(false);
     };
@@ -82,10 +83,11 @@ export default function BannersClient({ initialBanners }: { initialBanners: Bann
         setLoading(false);
     };
 
-    const startEditing = (banner: Banner) => {
+    const startEditing = (banner: any) => {
         setFormData({
             title: banner.title,
             subtitle: banner.subtitle || "",
+            description: banner.description || "",
             image: banner.image,
             link: banner.link || "",
             active: banner.active,
@@ -132,6 +134,15 @@ export default function BannersClient({ initialBanners }: { initialBanners: Bann
                                         onChange={e => setFormData({ ...formData, subtitle: e.target.value })}
                                         placeholder="Optional caption"
                                         className="bg-white border-[#D2D2D2] h-9 rounded-[8px] text-[13px]"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label className="text-[13px] font-medium text-[#303030]">Description</Label>
+                                    <textarea
+                                        value={formData.description}
+                                        onChange={e => setFormData({ ...formData, description: e.target.value })}
+                                        placeholder="Detailed description for the hero slide..."
+                                        className="w-full flex min-h-[80px] w-full rounded-[8px] border border-[#D2D2D2] bg-white px-3 py-2 text-[13px] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black"
                                     />
                                 </div>
                                 <div className="space-y-2">

@@ -123,7 +123,7 @@ function SuccessContent() {
                                 <h2 className="text-[14px] font-bold text-[#111111] mb-5 uppercase tracking-wide">Your order is confirmed</h2>
                                 <div className="space-y-4 text-[13px] text-[#111111] font-medium leading-[1.6]">
                                     <p>Our concierge service will contact you shortly to finalize your delivery details.</p>
-                                    <p className="text-zinc-500 italic">"L'Excellence du Luxe & de l'Héritage"</p>
+                                    <p className="text-zinc-500 italic">"The Excellence of Luxury & Heritage"</p>
                                 </div>
                             </div>
 

@@ -2,17 +2,20 @@
 
 import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis, CartesianGrid } from "recharts";
 
-const data = [
-    { name: "Lun", sales: 12400 },
-    { name: "Mar", sales: 15600 },
-    { name: "Mer", sales: 13800 },
-    { name: "Jeu", sales: 18200 },
-    { name: "Ven", sales: 21000 },
-    { name: "Sam", sales: 19500 },
-    { name: "Dim", sales: 23400 },
-];
+interface OverviewProps {
+    data?: { name: string; total: number }[];
+}
 
-export function Overview() {
+export function Overview({ data: chartData }: OverviewProps) {
+    const data = chartData || [
+        { name: "Lun", total: 12400 },
+        { name: "Mar", total: 15600 },
+        { name: "Mer", total: 13800 },
+        { name: "Jeu", total: 18200 },
+        { name: "Ven", total: 21000 },
+        { name: "Sam", total: 19500 },
+        { name: "Dim", total: 23400 },
+    ];
     return (
         <div className="h-[300px] w-full mt-4">
             <ResponsiveContainer width="100%" height="100%">
@@ -45,7 +48,7 @@ export function Overview() {
                     />
                     <Line 
                         type="monotone" 
-                        dataKey="sales" 
+                        dataKey="total" 
                         stroke="#005BD3" 
                         strokeWidth={2} 
                         dot={{ r: 4, fill: "#005BD3", strokeWidth: 2, stroke: "#FFF" }}

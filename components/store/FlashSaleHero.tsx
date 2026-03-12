@@ -21,13 +21,13 @@ interface FlashSaleHeroProps {
 }
 
 const defaultProduct = {
-    name: "Ultimate Configuration",
-    description: "The pinnacle of technical achievement. Multi-node liquid cooling, enterprise-grade processing, and verified performance for critical workloads.",
-    originalPrice: 48990,
-    price: 42990,
-    discount: 12,
-    image: "/images/god-tier-build.png",
-    slug: "ultimate-configuration"
+    name: "Velvet Couture",
+    description: "The pinnacle of sartorial achievement. Handmade velvet with gold-threaded embroidery, designed for the most prestigious evening events.",
+    originalPrice: 8500,
+    price: 6490,
+    discount: 25,
+    image: "https://images.unsplash.com/photo-1566174053879-31528523f8ae?q=80&w=1200",
+    slug: "velvet-couture-evening-gown"
 };
 
 export function FlashSaleHero({ product = defaultProduct }: FlashSaleHeroProps) {

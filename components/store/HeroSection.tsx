@@ -1,133 +1,217 @@
 "use client";
+
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { ChevronRight, ChevronLeft } from "lucide-react";
-import { useState, useEffect } from "react";
+import { cn } from "@/lib/utils";
 
 const SLIDES = [
     {
-        id: 1,
-        subtitle: "L'ÉLÉGANCE REDÉFINIE",
-        title: "Collection Couture",
-        description: "Découvrez l'exclusivité de nos robes du soir, conçues pour les moments inoubliables.",
-        buttonText: "DÉCOUVRIR LA COLLECTION",
-        image: "https://images.unsplash.com/photo-1566174053879-31528523f8ae?q=80&w=1000",
-        bgColor: "bg-[#E2D8C5]",
-        textColor: "text-[#111111]",
-        link: "/shop?category=evening-wear"
+        id: "1",
+        subtitle: "Luxe & Tradition",
+        title: "Luxury Abayas",
+        description: "Experience the ultimate elegance with our signature Abaya collection. Crafted for the modern woman who values tradition.",
+        buttonText: "SHOP ABAYAS",
+        image: "https://images.unsplash.com/photo-1566174053879-31528523f8ae?q=80&w=2000",
+        link: "/shop?category=abayas"
     },
     {
-        id: 2,
-        subtitle: "SUR-MESURE",
-        title: "L'Art du Tailleur",
-        description: "L'excellence du costume masculin. Une coupe parfaite, des tissus d'exception.",
-        buttonText: "VOIR LES COSTUMES",
-        image: "https://images.unsplash.com/photo-1593032465175-481ac7f401a0?q=80&w=1200",
-        bgColor: "bg-[#111111]",
-        textColor: "text-white",
-        link: "/shop?category=suits"
+        id: "2",
+        subtitle: "Royal Scents",
+        title: "Perfumes & Oud",
+        description: "A journey through the scents of Arabia. Discover our premium selection of Oud, Perfumes, and Bukhoor.",
+        buttonText: "EXPLORE SCENTS",
+        image: "https://images.unsplash.com/photo-1547887538-e3a2f32cb1cc?q=80&w=2000",
+        link: "/shop?category=perfumes-oud"
+    },
+    {
+        id: "3",
+        subtitle: "Timeless Grace",
+        title: "Dresses & Jalabiyas",
+        description: "Elegant dresses and Jalabiyas for your most unforgettable moments. Where fashion meets heritage.",
+        buttonText: "VIEW COLLECTION",
+        image: "https://images.unsplash.com/photo-1617137968427-85924c800a22?q=80&w=2000",
+        link: "/shop?category=dresses-jalabiyas"
     }
 ];
 
-export function HeroSection({ banners }: { banners?: any[] }) {
+export function HeroSection({ banners, settings }: { banners?: any[]; settings?: Record<string, string> }) {
     const [current, setCurrent] = useState(0);
 
     const slides = banners && banners.length > 0 ? banners.map(b => ({
         id: b.id,
-        subtitle: b.subtitle || "EXCLUSIVITÉ",
-        title: b.title,
-        description: b.link ? "Ne ratez pas nos offres à prix compétitifs" : "Découvrez nos offres exceptionnelles",
-        buttonText: "DÉCOUVRIR",
+        subtitle: b.subtitle || settings?.homepageSubtitle || "EXCLUSIVE",
+        title: b.title || settings?.homepageTitle || "COLLECTION",
+        description: b.description || settings?.aboutText || "Discover our exceptional offers",
+        buttonText: "EXPLORE",
         image: b.image,
-        bgColor: "bg-zinc-900", // Fallback, could be added to DB if needed
         link: b.link || "/shop"
-    })) : SLIDES;
+    })) : [
+        {
+            id: "1",
+            subtitle: settings?.homepageSubtitle || "Luxe & Tradition",
+            title: settings?.homepageTitle || "Luxury Abayas",
+            description: settings?.aboutText || "Experience the ultimate elegance with our signature collection.",
+            buttonText: "SHOP NOW",
+            image: settings?.homepageImage || "https://images.unsplash.com/photo-1566174053879-31528523f8ae?q=80&w=2000",
+            link: "/shop?category=abayas"
+        }
+    ];
 
     const next = () => setCurrent((prev) => (prev + 1) % slides.length);
     const prev = () => setCurrent((prev) => (prev - 1 + slides.length) % slides.length);
 
     useEffect(() => {
-        const timer = setInterval(next, 8000);
+        const timer = setInterval(next, 7000);
         return () => clearInterval(timer);
     }, [slides.length]);
 
-    const slide = slides[current] || SLIDES[0];
-
     return (
-        <section className={`relative w-full min-h-[460px] lg:h-[520px] overflow-hidden ${slide.bgColor} group cursor-default rounded-[12px]`}>
-            {/* Background Decorative Pattern (Simulation of brand motifs) */}
-            <div className="absolute inset-0 opacity-[0.03] pointer-events-none mix-blend-overlay">
-                <div className="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] repeat" />
-            </div>
-            <div className="absolute inset-0 opacity-10 pointer-events-none">
-                <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_20%_30%,_rgba(89,44,47,0.4),_transparent_50%)]" />
-            </div>
+        <section className="relative w-full h-[85vh] min-h-[700px] overflow-hidden bg-black group font-sans">
+            {/* ── THE EXHIBITION HERO (Original Design) ── */}
+            <div className="absolute inset-0 bg-[#0a0a0a] flex items-center justify-center overflow-hidden">
+                {/* Background Text (Watermark style) */}
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 select-none pointer-events-none opacity-[0.03]">
+                    <span className="text-[25vw] font-serif font-black tracking-tighter text-white whitespace-nowrap">AUTHENTIC</span>
+                </div>
 
-            <div className="container mx-auto h-full px-4 lg:px-20 relative z-10">
-                <div className="flex flex-col lg:flex-row items-center justify-between h-full py-12 lg:py-0">
-
-                    {/* Left Content */}
-                    <div className="flex flex-col items-center lg:items-start text-center lg:text-left max-w-2xl lg:pt-10">
-                        <span className="text-brand-burgundy font-bold text-[12px] md:text-[13px] tracking-[0.5em] uppercase mb-4 animate-in fade-in slide-in-from-left-4 duration-700">
-                            {slide.subtitle} — EST. 2013
-                        </span>
-                        <h1 className="text-white font-black text-[38px] md:text-[54px] lg:text-[68px] leading-[1.05] tracking-tight mb-8 animate-in fade-in slide-in-from-left-6 duration-1000 uppercase">
-                            {slide.title}
-                        </h1>
-                        <p className="text-white/60 text-[14px] md:text-[15px] max-w-md leading-relaxed mb-10 animate-in fade-in slide-in-from-left-8 duration-1000 delay-200 uppercase tracking-widest">
-                            {slide.description}
-                        </p>
-
-                        <Link
-                            href={slide.link}
-                            className="bg-white hover:bg-brand-burgundy text-[#111111] hover:text-white font-bold px-10 py-5 rounded-[2px] text-[12px] uppercase tracking-[0.3em] transition-all shadow-2xl hover:scale-105 active:scale-95 animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-500"
+                {/* Slides Container */}
+                {slides.map((slide, idx) => {
+                    const isActive = idx === current;
+                    return (
+                        <div 
+                            key={slide.id}
+                            className={cn(
+                                "absolute inset-0 w-full h-full flex flex-col lg:flex-row items-center transition-all duration-1000",
+                                isActive ? "opacity-100 scale-100 z-10" : "opacity-0 scale-110 z-0 pointer-events-none"
+                            )}
                         >
-                            {slide.buttonText}
-                        </Link>
-                    </div>
+                            {/* LEFT: TEXTUAL ARCHITECTURE */}
+                            <div className="flex-1 w-full h-full flex flex-col justify-center px-12 lg:px-24 z-20">
+                                <div className={cn(
+                                    "transition-all duration-1000 delay-300 transform",
+                                    isActive ? "translate-y-0 opacity-100" : "translate-y-20 opacity-0"
+                                )}>
+                                    <div className="flex items-center gap-4 mb-8">
+                                        <div className="w-12 h-[1px] bg-brand-burgundy" />
+                                        <span className="text-[10px] font-black tracking-[0.5em] text-zinc-500 uppercase">{slide.subtitle}</span>
+                                    </div>
+                                    
+                                    <h1 className="text-white font-serif text-[60px] md:text-[80px] lg:text-[110px] leading-[0.9] tracking-tighter mb-10">
+                                        {slide.title.split(' ').map((word: string, i: number) => (
+                                            <span key={i} className={cn("block", i % 2 === 1 ? "pl-20 italic font-light text-zinc-300" : "font-bold")}>
+                                                {word}
+                                            </span>
+                                        ))}
+                                    </h1>
 
-                    {/* Right Product Image (Stands out more) */}
-                    <div className="relative w-full lg:w-[45%] h-[300px] lg:h-[450px] mt-12 lg:mt-0 flex items-center justify-center animate-in fade-in zoom-in duration-1000">
-                        {/* Glow effect under product */}
-                        <div className="absolute w-[80%] h-[60%] bg-white opacity-10 blur-[120px] rounded-full z-0" />
+                                    <div className="flex items-start gap-10">
+                                        <div className="flex flex-col gap-1 py-1">
+                                            <div className="w-2 h-2 bg-brand-burgundy rounded-full animate-pulse" />
+                                            <div className="w-[1px] h-20 bg-zinc-800 ml-[3.5px]" />
+                                        </div>
+                                        <div className="max-w-md">
+                                            <p className="text-zinc-400 text-[14px] leading-relaxed mb-10 tracking-wide font-light lowercase first-letter:uppercase">
+                                                {slide.description}
+                                            </p>
+                                            <Link href={slide.link} className="group relative inline-flex items-center gap-6">
+                                                <div className="w-14 h-14 rounded-full border border-zinc-700 flex items-center justify-center group-hover:bg-brand-burgundy group-hover:border-brand-burgundy transition-all duration-500">
+                                                    <ChevronRight className="w-6 h-6 text-white" />
+                                                </div>
+                                                <span className="text-[11px] font-black tracking-[0.4em] text-white uppercase group-hover:translate-x-2 transition-transform duration-500">
+                                                    Explore Now
+                                                </span>
+                                            </Link>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
 
-                        <div className="relative w-full h-full">
-                            <Image
-                                src={slide.image}
-                                alt={slide.title}
-                                fill
-                                className="object-contain drop-shadow-[0_25px_45px_rgba(0,0,0,0.5)] z-10 transition-transform duration-700 hover:scale-110"
-                                priority
-                                unoptimized
-                            />
+                            {/* RIGHT: FLOATING VISUALS */}
+                            <div className="flex-1 w-full h-full relative p-12 lg:p-24 overflow-hidden">
+                                {/* Large Main Image with tilted frame */}
+                                <div className={cn(
+                                    "relative w-full h-full bg-zinc-900 overflow-hidden transition-all duration-[1.5s] delay-500 shadow-2xl rotate-2 hover:rotate-0",
+                                    isActive ? "translate-x-0 opacity-100" : "translate-x-40 opacity-0"
+                                )}>
+                                    <Image 
+                                        src={slide.image} 
+                                        alt={slide.title} 
+                                        fill 
+                                        className="object-cover grayscale-[0.3] hover:grayscale-0 transition-all duration-1000"
+                                        unoptimized
+                                    />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-40" />
+                                </div>
+
+                                {/* Floating Detail Image (Small Overlay) */}
+                                <div className={cn(
+                                    "absolute bottom-20 left-4 w-48 h-64 border-8 border-[#0a0a0a] shadow-2xl z-30 hidden lg:block transition-all duration-[2s] delay-700",
+                                    isActive ? "translate-y-0 opacity-100" : "translate-y-40 opacity-0"
+                                )}>
+                                    <Image 
+                                        src={slide.image} 
+                                        alt="Detail" 
+                                        fill 
+                                        className="object-cover"
+                                        unoptimized
+                                    />
+                                </div>
+
+                                {/* Decorative Elements */}
+                                <div className="absolute top-1/4 -right-10 w-40 h-px bg-zinc-800 rotate-45" />
+                                <div className="absolute bottom-1/4 -left-10 w-40 h-px bg-zinc-800 rotate-45" />
+                            </div>
+                        </div>
+                    );
+                })}
+
+                {/* Progress Indicators (Vertical Original Style) */}
+                <div className="absolute right-12 top-1/2 -translate-y-1/2 flex flex-col gap-6 z-40">
+                    {slides.map((_, idx) => (
+                        <button 
+                            key={idx}
+                            onClick={() => setCurrent(idx)}
+                            className="group flex items-center gap-4 focus:outline-none"
+                        >
+                            <span className={cn(
+                                "text-[10px] font-bold transition-all duration-500",
+                                idx === current ? "text-brand-burgundy translate-x-0" : "text-zinc-700 -translate-x-4 opacity-0 group-hover:opacity-100 group-hover:translate-x-0"
+                            )}>
+                                0{idx + 1}
+                            </span>
+                            <div className={cn(
+                                "w-10 h-[1px] transition-all duration-500",
+                                idx === current ? "bg-brand-burgundy w-16" : "bg-zinc-800"
+                            )} />
+                        </button>
+                    ))}
+                </div>
+
+                {/* Bottom Bar Controls */}
+                <div className="absolute bottom-0 left-0 w-full h-24 border-t border-white/5 flex items-center justify-between px-12 lg:px-24 z-40 bg-black/20 backdrop-blur-sm">
+                    <div className="flex items-center gap-12">
+                        <div className="flex flex-col gap-1">
+                            <span className="text-[10px] text-zinc-500 font-bold tracking-widest uppercase">Active Edition</span>
+                            <span className="text-[12px] text-white font-medium">Local Bazar Hub 2025</span>
+                        </div>
+                        <div className="w-px h-8 bg-zinc-800" />
+                        <div className="flex flex-col gap-1">
+                            <span className="text-[10px] text-zinc-500 font-bold tracking-widest uppercase">Gallery</span>
+                            <span className="text-[12px] text-white font-medium">0{current + 1} / 0{slides.length}</span>
                         </div>
                     </div>
+                    
+                    <div className="flex items-center gap-8">
+                        <button onClick={prev} className="p-4 rounded-full border border-zinc-800 text-zinc-400 hover:border-white hover:text-white transition-all">
+                            <ChevronLeft className="w-5 h-5" />
+                        </button>
+                        <button onClick={next} className="p-4 rounded-full border border-zinc-800 text-zinc-400 hover:border-white hover:text-white transition-all">
+                            <ChevronRight className="w-5 h-5" />
+                        </button>
+                    </div>
                 </div>
-            </div>
-
-            {/* Nav Arrows */}
-            <button
-                onClick={(e) => { e.preventDefault(); prev(); }}
-                className="absolute left-6 top-1/2 -translate-y-1/2 z-30 w-12 h-12 bg-white/5 hover:bg-white/10 text-white flex items-center justify-center rounded-full opacity-0 group-hover:opacity-100 transition-all border border-white/10 backdrop-blur-sm"
-            >
-                <ChevronLeft className="w-6 h-6" />
-            </button>
-            <button
-                onClick={(e) => { e.preventDefault(); next(); }}
-                className="absolute right-6 top-1/2 -translate-y-1/2 z-30 w-12 h-12 bg-white/5 hover:bg-white/10 text-white flex items-center justify-center rounded-full opacity-0 group-hover:opacity-100 transition-all border border-white/10 backdrop-blur-sm"
-            >
-                <ChevronRight className="w-6 h-6" />
-            </button>
-
-            {/* Pagination Indicators Container */}
-            <div className="absolute bottom-8 left-0 right-0 z-30 flex justify-center gap-4">
-                {slides.map((_, i) => (
-                    <button
-                        key={i}
-                        onClick={() => setCurrent(i)}
-                        className={`transition-all duration-300 ${current === i ? "w-10 h-1.5 bg-[#592C2F] rounded-full" : "w-1.5 h-1.5 bg-white/30 rounded-full hover:bg-white/50"}`}
-                    />
-                ))}
             </div>
         </section>
     );

@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useMotionValue, useSpring, useTransform, AnimatePresence } from "framer-motion";
-import { Monitor, Cpu, Headphones, Keyboard, Activity, Shield, Zap, Target } from "lucide-react";
+import { Scissors, Sparkles, Shirt, ShoppingBag, Activity, Shield, Zap, Target } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import React, { useRef, useState } from "react";
@@ -9,7 +9,6 @@ import { useLanguage } from "@/components/providers/language-provider";
 import { cn } from "@/lib/utils";
 
 // --- Zenith HUD Border Component ---
-// --- Frame Component ---
 function ProFrame({ color }: { color: string }) {
     return (
         <svg className="absolute inset-0 w-full h-full pointer-events-none z-40 overflow-visible">
@@ -95,23 +94,22 @@ function CategoryCard({
                         fill
                         className="object-cover opacity-100 dark:opacity-60 group-hover:scale-105 transition-transform duration-700"
                     />
-                    {/* Only show gradient in dark mode for depth */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10 hidden dark:block" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent z-10" />
                 </div>
 
                 {/* Header */}
                 <div className="relative z-50 flex justify-between items-start">
                     <div className="flex flex-col gap-1">
                         <span className={cn(
-                            "font-black text-zinc-500 flex items-center gap-2",
+                            "font-black text-white mix-blend-difference flex items-center gap-2",
                             isAr ? "text-[10px]" : "text-[8px] uppercase tracking-widest"
                         )}>
-                            <Activity className="w-3 h-3" /> {t("spec.sysLink")}
+                            <Activity className="w-3 h-3 text-brand-burgundy" /> {t("home.protocol")}
                         </span>
-                        <div className="h-px w-16 bg-[var(--color-brand-charcoal)]/30" />
+                        <div className="h-px w-16 bg-brand-burgundy/50" />
                     </div>
 
-                    <div className="p-3 rounded-lg border border-black/5 dark:border-white/5 bg-background/50 backdrop-blur-xl transition-all duration-500">
+                    <div className="p-3 rounded-lg border border-black/5 dark:border-white/5 bg-white/50 backdrop-blur-xl transition-all duration-500">
                         <Icon style={{ color: activeColor }} className="w-5 h-5 transition-transform" />
                     </div>
                 </div>
@@ -119,7 +117,7 @@ function CategoryCard({
                 {/* Title */}
                 <div className="relative z-40 mt-12 mb-8" style={{ transform: "translateZ(40px)" }}>
                     <motion.div
-                        className="inline-block p-4 rounded-2xl bg-white/40 dark:bg-black/40 backdrop-blur-md border border-white/20 dark:border-white/5"
+                        className="inline-block p-4 rounded-2xl bg-white/60 dark:bg-black/40 backdrop-blur-md border border-white/20 dark:border-white/5"
                     >
                         <h3
                             className={cn(
@@ -128,7 +126,7 @@ function CategoryCard({
                             )}
                         >
                             {title.split(' ')[0]} <br />
-                            <span className="text-zinc-600 dark:text-zinc-400">{title.split(' ').slice(1).join(' ')}</span>
+                            <span className="text-brand-burgundy">{title.split(' ').slice(1).join(' ')}</span>
                         </h3>
                     </motion.div>
                 </div>
@@ -136,7 +134,7 @@ function CategoryCard({
                 {/* Stats */}
                 <div className="relative z-50 flex flex-wrap gap-4 pt-6 mt-auto" style={{ transform: "translateZ(20px)" }}>
                     {dataPoints.map((point, i) => (
-                        <div key={i} className="flex flex-col gap-0.5 bg-white/60 dark:bg-black/40 backdrop-blur-md px-3 py-2 rounded-lg border border-white/20 dark:border-white/5 shadow-sm">
+                        <div key={i} className="flex flex-col gap-0.5 bg-white/70 dark:bg-black/50 backdrop-blur-md px-3 py-2 rounded-lg border border-white/20 dark:border-white/5 shadow-sm">
                             <span className={cn(
                                 "font-black text-zinc-600 dark:text-zinc-400",
                                 isAr ? "text-[9px]" : "text-[7px] uppercase tracking-widest"
@@ -147,8 +145,8 @@ function CategoryCard({
                         </div>
                     ))}
                     <div className="ms-auto mt-auto">
-                        <div className="flex items-center gap-2 px-3 py-1 bg-[var(--color-brand-charcoal)]/5 border border-blue-600/10 rounded-full">
-                            <Target className="w-2.5 h-2.5 text-[var(--color-brand-charcoal)]" />
+                        <div className="flex items-center gap-2 px-3 py-1 bg-white border border-brand-burgundy/20 rounded-full">
+                            <Target className="w-2.5 h-2.5 text-brand-burgundy" />
                             <span className={cn(
                                 "font-black text-foreground",
                                 isAr ? "text-[10px]" : "text-[8px] tracking-widest uppercase"
@@ -173,7 +171,7 @@ export function CategoryGrid() {
                     <motion.div
                         initial={{ opacity: 0, y: 10 }}
                         whileInView={{ opacity: 1, y: 0 }}
-                        className="flex items-center gap-4 text-[var(--color-brand-charcoal)]"
+                        className="flex items-center gap-4 text-brand-burgundy"
                     >
                         <Shield className="w-5 h-5" />
                         <span className="text-[10px] font-black uppercase tracking-[0.5em]">{t("home.hardwarePriority")}</span>
@@ -183,12 +181,12 @@ export function CategoryGrid() {
                         isAr ? "text-5xl md:text-7xl lg:text-8xl leading-tight" : "text-5xl md:text-8xl uppercase tracking-tighter leading-[0.8]"
                     )}>
                         {t("home.globalGear").split(' ')[0]} <br />
-                        <span className="text-muted-foreground opacity-30">{t("home.matrix")}</span>
+                        <span className="text-brand-burgundy opacity-30">{t("home.matrix")}</span>
                     </h2>
                 </div>
                 <div className="p-8 bg-card border border-black/5 dark:border-white/5 backdrop-blur-3xl rounded-xl space-y-4 max-w-md shadow-pro">
                     <div className="flex items-center gap-3">
-                        <Zap className="w-4 h-4 text-[var(--color-brand-charcoal)]" />
+                        <Zap className="w-4 h-4 text-brand-burgundy" />
                         <span className={cn(
                             "font-black text-muted-foreground",
                             isAr ? "text-[10px]" : "text-[8px] uppercase tracking-widest"
@@ -200,62 +198,62 @@ export function CategoryGrid() {
                 </div>
             </div>
 
-            {/* The Pro Category Grid */}
+            {/* The Luxury Category Grid */}
             <div className="grid grid-cols-1 md:grid-cols-6 lg:grid-cols-12 gap-6 min-h-[900px]">
-                {/* Computers */}
+                {/* Abayas */}
                 <CategoryCard
-                    href="/shop?category=laptops"
-                    title={t("cat.laptops")}
-                    image="https://techspace.ma/cdn/shop/files/pcportablegamer_bee81797-73fa-4158-9ee9-11cd5be35e7f_1000x.png"
-                    icon={Monitor}
+                    href="/shop?category=abayas"
+                    title={t("cat.couture")}
+                    image="https://images.unsplash.com/photo-1585487000160-afffbfc767ab?q=80&w=1200"
+                    icon={Sparkles}
                     className="md:col-span-3 lg:col-span-8 lg:row-span-2"
                     accentColor="blue"
                     dataPoints={[
-                        { label: t("spec.uptime"), value: "99.9%" },
-                        { label: t("spec.coreSync"), value: "Active" },
-                        { label: t("spec.refresh"), value: "240Hz" }
+                        { label: t("spec.uptime"), value: "Exclusive" },
+                        { label: t("spec.coreSync"), value: "Traditional" },
+                        { label: t("spec.refresh"), value: "Handmade" }
                     ]}
                 />
 
-                {/* Hardware */}
+                {/* Dresses & Jalabiyas */}
                 <CategoryCard
-                    href="/shop?category=components"
-                    title={t("cat.components")}
-                    image="https://techspace.ma/cdn/shop/files/GigabyteGeForceRTX5070WINDFORCEOCSFF12G_EXCLUSIVITEWEB_1000x.png"
-                    icon={Cpu}
+                    href="/shop?category=dresses-jalabiyas"
+                    title={t("cat.suits")}
+                    image="https://images.unsplash.com/photo-1566174053879-31528523f8ae?q=80&w=1200"
+                    icon={Scissors}
                     className="md:col-span-3 lg:col-span-4 lg:row-span-2"
                     accentColor="zinc"
                     dataPoints={[
-                        { label: t("spec.thermal"), value: "Optimal" },
-                        { label: t("spec.bandwidth"), value: "Ultra" }
+                        { label: t("spec.thermal"), value: "Signature" },
+                        { label: t("spec.bandwidth"), value: "Silk" }
                     ]}
                 />
 
-                {/* Peripherals */}
+                {/* Perfumes */}
                 <CategoryCard
-                    href="/shop?category=peripherals"
-                    title={t("cat.peripherals")}
-                    image="https://techspace.ma/cdn/shop/files/ZOTACGAMINGGeForceRTX5060Ti16GBTwinEdge_1000x.png"
-                    icon={Keyboard}
+                    href="/shop?category=perfumes-oud"
+                    title={t("cat.heritage")}
+                    image="https://images.unsplash.com/photo-1547887538-e3a2f32cb1cc?q=80&w=1200"
+                    icon={Shirt}
                     className="md:col-span-3 lg:col-span-6"
                     accentColor="blue"
                     dataPoints={[
-                        { label: t("spec.latency"), value: "0.1ms" },
-                        { label: t("spec.keyPolling"), value: "8000Hz" }
+                        { label: t("spec.latency"), value: "Royal" },
+                        { label: t("spec.keyPolling"), value: "Oud" }
                     ]}
                 />
 
-                {/* Audio */}
+                {/* Accessories */}
                 <CategoryCard
-                    href="/shop?category=audio"
-                    title={t("cat.audio")}
-                    image="https://techspace.ma/cdn/shop/files/RedragonH260HylasWiredGamingHeadset_1024x.png"
-                    icon={Headphones}
+                    href="/shop?category=accessories"
+                    title={t("cat.accessories")}
+                    image="https://images.unsplash.com/photo-1520903920243-00d872a2d1c9?q=80&w=1200"
+                    icon={ShoppingBag}
                     className="md:col-span-3 lg:col-span-6"
                     accentColor="slate"
                     dataPoints={[
-                        { label: t("spec.drivers"), value: "Planar" },
-                        { label: t("spec.isolation"), value: "Passive" }
+                        { label: t("spec.drivers"), value: "Finest" },
+                        { label: t("spec.isolation"), value: "Unique" }
                     ]}
                 />
             </div>

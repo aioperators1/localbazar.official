@@ -1,25 +1,125 @@
-import { Activity, ShieldCheck } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
+import { Activity, CreditCard, DollarSign, Package, Users } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { prisma } from "@/lib/prisma";
 
-export default function AnalyticsPage() {
+export default async function AnalyticsPage() {
+    const [
+        totalRevenue,
+        totalOrders,
+        totalProducts,
+        totalCustomers,
+        recentOrders
+    ] = await Promise.all([
+        prisma.order.aggregate({ 
+            _sum: { total: true },
+            where: { status: { not: 'CANCELLED' } }
+        }),
+        prisma.order.count(),
+        prisma.product.count(),
+        prisma.user.count({ where: { role: 'USER' } }),
+        prisma.order.findMany({
+            take: 5,
+            orderBy: { createdAt: 'desc' },
+            include: { user: true }
+        })
+    ]);
+
+    const revenue = totalRevenue._sum.total ? Number(totalRevenue._sum.total) : 0;
+
     return (
-        <div className="flex flex-col items-center justify-center min-h-[70vh] text-center p-12 bg-[#0e0e0e] rounded-[8px] border border-white/5 shadow-2xl">
-            <div className="w-24 h-24 bg-[#592C2F]/10 rounded-full flex items-center justify-center mb-8 relative">
-                <div className="absolute inset-0 bg-[#592C2F]/20 rounded-full animate-pulse" />
-                <Activity className="w-12 h-12 text-[#592C2F] relative z-10" />
+        <div className="space-y-8 pb-12">
+            <div className="flex items-center justify-between">
+                <div>
+                    <h1 className="text-2xl font-black text-[#111111] uppercase tracking-tight">Analytics Overview</h1>
+                    <p className="text-[13px] text-[#616161] font-medium mt-1">Track your boutique's performance and sales.</p>
+                </div>
             </div>
-            <h1 className="text-4xl font-serif font-black text-white tracking-widest mb-6 uppercase italic">Analytique <span className="text-[#592C2F]">Signature</span></h1>
-            <p className="text-zinc-500 font-bold uppercase text-[10px] tracking-[0.3em] max-w-lg mb-10 leading-relaxed">
-                Le module d'analyse prédictive Local Bazar est en cours de déploiement. Ce portail offrira une vision à 360° sur l'excellence opérationnelle et le désir d'achat de votre clientèle.
-            </p>
-            <div className="flex items-center gap-4 mb-10 bg-white/5 px-6 py-3 rounded-[4px] text-[10px] font-black text-[#E2D8C5] uppercase tracking-[0.4em] border border-white/5 shadow-inner">
-                <ShieldCheck className="w-4 h-4 text-[#592C2F]" />
-                Accès Sécurisé • Déploiement en cours
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <Card className="border-[#E3E3E3] shadow-sm rounded-xl overflow-hidden">
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 bg-[#F9F9F9] border-b border-[#F1F1F1]">
+                        <CardTitle className="text-[12px] font-black uppercase tracking-tight">Total Revenue</CardTitle>
+                        <DollarSign className="h-4 w-4 text-[#616161]" />
+                    </CardHeader>
+                    <CardContent className="p-6">
+                        <div className="text-2xl font-black text-[#111111]">QAR {revenue.toFixed(2)}</div>
+                        <p className="text-[10px] text-[#8A8A8A] font-bold uppercase mt-1 tracking-widest">+20% from last month</p>
+                    </CardContent>
+                </Card>
+                <Card className="border-[#E3E3E3] shadow-sm rounded-xl overflow-hidden">
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 bg-[#F9F9F9] border-b border-[#F1F1F1]">
+                        <CardTitle className="text-[12px] font-black uppercase tracking-tight">Orders</CardTitle>
+                        <CreditCard className="h-4 w-4 text-[#616161]" />
+                    </CardHeader>
+                    <CardContent className="p-6">
+                        <div className="text-2xl font-black text-[#111111]">+{totalOrders}</div>
+                        <p className="text-[10px] text-[#8A8A8A] font-bold uppercase mt-1 tracking-widest">+15% from last month</p>
+                    </CardContent>
+                </Card>
+                <Card className="border-[#E3E3E3] shadow-sm rounded-xl overflow-hidden">
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 bg-[#F9F9F9] border-b border-[#F1F1F1]">
+                        <CardTitle className="text-[12px] font-black uppercase tracking-tight">Products</CardTitle>
+                        <Package className="h-4 w-4 text-[#616161]" />
+                    </CardHeader>
+                    <CardContent className="p-6">
+                        <div className="text-2xl font-black text-[#111111]">+{totalProducts}</div>
+                        <p className="text-[10px] text-[#8A8A8A] font-bold uppercase mt-1 tracking-widest">Active inventory</p>
+                    </CardContent>
+                </Card>
+                <Card className="border-[#E3E3E3] shadow-sm rounded-xl overflow-hidden">
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 bg-[#F9F9F9] border-b border-[#F1F1F1]">
+                        <CardTitle className="text-[12px] font-black uppercase tracking-tight">Customers</CardTitle>
+                        <Users className="h-4 w-4 text-[#616161]" />
+                    </CardHeader>
+                    <CardContent className="p-6">
+                        <div className="text-2xl font-black text-[#111111]">+{totalCustomers}</div>
+                        <p className="text-[10px] text-[#8A8A8A] font-bold uppercase mt-1 tracking-widest">Registered users</p>
+                    </CardContent>
+                </Card>
             </div>
-            <Button asChild className="bg-[#592C2F] hover:bg-white text-white hover:text-[#592C2F] font-black h-14 px-12 uppercase tracking-[0.2em] transition-all rounded-[4px] border-none shadow-2xl">
-                <Link href="/admin">Retour au Dashboard</Link>
-            </Button>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <Card className="border-[#E3E3E3] shadow-sm rounded-xl overflow-hidden">
+                    <CardHeader className="bg-[#F9F9F9] border-b border-[#F1F1F1] p-6">
+                        <CardTitle className="text-[16px] font-black uppercase tracking-tight">Recent Orders</CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-0">
+                        {recentOrders.length === 0 ? (
+                            <div className="p-6 text-center text-[13px] text-[#616161] font-medium">No recent orders found.</div>
+                        ) : (
+                            <div className="divide-y divide-[#F1F1F1]">
+                                {recentOrders.map(order => (
+                                    <div key={order.id} className="flex items-center justify-between p-4 px-6 hover:bg-[#F9F9F9] transition-colors">
+                                        <div className="flex items-center gap-4">
+                                            <div className="h-10 w-10 rounded-full bg-[#111] text-white flex items-center justify-center font-bold text-[12px]">
+                                                {order.user?.name?.charAt(0) || "G"}
+                                            </div>
+                                            <div>
+                                                <p className="text-[13px] font-bold text-[#111]">{order.user?.name || "Guest User"}</p>
+                                                <p className="text-[11px] text-[#616161] font-medium">{order.user?.email || "No email"}</p>
+                                            </div>
+                                        </div>
+                                        <div className="text-right">
+                                            <p className="text-[13px] font-black text-[#111]">QAR {Number(order.total).toFixed(2)}</p>
+                                            <p className="text-[10px] text-[#8A8A8A] font-bold uppercase tracking-widest">{order.status}</p>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </CardContent>
+                </Card>
+
+                <Card className="border-[#E3E3E3] shadow-sm rounded-xl overflow-hidden">
+                    <CardHeader className="bg-[#F9F9F9] border-b border-[#F1F1F1] p-6">
+                        <CardTitle className="text-[16px] font-black uppercase tracking-tight">Performance Overview</CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-6 flex flex-col items-center justify-center h-64">
+                         <Activity className="w-12 h-12 text-[#D2D2D2] mb-4" />
+                         <p className="text-[13px] text-[#616161] font-medium text-center">Charts will be active once more sales data is available.</p>
+                    </CardContent>
+                </Card>
+            </div>
         </div>
     );
 }

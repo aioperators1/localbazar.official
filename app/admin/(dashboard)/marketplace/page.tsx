@@ -1,24 +1,31 @@
-import { Store, ShieldCheck } from "lucide-react";
+import { Store, ShieldCheck, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { Card, CardContent } from "@/components/ui/card";
 
 export default function MarketplacePage() {
     return (
-        <div className="flex flex-col items-center justify-center min-h-[70vh] text-center p-12 bg-[#0e0e0e] rounded-[8px] border border-white/5 shadow-2xl">
-            <div className="w-24 h-24 bg-[#592C2F]/10 rounded-full flex items-center justify-center mb-8 border border-white/5 relative overflow-hidden">
-                <Store className="w-10 h-10 text-[#592C2F]" />
-            </div>
-            <h1 className="text-4xl font-serif font-black text-white tracking-widest mb-6 uppercase italic">Marketplace <span className="text-[#592C2F]">Signature</span></h1>
-            <p className="text-zinc-500 font-bold uppercase text-[10px] tracking-[0.3em] max-w-lg mb-10 leading-relaxed">
-                Ce portail de gestion pour les vendeurs tiers est en cours d'harmonisation. Bientôt, vous pourrez modérer l'excellence des pièces proposées par nos partenaires certifiés.
-            </p>
-            <div className="flex items-center gap-4 mb-10 bg-white/5 px-6 py-3 rounded-[4px] text-[10px] font-black text-[#E2D8C5] uppercase tracking-[0.4em] border border-white/5 shadow-inner">
-                <ShieldCheck className="w-4 h-4 text-[#592C2F]" />
-                Mise à jour en cours • Excellence Local Bazar
-            </div>
-            <Button asChild className="bg-[#592C2F] hover:bg-white text-white hover:text-[#592C2F] font-black h-14 px-12 uppercase tracking-[0.2em] transition-all rounded-[4px] border-none shadow-2xl">
-                <Link href="/admin">Retourner au dashboard central</Link>
-            </Button>
+        <div className="flex flex-col items-center justify-center min-h-[70vh] text-center p-12">
+            <Card className="max-w-xl border-[#E3E3E3] shadow-sm rounded-xl overflow-hidden bg-white">
+                <CardContent className="p-12 flex flex-col items-center">
+                    <div className="w-20 h-20 bg-[#F1F1F1] rounded-full flex items-center justify-center mb-6">
+                        <Store className="w-8 h-8 text-[#111111]" />
+                    </div>
+                    <h1 className="text-2xl font-black text-[#111111] uppercase tracking-tight mb-4">
+                        Marketplace <span className="text-[#616161]">Module</span>
+                    </h1>
+                    <p className="text-[13px] text-[#616161] font-medium max-w-md mb-8 leading-relaxed">
+                        The vendor management and third-party marketplace portal is currently in development. Soon, you will be able to moderate sellers and commission rates centrally.
+                    </p>
+                    <div className="flex items-center gap-3 mb-10 bg-[#F9F9F9] px-6 py-3 rounded-lg text-[11px] font-bold text-[#8A8A8A] uppercase tracking-widest border border-[#F1F1F1]">
+                        <Clock className="w-4 h-4 text-[#111111]" />
+                        Deployment In Progress
+                    </div>
+                    <Button asChild className="bg-[#111111] hover:bg-black text-white font-bold h-11 px-8 rounded-lg shadow-lg transition-all">
+                        <Link href="/admin">Return to Dashboard</Link>
+                    </Button>
+                </CardContent>
+            </Card>
         </div>
     );
 }

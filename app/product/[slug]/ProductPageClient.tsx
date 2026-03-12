@@ -40,7 +40,7 @@ export default function ProductPageClient({ product, images, similarProducts }: 
 
     const handleBuyNow = () => {
         if (sizes.length > 0 && !selectedSize) {
-            alert("Veuillez sélectionner une taille");
+            alert("Please select a size");
             return;
         }
         addItem({
@@ -64,7 +64,7 @@ export default function ProductPageClient({ product, images, similarProducts }: 
             <div className="container mx-auto px-4 lg:px-20 max-w-[1500px]">
                 {/* Breadcrumbs - Minimalist */}
                 <div className="flex items-center gap-2 mb-12 text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400">
-                    <Link href="/" className="hover:text-[#111111] transition-colors">Accueil</Link>
+                    <Link href="/" className="hover:text-[#111111] transition-colors">Home</Link>
                     <ChevronRight className="w-3 h-3" />
                     <Link href="/shop" className="hover:text-[#111111] transition-colors">Collections</Link>
                     <ChevronRight className="w-3 h-3" />
@@ -100,7 +100,7 @@ export default function ProductPageClient({ product, images, similarProducts }: 
                         {colors.length > 0 && (
                             <div className="mb-10">
                                 <span className="text-[10px] font-bold uppercase tracking-[0.2em] mb-4 block text-zinc-500">
-                                    Couleur: <span className="text-[#111111]">{selectedColor?.name}</span>
+                                    Color: <span className="text-[#111111]">{selectedColor?.name}</span>
                                 </span>
                                 <div className="flex gap-4">
                                     {colors.map((color: any, idx: number) => (
@@ -126,10 +126,10 @@ export default function ProductPageClient({ product, images, similarProducts }: 
                         {sizes.length > 0 && (
                             <div className="mb-12">
                                 <div className="flex justify-between items-center mb-4">
-                                    <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500">Choisir la taille</span>
+                                    <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500">Select Size</span>
                                     <button className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.1em] text-zinc-400 hover:text-[#111111] transition-colors">
                                         <Ruler className="w-3.5 h-3.5" />
-                                        Guide des tailles
+                                        Size Guide
                                     </button>
                                 </div>
                                 <div className="flex flex-wrap gap-2">
@@ -169,7 +169,7 @@ export default function ProductPageClient({ product, images, similarProducts }: 
                                 onClick={handleBuyNow}
                                 className="h-16 w-full bg-white border border-[#111111] text-[#111111] font-bold text-[12px] uppercase tracking-[0.3em] hover:bg-[#111111] hover:text-white transition-all rounded-none"
                             >
-                                Acheter Maintenant
+                                Buy It Now
                             </button>
                         </div>
 
@@ -181,50 +181,50 @@ export default function ProductPageClient({ product, images, similarProducts }: 
                             </button>
                             <button className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.15em] text-zinc-400 hover:text-[#111111] transition-colors">
                                 <Share2 className="w-4 h-4" />
-                                Partager
+                                Share
                             </button>
                         </div>
 
                         {/* Accordion Details */}
                         <div className="space-y-6">
                             <AccordionItem 
-                                title="Description & Détails" 
+                                title="Description & Details" 
                                 isOpen={activeSection === "details"}
                                 onClick={() => setActiveSection(activeSection === "details" ? "" : "details")}
                             >
                                 <div className="space-y-4 text-[13px] text-zinc-600 leading-relaxed font-medium">
                                     <p>{product.description}</p>
                                     {product.materials && (
-                                        <p><strong className="text-[#111111] lowercase first-letter:uppercase font-bold">Matière:</strong> {product.materials}</p>
+                                        <p><strong className="text-[#111111] lowercase first-letter:uppercase font-bold">Material:</strong> {product.materials}</p>
                                     )}
-                                    <p><strong className="text-[#111111] lowercase first-letter:uppercase font-bold">Saison:</strong> Nouvelle Collection {new Date().getFullYear()}</p>
-                                    <p><strong className="text-[#111111] lowercase first-letter:uppercase font-bold">Référence:</strong> {product.id?.slice(0, 8).toUpperCase()}</p>
+                                    <p><strong className="text-[#111111] lowercase first-letter:uppercase font-bold">Season:</strong> New Collection {new Date().getFullYear()}</p>
+                                    <p><strong className="text-[#111111] lowercase first-letter:uppercase font-bold">Reference:</strong> {product.id?.slice(0, 8).toUpperCase()}</p>
                                 </div>
                             </AccordionItem>
 
                             <AccordionItem 
-                                title="Conseils d'Entretien" 
+                                title="Care Instructions" 
                                 isOpen={activeSection === "care"}
                                 onClick={() => setActiveSection(activeSection === "care" ? "" : "care")}
                             >
                                 <p className="text-[13px] text-zinc-600 leading-relaxed font-medium capitalize first-letter:uppercase">
-                                    {product.careInstructions || "Nettoyage professionnel recommandé pour préserver la qualité des fibres."}
+                                    {product.careInstructions || "Professional cleaning recommended to preserve fabric quality."}
                                 </p>
                             </AccordionItem>
 
                             <AccordionItem 
-                                title="Livraison & Retours" 
+                                title="Shipping & Returns" 
                                 isOpen={activeSection === "shipping"}
                                 onClick={() => setActiveSection(activeSection === "shipping" ? "" : "shipping")}
                             >
                                 <ul className="text-[13px] text-zinc-600 leading-relaxed font-medium space-y-2">
                                     <li className="flex items-center gap-3">
                                         <Truck className="w-4 h-4 text-[#111111]" />
-                                        <span>Livraison express offerte à Qatar</span>
+                                        <span>Free express shipping to Qatar</span>
                                     </li>
                                     <li className="flex items-center gap-3">
                                         <ShieldCheck className="w-4 h-4 text-[#111111]" />
-                                        <span>Retours gratuits sous 7 jours</span>
+                                        <span>Free returns within 7 days</span>
                                     </li>
                                 </ul>
                             </AccordionItem>
@@ -237,7 +237,7 @@ export default function ProductPageClient({ product, images, similarProducts }: 
                     <div className="mt-32 pt-24 border-t border-zinc-100">
                         <div className="text-center mb-16">
                             <span className="text-[11px] font-bold uppercase tracking-[0.4em] text-zinc-400 mb-4 block">Suggestions</span>
-                            <h2 className="text-[28px] lg:text-[36px] font-black text-[#111111] font-serif uppercase tracking-tight">Vous Aimerez Aussi</h2>
+                            <h2 className="text-[28px] lg:text-[36px] font-black text-[#111111] font-serif uppercase tracking-tight">You May Also Like</h2>
                         </div>
                         <ProductCarousel products={similarProducts} title="" />
                     </div>

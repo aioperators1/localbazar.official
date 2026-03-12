@@ -14,20 +14,20 @@ const arabicFont = Cairo({ subsets: ["arabic"], variable: "--font-cairo" });
 
 export const metadata: Metadata = {
   title: {
-    default: "Local Bazar | L'Excellence du Luxe & de l'Héritage",
+    default: "Local Bazar | The Excellence of Luxury & Heritage",
     template: "%s | Local Bazar",
   },
-  description: "Découvrez Local Bazar, la destination privilégiée pour le luxe masculin au Qatar. Parfums d'Orient, couture raffinée et héritage traditionnel depuis 2013.",
-  keywords: ["luxe", "fashion", "qatar", "parfums", "menswear", "local bazar"],
+  description: "Discover Local Bazar, the premier destination for luxury fashion in Qatar. Exquisite abayas, elegant jalabiyas, and premium oriental perfumes.",
+  keywords: ["luxury", "fashion", "qatar", "perfumes", "abayas", "jalabiyas", "local bazar"],
   authors: [{ name: "Local Bazar" }],
   creator: "Local Bazar",
-  metadataBase: new URL('https://localbazar.gq'),
+  metadataBase: new URL('https://localbazar.com'),
   openGraph: {
     type: "website",
-    locale: "fr_QA",
-    url: "https://localbazar.gq",
-    title: "Local Bazar | L'Excellence du Luxe & de l'Héritage",
-    description: "La destination privilégiée pour le luxe masculin au Qatar.",
+    locale: "en_QA",
+    url: "https://localbazar.com",
+    title: "Local Bazar | The Excellence of Luxury & Heritage",
+    description: "The premier destination for luxury fashion and heritage in Qatar.",
     siteName: "Local Bazar",
     images: [
       {
@@ -40,8 +40,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Local Bazar | L'Excellence du Luxe & de l'Héritage",
-    description: "Le meilleur du luxe masculin au Qatar.",
+    title: "Local Bazar | The Excellence of Luxury & Heritage",
+    description: "The premier destination for luxury fashion and heritage in Qatar.",
     images: ["/og-image.jpg"],
     creator: "@localbazar",
   },

@@ -21,8 +21,11 @@ import {
     List, 
     Link as LinkIcon, 
     Code,
-    ChevronLeft
+    ChevronLeft,
+    Plus,
+    Trash2
 } from "lucide-react";
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 
 interface Category {
@@ -39,7 +42,8 @@ interface ProductData {
     stock: number;
     categoryId: string;
     images: string;
-    brand?: string | null;
+    brandId?: string | null;
+    brandName?: string | null;
     sku?: string | null;
     description: string;
     specs?: string | null;
@@ -51,10 +55,11 @@ interface ProductData {
 
 interface ProductFormProps {
     categories: Category[];
+    brands: any[];
     initialData?: ProductData | null;
 }
 
-export default function ProductForm({ categories, initialData }: ProductFormProps) {
+export default function ProductForm({ categories, brands, initialData }: ProductFormProps) {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
     const [name, setName] = useState(initialData?.name || "");
@@ -68,29 +73,65 @@ export default function ProductForm({ categories, initialData }: ProductFormProp
         }
     };
 
+    const [images, setImages] = useState<string[]>(() => {
+        try {
+            if (initialData?.images && initialData.images.startsWith('[')) {
+                return JSON.parse(initialData.images);
+            } else if (initialData?.images) {
+                return [initialData.images];
+            }
+        } catch (e) {
+            console.error("Image parse error", e);
+        }
+        return [""];
+    });
+
+    const addImageField = () => setImages([...images, ""]);
+    const updateImageField = (index: number, value: string) => {
+        const newImages = [...images];
+        newImages[index] = value;
+        setImages(newImages);
+    };
+    const removeImageField = (index: number) => {
+        if (images.length > 1) {
+            setImages(images.filter((_, i) => i !== index));
+        } else {
+            setImages([""]);
+        }
+    };
+
     async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
         setLoading(true);
 
         const formData = new FormData(event.currentTarget);
+        
+        // Clean up empty images
+        const filteredImages = images.filter(img => img.trim() !== "");
+
         const data = {
             name: formData.get("name") as string,
             slug: formData.get("slug") as string,
             price: formData.get("price") as string,
             stock: formData.get("stock") as string,
             categoryId: formData.get("categoryId") as string,
-            image: formData.get("image") as string,
-            brand: formData.get("brand") as string,
+            image: filteredImages, // Sending as array to the action
+            brandId: formData.get("brandId") as string,
+            brandName: formData.get("brandName") as string,
             sku: formData.get("sku") as string,
             description: formData.get("description") as string,
             specs: initialData?.specs || "{}",
+            sizes: formData.get("sizes") as string,
+            colors: formData.get("colors") as string,
+            materials: formData.get("materials") as string,
+            careInstructions: formData.get("careInstructions") as string,
         };
 
         let res;
         if (initialData?.id) {
             res = await updateProduct(initialData.id, data);
         } else {
-            res = await createProduct(data);
+            res = await createProduct(data as any);
         }
 
         if (res.success) {
@@ -196,22 +237,88 @@ export default function ProductForm({ categories, initialData }: ProductFormProp
 
                     {/* Media */}
                     <div className="bg-white rounded-xl border border-[#E3E3E3] shadow-sm p-6 space-y-4">
-                        <Label className="text-[11px] font-black text-[#616161] uppercase tracking-widest">Media</Label>
-                        <div className="relative border-2 border-dashed border-[#E3E3E3] rounded-xl p-8 flex flex-col items-center justify-center text-center space-y-4 hover:border-[#303030] hover:bg-[#F9F9F9] transition-all cursor-pointer group">
-                            <div className="w-12 h-12 rounded-full bg-[#F1F1F1] flex items-center justify-center group-hover:scale-110 transition-transform">
-                                <ImageIcon className="w-6 h-6 text-[#616161]" />
+                        <div className="flex items-center justify-between">
+                            <Label className="text-[11px] font-black text-[#616161] uppercase tracking-widest">Media Gallery</Label>
+                            <Button type="button" variant="ghost" onClick={addImageField} className="h-7 text-[10px] font-bold text-[#005BD3] hover:bg-[#F1F1F1]">
+                                <Plus className="w-3 h-3 mr-1" /> Add Image URL
+                            </Button>
+                        </div>
+                        <div className="grid grid-cols-1 gap-3">
+                            {images.map((url, idx) => (
+                                <div key={idx} className="flex gap-2">
+                                    <div className="relative w-10 h-10 rounded-lg bg-[#F1F1F1] overflow-hidden shrink-0 border border-[#E3E3E3]">
+                                        {url ? (
+                                            <Image src={url} alt="preview" fill className="object-cover" unoptimized />
+                                        ) : (
+                                            <div className="w-full h-full flex items-center justify-center">
+                                                <ImageIcon className="w-4 h-4 text-[#D2D2D2]" />
+                                            </div>
+                                        )}
+                                    </div>
+                                    <Input 
+                                        value={url}
+                                        onChange={e => updateImageField(idx, e.target.value)}
+                                        placeholder="https://..."
+                                        className="text-[12px] h-10 border-[#D2D2D2] bg-white rounded-lg focus:ring-1 focus:ring-black flex-1"
+                                    />
+                                    <Button 
+                                        type="button" 
+                                        variant="ghost" 
+                                        size="icon" 
+                                        onClick={() => removeImageField(idx)}
+                                        className="h-10 w-10 text-rose-500 hover:bg-rose-50 hover:text-rose-600 rounded-lg"
+                                    >
+                                        <Trash2 className="w-4 h-4" />
+                                    </Button>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Specifications Accordion Replacement (Native for Form) */}
+                    <div className="bg-white rounded-xl border border-[#E3E3E3] shadow-sm p-6 space-y-6">
+                        <Label className="text-[11px] font-black text-[#616161] uppercase tracking-widest">Detailed Specifications</Label>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="space-y-2">
+                                <Label htmlFor="materials" className="text-[11px] text-[#616161] font-bold">Materials</Label>
+                                <Input 
+                                    id="materials" 
+                                    name="materials" 
+                                    defaultValue={initialData?.materials || ""} 
+                                    placeholder="e.g. 100% Organic Silk"
+                                    className="bg-white border-[#D2D2D2] h-10 rounded-lg text-[13px]"
+                                />
                             </div>
-                            <div className="space-y-1">
-                                <p className="text-[13px] font-bold text-[#303030]">Drop image or paste URL</p>
-                                <p className="text-[11px] text-[#616161]">JPEG, PNG, WEBP supported</p>
+                            <div className="space-y-2">
+                                <Label htmlFor="careInstructions" className="text-[11px] text-[#616161] font-bold">Care Instructions</Label>
+                                <Input 
+                                    id="careInstructions" 
+                                    name="careInstructions" 
+                                    defaultValue={initialData?.careInstructions || ""} 
+                                    placeholder="e.g. Dry clean only"
+                                    className="bg-white border-[#D2D2D2] h-10 rounded-lg text-[13px]"
+                                />
                             </div>
-                            <Input 
-                                id="image" 
-                                name="image" 
-                                defaultValue={initialData?.images}
-                                placeholder="https://..."
-                                className="text-[12px] h-9 max-w-sm text-center border-[#D2D2D2] bg-white rounded-lg focus:ring-1 focus:ring-black"
-                            />
+                            <div className="space-y-2">
+                                <Label htmlFor="sizes" className="text-[11px] text-[#616161] font-bold">Available Sizes (JSON array)</Label>
+                                <Input 
+                                    id="sizes" 
+                                    name="sizes" 
+                                    defaultValue={initialData?.sizes || '["S", "M", "L", "XL"]'} 
+                                    placeholder='["S", "M", "L"]'
+                                    className="bg-white border-[#D2D2D2] h-10 rounded-lg text-[13px] font-mono"
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="colors" className="text-[11px] text-[#616161] font-bold">Available Colors (JSON array)</Label>
+                                <Input 
+                                    id="colors" 
+                                    name="colors" 
+                                    defaultValue={initialData?.colors || '[]'} 
+                                    placeholder='[{"name": "Noir", "hex": "#000"}]'
+                                    className="bg-white border-[#D2D2D2] h-10 rounded-lg text-[13px] font-mono"
+                                />
+                            </div>
                         </div>
                     </div>
 
@@ -326,10 +433,30 @@ export default function ProductForm({ categories, initialData }: ProductFormProp
                         <Label className="text-[11px] font-black text-[#616161] uppercase tracking-widest">Organization</Label>
                         <div className="space-y-4">
                             <div className="space-y-2">
-                                <Label className="text-[11px] text-[#616161] font-bold">Brand</Label>
+                                <Label className="text-[11px] text-[#616161] font-bold">Select Brand</Label>
+                                <div className="relative">
+                                    <select
+                                        name="brandId"
+                                        defaultValue={initialData?.brandId || ""}
+                                        className="w-full h-10 bg-white border border-[#D2D2D2] rounded-lg px-4 text-[13px] font-bold focus:ring-1 focus:ring-black outline-none appearance-none cursor-pointer hover:border-[#303030] transition-colors"
+                                    >
+                                        <option value="">No Brand (Generic)</option>
+                                        {brands.map((brand) => (
+                                            <option key={brand.id} value={brand.id}>
+                                                {brand.name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    <div className="absolute right-3 top-3 pointer-events-none opacity-40">
+                                        <ChevronLeft className="w-4 h-4 -rotate-90" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="space-y-2">
+                                <Label className="text-[11px] text-[#616161] font-bold">Custom Brand Name (Optional)</Label>
                                 <Input 
-                                    name="brand"
-                                    defaultValue={initialData?.brand || ""}
+                                    name="brandName"
+                                    defaultValue={initialData?.brandName || ""}
                                     placeholder="e.g. Local Bazar" 
                                     className="h-9 text-[13px] border-[#D2D2D2] rounded-lg bg-[#F9F9F9] focus:ring-1 focus:ring-black font-bold" 
                                 />

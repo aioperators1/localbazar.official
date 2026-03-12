@@ -59,11 +59,11 @@ export default async function ProductPage({
             images = [product.images];
         }
     } catch {
-        images = ["https://images.unsplash.com/photo-1550009158-9ebf69173e03?q=80&w=1000"];
+        images = ["https://images.unsplash.com/photo-1594932224036-9c205771abb6?q=80&w=1000"];
     }
 
     if (images.length === 0) {
-        images = ["https://images.unsplash.com/photo-1550009158-9ebf69173e03?q=80&w=1000"];
+        images = ["https://images.unsplash.com/photo-1594932224036-9c205771abb6?q=80&w=1000"];
     }
 
     // Product is already partially serialized by getProductBySlug
@@ -71,20 +71,15 @@ export default async function ProductPage({
         ...product,
     };
 
-    // Infer category if missing
+    // Infer category if missing (Fashion focus)
     let catToFetch = product.categoryId || product.category?.slug;
     if (!catToFetch) {
         const n = product.name.toLowerCase();
-        if (n.includes('pc gamer')) catToFetch = 'pc-gamer';
-        else if (n.includes('rtx') || n.includes('rx ') || n.includes('geforce') || n.includes('radeon') || n.includes('gpu')) catToFetch = 'cartes-graphiques';
-        else if (n.includes('ryzen') || n.includes('intel core') || n.includes('processeur')) catToFetch = 'processeurs';
-        else if (n.includes('carte mère') || n.includes('b650') || n.includes('x670') || n.includes('z790') || n.includes('motherboard')) catToFetch = 'cartes-meres';
-        else if (n.includes('ssd') || n.includes('ram') || n.includes('ddr5') || n.includes('grizzly') || n.includes('thermal')) catToFetch = 'composants';
-        else if (n.includes('souris') || n.includes('clavier') || n.includes('casque') || n.includes('razer')) catToFetch = 'peripheriques';
-        else if (n.includes('desk') || n.includes('bureau') || n.includes('cockpit') || n.includes('skilldesk')) catToFetch = 'chaises-bureaux';
-        else if (n.includes('ecran') || n.includes('monitor') || n.includes('msi mag')) catToFetch = 'ecrans';
-        else if (n.includes('portable') || n.includes('laptop')) catToFetch = 'pc-portable';
-        else catToFetch = undefined; // Fallback to all if really can't figure it out
+        if (n.includes('couture') || n.includes('robe') || n.includes('dress')) catToFetch = 'evening-wear';
+        else if (n.includes('tailleur') || n.includes('suit') || n.includes('costume')) catToFetch = 'suits';
+        else if (n.includes('héritage') || n.includes('traditional') || n.includes('heritage')) catToFetch = 'traditional';
+        else if (n.includes('accessoire') || n.includes('sac') || n.includes('bag')) catToFetch = 'accessories';
+        else catToFetch = undefined; 
     }
 
     // Fetch similar products
@@ -106,12 +101,12 @@ export default async function ProductPage({
                     pImages = [p.images];
                 }
             } catch {
-                pImages = ["https://images.unsplash.com/photo-1550009158-9ebf69173e03?q=80&w=1000"];
+                pImages = ["https://images.unsplash.com/photo-1594932224036-9c205771abb6?q=80&w=1000"];
             }
 
             return {
                 ...p,
-                image: pImages.length > 0 ? pImages[0] : "https://images.unsplash.com/photo-1550009158-9ebf69173e03?q=80&w=1000"
+                image: pImages.length > 0 ? pImages[0] : "https://images.unsplash.com/photo-1594932224036-9c205771abb6?q=80&w=1000"
             };
         });
 

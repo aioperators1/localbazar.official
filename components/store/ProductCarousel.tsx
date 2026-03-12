@@ -5,9 +5,10 @@ import Autoplay from "embla-carousel-autoplay";
 import { useCallback, useEffect, useState } from "react";
 import { ProductCard } from "@/components/store/ProductCard";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface ProductCarouselProps {
-    title: string;
+    title?: string;
     products: any[];
 }
 
@@ -39,43 +40,49 @@ export function ProductCarousel({ title, products }: ProductCarouselProps) {
     if (!products.length) return null;
 
     return (
-        <section className="pt-6 pb-2 relative">
-            <div className="max-w-7xl mx-auto px-4">
-                <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-xl md:text-2xl font-bold text-[var(--color-brand-blue)] uppercase">
-                        {title}
-                    </h2>
-                    <div className="flex gap-2">
-                        <button
-                            onClick={scrollPrev}
-                            className={`p-2 rounded-sm border border-zinc-200 transition-colors ${prevBtnEnabled ? "text-zinc-800 hover:bg-zinc-100" : "text-zinc-300"
-                                }`}
-                            disabled={!prevBtnEnabled}
-                        >
-                            <ChevronLeft className="w-5 h-5" />
-                        </button>
-                        <button
-                            onClick={scrollNext}
-                            className={`p-2 rounded-sm border border-zinc-200 transition-colors ${nextBtnEnabled ? "text-zinc-800 hover:bg-zinc-100" : "text-zinc-300"
-                                }`}
-                            disabled={!nextBtnEnabled}
-                        >
-                            <ChevronRight className="w-5 h-5" />
-                        </button>
+        <section className="relative group/main">
+            <div className="container mx-auto px-4 lg:px-24">
+                {title && (
+                    <div className="flex items-center justify-between mb-8">
+                        <h2 className="text-[24px] font-serif text-black uppercase tracking-tight">
+                            {title}
+                        </h2>
                     </div>
-                </div>
+                )}
 
-                <div className="overflow-hidden" ref={emblaRef}>
-                    <div className="flex -ml-4">
-                        {products.map((product) => (
-                            <div
-                                key={product.id}
-                                className="pl-4 pb-4 min-w-[280px] sm:min-w-[300px] md:min-w-[25%] lg:min-w-[20%] flex-[0_0_auto]"
-                            >
-                                <ProductCard product={product} />
-                            </div>
-                        ))}
+                <div className="relative">
+                    <div className="overflow-hidden" ref={emblaRef}>
+                        <div className="flex -ml-6">
+                            {products.map((product) => (
+                                <div
+                                    key={product.id}
+                                    className="pl-6 pb-4 min-w-[280px] sm:min-w-[320px] md:min-w-[33.33%] lg:min-w-[25%] flex-[0_0_auto]"
+                                >
+                                    <ProductCard product={product} />
+                                </div>
+                            ))}
+                        </div>
                     </div>
+
+                    {/* Navigation Arrows - Minimalist Floating */}
+                    <button
+                        onClick={scrollPrev}
+                        className={cn(
+                            "absolute -left-6 lg:-left-12 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white shadow-xl flex items-center justify-center transition-all opacity-0 group-hover/main:opacity-100 hover:bg-black hover:text-white z-20",
+                            !prevBtnEnabled && "hidden"
+                        )}
+                    >
+                        <ChevronLeft className="w-6 h-6" />
+                    </button>
+                    <button
+                        onClick={scrollNext}
+                        className={cn(
+                            "absolute -right-6 lg:-right-12 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white shadow-xl flex items-center justify-center transition-all opacity-0 group-hover/main:opacity-100 hover:bg-black hover:text-white z-20",
+                            !nextBtnEnabled && "hidden"
+                        )}
+                    >
+                        <ChevronRight className="w-6 h-6" />
+                    </button>
                 </div>
             </div>
         </section>

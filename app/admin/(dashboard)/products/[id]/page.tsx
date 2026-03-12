@@ -14,12 +14,16 @@ interface EditProductPageProps {
 export default async function EditProductPage(props: EditProductPageProps) {
     const params = await props.params;
 
-    const [product, categories] = await Promise.all([
+    const prismaAny = prisma as any;
+    const [product, categories, brands] = await Promise.all([
         prisma.product.findUnique({
             where: { id: params.id },
         }),
-        prisma.category.findMany({
+        prismaAny.category.findMany({
             include: { parent: true },
+            orderBy: { name: 'asc' }
+        }),
+        prismaAny.brand.findMany({
             orderBy: { name: 'asc' }
         })
     ]);
@@ -36,7 +40,7 @@ export default async function EditProductPage(props: EditProductPageProps) {
         updatedAt: product.updatedAt.toISOString(),
     };
 
-    const serializedCategories = categories.map(cat => ({
+    const serializedCategories = categories.map((cat: any) => ({
         ...cat,
         createdAt: cat.createdAt.toISOString(),
         parent: cat.parent ? {
@@ -47,7 +51,6 @@ export default async function EditProductPage(props: EditProductPageProps) {
 
     return (
         <div className="space-y-6">
-            {/* Shopify-style Header */}
             <div className="flex flex-col gap-4">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
@@ -63,6 +66,7 @@ export default async function EditProductPage(props: EditProductPageProps) {
 
             <ProductForm
                 categories={serializedCategories}
+                brands={brands}
                 initialData={serializedProduct}
             />
         </div>

@@ -17,7 +17,7 @@ export function ShopHeader({ categoryName, slug, productCount }: ShopHeaderProps
     // Resolve Title
     const title = slug
         ? t(`cat.${slug}` as Parameters<typeof t>[0])
-        : (categoryName === "Full Catalogue" ? "Tous Les Produits" : categoryName);
+        : (categoryName === "Full Catalogue" ? "All Products" : categoryName);
 
     // Fallback if translation returns key
     const displayTitle = title.startsWith("cat.") ? categoryName : title;

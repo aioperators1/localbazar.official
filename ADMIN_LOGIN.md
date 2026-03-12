@@ -1,18 +1,18 @@
-# Dashboard Login Credentials
+# Local Bazar Admin Credentials
 
 ## Admin Access
 
 **URL:** http://localhost:3000/admin/login
 
 **Username:** admin  
-**Email:** admin@electro-islam.com  
-**Password:** electrolwfjwn12381nd
+**Email:** admin@localbazar.com  
+**Password:** localbazar_admin_2024!
 
 ---
 
 ## How to Log In
 
-1. **Start the development server** (if not already running):
+1. **Start the development server**:
    ```bash
    npm run dev
    ```
@@ -21,57 +21,33 @@
    - Open your browser and go to: http://localhost:3000/admin/login
 
 3. **Enter credentials**:
-   - **Username or Email:** You can use either `admin` or `admin@electro-islam.com`
-   - **Password:** `electrolwfjwn12381nd`
+   - **Username or Email:** You can use either `admin` or `admin@localbazar.com`
+   - **Password:** `localbazar_admin_2024!`
 
-4. **Click "Sign In"** to access the admin dashboard
-
----
-
-## Fixed Issues
-
-✅ **All problems have been fixed! Build is now successful.**
-
-### 1. React Component Errors
-- **Fixed accordion component** - Resolved `setIsOpen` prop error by properly destructuring React-specific props before spreading to DOM elements
-- Props `setIsOpen` and `value` are now excluded from being passed to native `<div>` elements
-
-### 2. Missing Dependencies
-- **Installed Radix UI packages:**
-  - `@radix-ui/react-icons`
-  - `@radix-ui/react-select`
-
-### 3. TypeScript Type Errors
-- **Fixed admin dashboard stats** - Added missing `users` field to error return object
-- **Fixed shop page** - Updated fallback categories to include all required fields (image, createdAt, parentId)
-- **Fixed admin products page** - Converted Prisma Decimal price to number
-- **Fixed deals page** - Properly mapped product data to match ProductCard interface
-- **Fixed test-db page** - Added explicit type annotation for users array
-- **Fixed Overview component** - Updated Tooltip formatter to accept correct Recharts type
-- **Fixed admin actions** - Added type guards and String() conversions for parseFloat/parseInt
-
-### 4. Build Success
-- ✅ Production build completes successfully
-- ✅ All TypeScript errors resolved
-- ✅ All pages compile correctly
+4. **Click "Sign In"** to access the premium management suite.
 
 ---
 
-## Dashboard Features
+## Luxury Transformation Complete
+
+✅ **PC & Electronics completely removed.**
+✅ **Luxury Fashion branding implemented across all pages.**
+✅ **New High-End category system (Couture, Suits, Heritage, Accessories).**
+✅ **Premium Aesthetic matching Image 2.**
+
+---
+
+## Management Features
 
 Once logged in, you'll have access to:
-- **Orders Management** - View and manage customer orders
-- **Products Management** - Add, edit, and delete products
-- **Categories Management** - Manage product categories
-- **Reservations** - View and manage table reservations
-- **Floor Plan** - Interactive table layout management
-- **Analytics & Insights** - Business metrics and statistics
+- **Orders Management** - Manage luxury fashion orders and concierge services.
+- **Products Management** - Add, edit, and delete haute couture items.
+- **Categories Management** - Manage fashion collections (Evening Wear, Traditional, etc.).
+- **Analytics & Insights** - Sales metrics and trend analysis.
 
 ---
 
 ## Troubleshooting
-
-If you encounter any login issues:
 
 1. **Verify the database is seeded:**
    ```bash
@@ -79,13 +55,7 @@ If you encounter any login issues:
    ```
 
 2. **Check database directly:**
-   You can use `npx prisma studio` to view and edit users directly in the browser.
+   Use `npx prisma studio` to view and edit stock/pricing directly.
 
 3. **Reset password if needed:**
-   - The password is hashed using bcrypt with 12 rounds
-   - Default password is always `electrolwfjwn12381nd` after seeding
-
-4. **"Server error" on login page:**
-   - This usually means a configuration issue in `.env`.
-   - Ensure `NEXTAUTH_URL` and `NEXTAUTH_SECRET` are set correctly without line breaks.
-   - Restart the server with `npm run dev` after changing `.env`.
+   - Default password is `localbazar_admin_2024!` after seeding.

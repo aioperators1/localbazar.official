@@ -11,17 +11,42 @@ type ProductInput = {
     price: string | number;
     stock: string | number;
     categoryId: string;
-    image: string;
-    brand: string;
+    image: string | string[]; // Can be single URL or array
+    brandId?: string;
+    brandName?: string;
     sku: string;
     specs?: string;
+    sizes?: string;
+    colors?: string;
+    materials?: string;
+    careInstructions?: string;
 };
 
 export async function getDashboardStats() {
     try {
-        const [totalRevenue, totalOrders, totalProducts, recentOrders] = await Promise.all([
-            prisma.order.aggregate({
-                _sum: { total: true }
+        const now = new Date();
+        const startOfThisMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+        const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+
+        const [
+            totalRevenue, 
+            totalOrders, 
+            totalProducts, 
+            recentOrders,
+            totalUsers,
+            
+            thisMonthRevenue,
+            lastMonthRevenue,
+            
+            thisMonthOrders,
+            lastMonthOrders,
+            
+            thisMonthUsers,
+            lastMonthUsers
+        ] = await Promise.all([
+            prisma.order.aggregate({ 
+                _sum: { total: true },
+                where: { status: { not: 'CANCELLED' } } 
             }),
             prisma.order.count(),
             prisma.product.count(),
@@ -29,24 +54,64 @@ export async function getDashboardStats() {
                 take: 5,
                 orderBy: { createdAt: 'desc' },
                 include: { user: true }
-            })
+            }),
+            prisma.user.count({ where: { role: 'USER' } }),
+            
+            prisma.order.aggregate({ 
+                where: { createdAt: { gte: startOfThisMonth }, status: { not: 'CANCELLED' } },
+                _sum: { total: true } 
+            }),
+            prisma.order.aggregate({ 
+                where: { createdAt: { gte: startOfLastMonth, lt: startOfThisMonth }, status: { not: 'CANCELLED' } },
+                _sum: { total: true } 
+            }),
+            
+            prisma.order.count({ where: { createdAt: { gte: startOfThisMonth } } }),
+            prisma.order.count({ where: { createdAt: { gte: startOfLastMonth, lt: startOfThisMonth } } }),
+            
+            prisma.user.count({ where: { role: 'USER', createdAt: { gte: startOfThisMonth } } }),
+            prisma.user.count({ where: { role: 'USER', createdAt: { gte: startOfLastMonth, lt: startOfThisMonth } } })
         ]);
+
+        const calcTrend = (current: number, previous: number) => {
+            if (previous === 0) return current > 0 ? { change: "+100%", trend: "up" } : { change: "0%", trend: "neutral" };
+            const diff = ((current - previous) / previous) * 100;
+            return {
+                change: `${diff > 0 ? '+' : ''}${diff.toFixed(1)}%`,
+                trend: diff > 0 ? "up" : diff < 0 ? "down" : "neutral"
+            };
+        };
+
+        const revenueCurrent = Number(thisMonthRevenue._sum.total || 0);
+        const revenuePrevious = Number(lastMonthRevenue._sum.total || 0);
 
         return {
             revenue: Number(totalRevenue._sum.total || 0),
             orders: totalOrders,
             products: totalProducts,
-            users: await prisma.user.count(),
+            users: totalUsers,
             recentOrders: recentOrders.map(order => ({
                 ...order,
                 total: Number(order.total),
                 createdAt: order.createdAt.toISOString(),
                 updatedAt: order.updatedAt.toISOString(),
-            }))
+            })),
+            trends: {
+                revenue: calcTrend(revenueCurrent, revenuePrevious),
+                orders: calcTrend(thisMonthOrders, lastMonthOrders),
+                users: calcTrend(thisMonthUsers, lastMonthUsers)
+            }
         };
     } catch (error) {
         console.error("Stats Error:", error);
-        return { revenue: 0, orders: 0, products: 0, users: 0, recentOrders: [] };
+        return { 
+            revenue: 0, orders: 0, products: 0, users: 0, recentOrders: [],
+            trends: {
+                revenue: { change: "0%", trend: "neutral" },
+                orders: { change: "0%", trend: "neutral" },
+                users: { change: "0%", trend: "neutral" }
+            }
+        };
     }
 }
 
@@ -61,10 +126,15 @@ export async function createProduct(data: ProductInput) {
                 price: parseFloat(String(data.price)),
                 stock: parseInt(String(data.stock)),
                 categoryId: data.categoryId,
-                images: JSON.stringify([data.image]), // Simplification for now
-                brand: data.brand,
+                images: Array.isArray(data.image) ? JSON.stringify(data.image) : JSON.stringify([data.image]),
+                brandId: data.brandId,
+                brandName: data.brandName,
                 sku: data.sku,
                 specs: data.specs,
+                sizes: data.sizes,
+                colors: data.colors,
+                materials: data.materials,
+                careInstructions: data.careInstructions,
             }
         });
         revalidatePath('/admin/products');
@@ -95,12 +165,14 @@ export async function updateProduct(id: string, data: Partial<ProductInput>) {
 
         // Map 'image' input to 'images' database field
         if (image) {
-            updateData.images = JSON.stringify([image]);
+            updateData.images = Array.isArray(image) ? JSON.stringify(image) : JSON.stringify([image]);
         }
 
-        if (specs !== undefined) {
-            updateData.specs = specs;
-        }
+        if (specs !== undefined) updateData.specs = specs;
+        if (data.sizes !== undefined) updateData.sizes = data.sizes;
+        if (data.colors !== undefined) updateData.colors = data.colors;
+        if (data.materials !== undefined) updateData.materials = data.materials;
+        if (data.careInstructions !== undefined) updateData.careInstructions = data.careInstructions;
 
         await prisma.product.update({
             where: { id },
@@ -210,7 +282,8 @@ export async function getMonthlyRevenue() {
                 createdAt: {
                     gte: new Date(`${currentYear}-01-01`),
                     lt: new Date(`${currentYear + 1}-01-01`)
-                }
+                },
+                status: { not: 'CANCELLED' }
             },
             select: {
                 createdAt: true,
@@ -253,13 +326,14 @@ export async function getAdminBanners() {
     }
 }
 
-export async function createBanner(data: { title: string, subtitle?: string, image: string, link?: string, active?: boolean, order?: number }) {
+export async function createBanner(data: { title: string, subtitle?: string, description?: string, image: string, link?: string, active?: boolean, order?: number }) {
     try {
         const prismaAny = prisma as any;
         await prismaAny.banner.create({
             data: {
                 title: data.title,
                 subtitle: data.subtitle,
+                description: data.description,
                 image: data.image,
                 link: data.link,
                 active: data.active ?? true,
@@ -274,7 +348,7 @@ export async function createBanner(data: { title: string, subtitle?: string, ima
     }
 }
 
-export async function updateBanner(id: string, data: Partial<{ title: string, subtitle: string, image: string, link: string, active: boolean, order: number }>) {
+export async function updateBanner(id: string, data: Partial<{ title: string, subtitle: string, description: string, image: string, link: string, active: boolean, order: number }>) {
     try {
         const prismaAny = prisma as any;
         await prismaAny.banner.update({
@@ -304,9 +378,8 @@ export async function deleteBanner(id: string) {
 // --- SETTINGS MANAGEMENT ---
 export async function getAdminSettings() {
     try {
-        const prismaAny = prisma as any;
-        const settings = await prismaAny.setting.findMany();
-        return settings.reduce((acc: any, setting: any) => {
+        const settings = await prisma.setting.findMany();
+        return settings.reduce((acc: Record<string, string>, setting) => {
             acc[setting.key] = setting.value;
             return acc;
         }, {});
@@ -318,17 +391,16 @@ export async function getAdminSettings() {
 
 export async function updateAdminSettings(data: Record<string, string>) {
     try {
-        const prismaAny = prisma as any;
         // Use a transaction to update all settings
         const updates = Object.entries(data).map(([key, value]) => {
-            return prismaAny.setting.upsert({
+            return prisma.setting.upsert({
                 where: { key },
                 update: { value },
                 create: { key, value }
             });
         });
 
-        await prismaAny.$transaction(updates);
+        await prisma.$transaction(updates);
         revalidatePath('/');
         revalidatePath('/admin/settings');
         return { success: true };
@@ -363,14 +435,16 @@ export async function getAdminCategories() {
     }
 }
 
-export async function createCategory(data: { name: string, slug: string, image?: string, parentId?: string }) {
+export async function createCategory(data: { name: string, slug: string, image?: string, parentId?: string, description?: string, featured?: boolean }) {
     try {
         await prisma.category.create({
             data: {
                 name: data.name,
                 slug: data.slug,
                 image: data.image,
-                parentId: data.parentId || null
+                parentId: data.parentId || null,
+                description: data.description,
+                featured: data.featured ?? false,
             }
         });
         revalidatePath('/admin/categories');
@@ -382,7 +456,7 @@ export async function createCategory(data: { name: string, slug: string, image?:
     }
 }
 
-export async function updateCategory(id: string, data: Partial<{ name: string, slug: string, image: string, parentId: string }>) {
+export async function updateCategory(id: string, data: Partial<{ name: string, slug: string, image: string, parentId: string, description: string, featured: boolean }>) {
     try {
         const { parentId, ...rest } = data;
         await prisma.category.update({
@@ -409,6 +483,57 @@ export async function deleteCategory(id: string) {
         return { success: true };
     } catch (error) {
         console.error("Delete Category Error:", error);
+        return { success: false, error: String(error) };
+    }
+}
+// --- BRAND MANAGEMENT ---
+export async function getAdminBrands() {
+    try {
+        const prismaAny = prisma as any;
+        const brands = await prismaAny.brand.findMany({
+            orderBy: { name: 'asc' }
+        });
+        return brands;
+    } catch (error) {
+        console.error("Get Brands Error:", error);
+        return [];
+    }
+}
+
+export async function createBrand(data: { name: string, slug: string, logo?: string, description?: string, featured?: boolean }) {
+    try {
+        const prismaAny = prisma as any;
+        await prismaAny.brand.create({
+            data
+        });
+        revalidatePath('/admin/brands');
+        return { success: true };
+    } catch (error) {
+        return { success: false, error: String(error) };
+    }
+}
+
+export async function updateBrand(id: string, data: Partial<{ name: string, slug: string, logo: string, description: string, featured: boolean }>) {
+    try {
+        const prismaAny = prisma as any;
+        await prismaAny.brand.update({
+            where: { id },
+            data
+        });
+        revalidatePath('/admin/brands');
+        return { success: true };
+    } catch (error) {
+        return { success: false, error: String(error) };
+    }
+}
+
+export async function deleteBrand(id: string) {
+    try {
+        const prismaAny = prisma as any;
+        await prismaAny.brand.delete({ where: { id } });
+        revalidatePath('/admin/brands');
+        return { success: true };
+    } catch (error) {
         return { success: false, error: String(error) };
     }
 }

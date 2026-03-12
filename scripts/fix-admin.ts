@@ -1,44 +1,38 @@
 import { PrismaClient } from "@prisma/client";
-import { hash } from "bcryptjs";
+import { compare, hash } from "bcryptjs";
 
 const prisma = new PrismaClient();
 
 async function main() {
-    const newUsername = "adminlocal345";
     const newPassword = "fjwhgyfw1323h";
     const hashedPassword = await hash(newPassword, 12);
 
-    // Show all users before
-    const all = await prisma.user.findMany({ select: { id: true, username: true, email: true, role: true } });
-    console.log("Users:", JSON.stringify(all, null, 2));
+    // Delete ALL existing admin users and create fresh
+    await prisma.user.deleteMany({ where: { role: "ADMIN" } });
+    console.log("Deleted old admin users");
 
-    // Update the admin user — find by ADMIN role
-    const admin = await prisma.user.findFirst({ where: { role: "ADMIN" } });
+    const admin = await prisma.user.create({
+        data: {
+            username: "adminlocal345",
+            email: "admin-lb@localbazar.internal",
+            name: "Admin",
+            password: hashedPassword,
+            role: "ADMIN",
+        }
+    });
     
-    if (admin) {
-        const updated = await prisma.user.update({
-            where: { id: admin.id },
-            data: {
-                username: newUsername,
-                password: hashedPassword,
-                role: "ADMIN",
-                name: "Admin",
-            }
-        });
-        console.log("\n✅ Updated:", updated.username, updated.email, updated.role);
-    } else {
-        // No admin at all - create one with a unique email
-        const created = await prisma.user.create({
-            data: {
-                username: newUsername,
-                email: "admin@localbazar.internal",
-                name: "Admin",
-                password: hashedPassword,
-                role: "ADMIN",
-            }
-        });
-        console.log("\n✅ Created:", created.username, created.role);
-    }
+    // Verify immediately
+    const found = await prisma.user.findFirst({ where: { username: "adminlocal345" } });
+    if (!found) { console.log("ERROR: Not found after creation"); return; }
+    
+    const valid = await compare(newPassword, found.password);
+    console.log("\n=== RESULT ===");
+    console.log("Created user ID:", admin.id);
+    console.log("username:", found.username);
+    console.log("email:", found.email);
+    console.log("role:", found.role);
+    console.log("Password valid:", valid);
+    console.log("\n✅ Login with: adminlocal345 / fjwhgyfw1323h");
 }
 
-main().catch(e => { console.error("ERROR:", e.message); }).finally(() => prisma.$disconnect());
+main().catch(e => console.error("FATAL:", e.message)).finally(() => prisma.$disconnect());

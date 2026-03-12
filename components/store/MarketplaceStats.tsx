@@ -11,15 +11,15 @@ export function MarketplaceStats() {
 
     const STATS = [
         {
-            label: isAr ? "الأكثر تداولاً" : "Trending Now",
-            value: "RTX 40 Series",
+            label: isAr ? "الأكثر طلباً" : "Trending Now",
+            value: "Silk Couture",
             icon: TrendingUp,
-            color: "text-[var(--color-brand-charcoal)]",
-            bg: "bg-[var(--color-brand-charcoal)]/10"
+            color: "text-brand-burgundy",
+            bg: "bg-brand-burgundy/10"
         },
         {
             label: isAr ? "مستخدم نشط" : "Active Users",
-            value: "14,200+",
+            value: "8,500+",
             icon: Users,
             color: "text-emerald-500",
             bg: "bg-emerald-500/10"
@@ -51,7 +51,7 @@ export function MarketplaceStats() {
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ delay: i * 0.1 }}
-                            className="group relative p-6 rounded-2xl bg-zinc-50/50 dark:bg-white/[0.03] border border-zinc-200 dark:border-white/5 hover:border-[var(--color-brand-charcoal)]/20 dark:hover:border-white/10 transition-all duration-300 backdrop-blur-sm shadow-sm"
+                            className="group relative p-6 rounded-2xl bg-zinc-50/50 dark:bg-white/[0.03] border border-zinc-200 dark:border-white/5 hover:border-brand-burgundy/20 dark:hover:border-white/10 transition-all duration-300 backdrop-blur-sm shadow-sm"
                         >
                             <div className="flex items-center gap-4">
                                 <div className={cn("p-3 rounded-xl", stat.bg, stat.color)}>
@@ -78,15 +78,15 @@ export function MarketplaceStats() {
                         <div key={idx} className="flex gap-12 items-center px-6">
                             <span className="text-[10px] font-medium text-zinc-500 flex items-center gap-2">
                                 <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full" />
-                                MACBOOK PRO M3 LISTED IN CASABLANCA
+                                SILK EVENING DRESS LISTED IN CASABLANCA
                             </span>
                             <span className="text-[10px] font-medium text-zinc-500 flex items-center gap-2">
                                 <span className="w-1.5 h-1.5 bg-blue-500 rounded-full" />
-                                RTX 4080 SOLD IN MARRAKECH
+                                LUXURY SUIT SOLD IN MARRAKECH
                             </span>
                             <span className="text-[10px] font-medium text-zinc-500 flex items-center gap-2">
                                 <span className="w-1.5 h-1.5 bg-indigo-500 rounded-full" />
-                                NEW GAMING CHAIR LISTED IN TANGIER
+                                NEW DESIGNER ACCESSORY LISTED IN TANGIER
                             </span>
                         </div>
                     ))}

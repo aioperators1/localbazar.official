@@ -4,123 +4,98 @@ import { hash } from 'bcryptjs'
 const prisma = new PrismaClient()
 
 async function main() {
-    console.log('Seeding database...')
-
-    // Clean up existing data (optional, but good for idempotency)
-    // await prisma.orderItem.deleteMany()
-    // await prisma.order.deleteMany()
-    // await prisma.review.deleteMany()
-    // await prisma.product.deleteMany()
-    // await prisma.category.deleteMany()
+    console.log('Seeding database for Local Bazar Doha Hub...')
 
     // 0. Create Admin User
-    // 0. Create Admin User
-    const password = await hash('electrolwfjwn12381nd', 12)
+    const password = await hash('localbazar_admin_2024!', 12)
     const admin = await prisma.user.upsert({
         where: { username: 'admin' },
         update: {
             password,
             role: 'ADMIN',
-            email: 'admin@electro-islam.com'
+            email: 'admin@localbazar.com'
         },
         create: {
-            email: 'admin@electro-islam.com',
+            email: 'admin@localbazar.com',
             name: 'Admin User',
             password,
             role: 'ADMIN',
             username: 'admin'
         }
     })
-    console.log({ admin })
+    console.log('Admin seeded.')
 
-    // 1. Create Categories
-    const laptops = await prisma.category.upsert({
-        where: { slug: 'laptops' },
-        update: {},
-        create: { name: 'Laptops', slug: 'laptops', image: 'https://images.unsplash.com/photo-1603302576837-37561b2e2302?q=80&w=1000' }
-    })
+    // 1. Create Luxury Categories (Doha Hub Style)
+    const categories = [
+        { name: 'Abayas', slug: 'abayas', image: 'https://images.unsplash.com/photo-1585487000160-afffbfc767ab?q=80&w=1200' },
+        { name: 'Dresses & Jalabiyas', slug: 'dresses-jalabiyas', image: 'https://images.unsplash.com/photo-1566174053879-31528523f8ae?q=80&w=1200' },
+        { name: 'Men', slug: 'men', image: 'https://images.unsplash.com/photo-1594932224036-9c205771abb6?q=80&w=1200' },
+        { name: 'Perfumes & Oud', slug: 'perfumes-oud', image: 'https://images.unsplash.com/photo-1547887538-e3a2f32cb1cc?q=80&w=1200' },
+        { name: 'Jewelry', slug: 'jewelry', image: 'https://images.unsplash.com/photo-1610812383719-38379010461f?q=80&w=1200' },
+        { name: 'Accessories', slug: 'accessories', image: 'https://images.unsplash.com/photo-1520903920243-00d872a2d1c9?q=80&w=1200' }
+    ]
 
-    const components = await prisma.category.upsert({
-        where: { slug: 'components' },
-        update: {},
-        create: { name: 'Components', slug: 'components', image: 'https://images.unsplash.com/photo-1591488320449-011701bb6704?q=80&w=1000' }
-    })
+    const seededCategories = []
+    for (const cat of categories) {
+        const c = await prisma.category.upsert({
+            where: { slug: cat.slug },
+            update: { name: cat.name, image: cat.image },
+            create: cat
+        })
+        seededCategories.push(c)
+    }
+    console.log('Categories seeded.')
 
-    const audio = await prisma.category.upsert({
-        where: { slug: 'audio' },
-        update: {},
-        create: { name: 'Audio', slug: 'audio', image: 'https://images.unsplash.com/photo-1618366712010-f4ae9c647dcb?q=80&w=1000' }
-    })
-
-    const peripherals = await prisma.category.upsert({
-        where: { slug: 'peripherals' },
-        update: {},
-        create: { name: 'Peripherals', slug: 'peripherals', image: 'https://images.unsplash.com/photo-1595225476474-87563907a212?q=80&w=1000' }
-    })
-    const monitors = await prisma.category.upsert({
-        where: { slug: 'monitors' },
-        update: {},
-        create: { name: 'Monitors', slug: 'monitors', image: 'https://techspace.ma/cdn/shop/files/MSIMAG274QF_1000x.png' }
-    })
-
-    const pcgamer = await prisma.category.upsert({
-        where: { slug: 'pc-gamer' },
-        update: {},
-        create: { name: 'PC Gamer', slug: 'pc-gamer', image: 'https://techspace.ma/cdn/shop/files/PCGAMER01.10.2025_d84ff562-927d-4ea8-990f-3f64463a7b0c_1000x.png' }
-    })
-    // 2. Create Products
+    // 2. Create Luxury Products
     const products = [
         {
-            name: 'MSI Modern 14 C13M',
-            slug: 'msi-modern-14-c13m',
-            description: 'Compact et puissant, parfait pour la productivité. i5-1335U/8GB.',
-            price: 5490,
+            name: "Velvet Couture Abaya",
+            slug: 'velvet-couture-abaya',
+            description: "A signature piece of Doha elegance. Crafted from premium Italian velvet with gold thread embroidery.",
+            price: 4500,
+            stock: 5,
+            images: JSON.stringify(['https://images.unsplash.com/photo-1585487000160-afffbfc767ab?q=80&w=1200']),
+            categoryId: seededCategories.find(c => c.slug === 'abayas')?.id || '',
+            brandName: 'Local Bazar Signature',
+            featured: true
+        },
+        {
+            name: "Silk Jalabiya 'Midnight Bloom'",
+            slug: 'silk-jalabiya-midnight',
+            description: "Hand-painted silk jalabiya featuring floral patterns for exclusive evenings.",
+            price: 3200,
+            stock: 3,
+            images: JSON.stringify(['https://images.unsplash.com/photo-1566174053879-31528523f8ae?q=80&w=1200']),
+            categoryId: seededCategories.find(c => c.slug === 'dresses-jalabiyas')?.id || '',
+            brandName: 'Local Bazar Couture',
+            featured: true
+        },
+        {
+            name: "Oud Royale Extrait",
+            slug: 'oud-royale-extrait',
+            description: "Pure Cambodian Oud aged for 20 years. A fragrance for the true connoisseur.",
+            price: 1800,
             stock: 12,
-            images: JSON.stringify(['https://techspace.ma/cdn/shop/files/MSIModern14C13M-1450MA_b7e596e5-8d0f-4001-bc71-6826d299d563_1000x.png']),
-            categoryId: laptops.id,
-            brand: 'MSI',
-            featured: true
-        },
-        {
-            name: 'PC Gamer Techspace R7',
-            slug: 'pc-gamer-techspace-r7',
-            description: 'Une bête de course pour le gaming 4K. R7 5700X/512GB.',
-            price: 12990,
-            stock: 8,
-            images: JSON.stringify(['https://techspace.ma/cdn/shop/files/PCGAMER01.10.2025_d84ff562-927d-4ea8-990f-3f64463a7b0c_1000x.png']),
-            categoryId: pcgamer.id,
-            brand: 'Techspace',
-            featured: true
-        },
-        {
-            name: 'MSI MAG 274QF 2K',
-            slug: 'msi-mag-274qf-2k',
-            description: '27" Fast IPS 180Hz 2K pour une fluidité extrême.',
-            price: 4200,
-            stock: 20,
-            images: JSON.stringify(['https://techspace.ma/cdn/shop/files/MSIMAG274QF_1000x.png']),
-            categoryId: monitors.id,
-            brand: 'MSI',
-            featured: true
-        },
-        {
-            name: 'RTX 5070 WINDFORCE',
-            slug: 'rtx-5070-windforce',
-            description: 'La nouvelle génération de puissance graphique.',
-            price: 9900,
-            stock: 15,
-            images: JSON.stringify(['https://techspace.ma/cdn/shop/files/GigabyteGeForceRTX5070WINDFORCEOCSFF12G_EXCLUSIVITEWEB_1000x.png']),
-            categoryId: components.id,
-            brand: 'Gigabyte',
+            images: JSON.stringify(['https://images.unsplash.com/photo-1547887538-e3a2f32cb1cc?q=80&w=1200']),
+            categoryId: seededCategories.find(c => c.slug === 'perfumes-oud')?.id || '',
+            brandName: 'Local Bazar Parfums',
             featured: true
         }
     ]
 
     for (const p of products) {
-        const exists = await prisma.product.findUnique({ where: { slug: p.slug } })
-        if (!exists) {
-            await prisma.product.create({ data: p })
-        }
+        if (!p.categoryId) continue
+        await prisma.product.upsert({
+            where: { slug: p.slug },
+            update: { 
+                ...p,
+                price: Number(p.price)
+            },
+            create: {
+                ...p,
+                price: Number(p.price)
+            }
+        })
     }
 
     console.log('Seeding finished.')

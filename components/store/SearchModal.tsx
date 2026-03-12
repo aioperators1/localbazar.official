@@ -70,7 +70,7 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
                             <div className="w-8 h-8 rounded-full bg-[var(--color-brand-charcoal)]/10 flex items-center justify-center">
                                 <Search className="w-4 h-4 text-[var(--color-brand-charcoal)]" />
                             </div>
-                            <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Recherche catalogue</span>
+                            <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Catalog Search</span>
                         </div>
                         <button onClick={onClose} className="p-2 hover:bg-zinc-100 rounded-full transition-colors text-zinc-400">
                             <X className="w-5 h-5" />
@@ -82,7 +82,7 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
                             value={query}
                             onChange={(e) => setQuery(e.target.value)}
                             onKeyDown={handleKeyDown}
-                            placeholder="Rechercher un produit..."
+                            placeholder="Search for a product..."
                             className="w-full h-16 bg-transparent border-none text-2xl sm:text-4xl font-black tracking-tighter text-zinc-900 placeholder:text-zinc-200 focus-visible:ring-0 uppercase p-0"
                             autoFocus
                         />
@@ -103,8 +103,8 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
                                 <div className="space-y-4">
                                     <Target className="w-12 h-12 text-zinc-100 mx-auto" />
                                     <div className="space-y-1">
-                                        <p className="text-[10px] font-black uppercase tracking-widest text-zinc-300">En attente de saisie</p>
-                                        <h3 className="text-xl font-bold text-zinc-400 uppercase tracking-tight">Entrez le nom d'un produit ou d'une catégorie</h3>
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-zinc-300">Waiting for input</p>
+                                        <h3 className="text-xl font-bold text-zinc-400 uppercase tracking-tight">Enter a product name or category</h3>
                                     </div>
                                 </div>
                             </motion.div>
@@ -116,7 +116,7 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
                                 className="h-full flex flex-col items-center justify-center py-20"
                             >
                                 <Loader2 className="w-12 h-12 text-[var(--color-brand-charcoal)] animate-spin" />
-                                <p className="mt-6 text-[10px] font-black text-[var(--color-brand-charcoal)]/40 uppercase tracking-widest">Recherche en cours...</p>
+                                <p className="mt-6 text-[10px] font-black text-[var(--color-brand-charcoal)]/40 uppercase tracking-widest">Searching...</p>
                             </motion.div>
                         ) : results.length > 0 ? (
                             <motion.div
@@ -146,7 +146,7 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
                                                 {product.name}
                                             </h4>
                                             <p className="text-xs font-black text-[#00BFA5]">
-                                                {product.price.toLocaleString()}.00 dh
+                                                {product.price.toLocaleString()}.00 QAR
                                             </p>
                                         </div>
 
@@ -166,8 +166,8 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
                                 <div className="space-y-4">
                                     <X className="w-12 h-12 text-zinc-100 mx-auto" />
                                     <div className="space-y-1">
-                                        <p className="text-[10px] font-black uppercase tracking-widest text-zinc-300">Aucun produit trouvé</p>
-                                        <h3 className="text-xl font-bold text-zinc-400 uppercase tracking-tight">Essayez un autre mot-clé</h3>
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-zinc-300">No products found</p>
+                                        <h3 className="text-xl font-bold text-zinc-400 uppercase tracking-tight">Try another keyword</h3>
                                     </div>
                                 </div>
                             </motion.div>
@@ -183,7 +183,7 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
                             onClick={onClose}
                             className="flex items-center justify-center gap-4 w-full py-4 text-[10px] font-black text-white uppercase tracking-widest transition-all bg-[var(--color-brand-charcoal)] hover:bg-[#003d33] rounded-full shadow-lg"
                         >
-                            Voir tous les résultats
+                            See all results
                             <ArrowRight className="w-4 h-4" />
                         </Link>
                     </div>

@@ -23,20 +23,20 @@ export default function ContactPage() {
                             <ContactItem
                                 icon={Phone}
                                 title="Hotline"
-                                content="+212 600 000 000"
+                                content="+974 5055 8884"
                                 sub="Mon-Fri, 9am - 6pm"
                             />
                             <ContactItem
                                 icon={Mail}
                                 title="Email Channel"
-                                content="support@electro-islam.com"
+                                content="localbazar.qtr@gmail.com"
                                 sub="24/7 Response"
                             />
                             <ContactItem
                                 icon={MapPin}
                                 title="HQ Location"
-                                content="Casablanca Technopark"
-                                sub="Building A, Floor 3"
+                                content="Lusir, Doha"
+                                sub="Tower A, Qatar"
                             />
                         </div>
                     </div>

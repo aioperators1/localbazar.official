@@ -5,12 +5,13 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 export default async function NewProductPage() {
-    const rawCategories = await prisma.category.findMany({
+    const prismaAny = prisma as any;
+    const rawCategories = await prismaAny.category.findMany({
         include: { parent: true },
         orderBy: { name: 'asc' }
     });
 
-    const categories = rawCategories.map(cat => ({
+    const categories = rawCategories.map((cat: any) => ({
         ...cat,
         createdAt: cat.createdAt.toISOString(),
         parent: cat.parent ? {
@@ -19,9 +20,12 @@ export default async function NewProductPage() {
         } : null
     }));
 
+    const brands = await prismaAny.brand.findMany({
+        orderBy: { name: 'asc' }
+    });
+
     return (
         <div className="space-y-6">
-            {/* Shopify-style Header */}
             <div className="flex flex-col gap-4">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
@@ -35,7 +39,7 @@ export default async function NewProductPage() {
                 </div>
             </div>
 
-            <ProductForm categories={categories} />
+            <ProductForm categories={categories} brands={brands} />
         </div>
     );
 }

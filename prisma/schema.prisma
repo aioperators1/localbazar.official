@@ -3,6 +3,7 @@
 
 generator client {
   provider = "prisma-client-js"
+  output   = "./generated/client"
 }
 
 datasource db {
@@ -84,7 +85,7 @@ model Product {
   name        String
   slug        String      @unique
   sku         String?     @unique
-  brand       String?
+  brandName   String?
   description String
   price       Decimal
   salePrice   Decimal?
@@ -99,6 +100,8 @@ model Product {
   featured    Boolean     @default(false)
   categoryId  String
   category    Category    @relation(fields: [categoryId], references: [id])
+  brandId      String?
+  brand        Brand?      @relation(fields: [brandId], references: [id])
   sellerId    String?
   seller      User?       @relation("UserProducts", fields: [sellerId], references: [id])
   status      String      @default("APPROVED") // PENDING, APPROVED, REJECTED
@@ -110,21 +113,23 @@ model Product {
   reviews     Review[]
 
   @@index([categoryId])
-  @@index([brand])
+  @@index([brandId])
   @@index([sellerId])
   @@index([status])
 }
 
 model Category {
-  id        String     @id @default(cuid())
-  name      String
-  slug      String     @unique
-  image     String?
-  parentId  String?
-  parent    Category?  @relation("CategoryToCategory", fields: [parentId], references: [id])
-  children  Category[] @relation("CategoryToCategory")
-  products  Product[]
-  createdAt DateTime   @default(now())
+  id          String     @id @default(cuid())
+  name        String
+  slug        String     @unique
+  description String?
+  image       String?
+  featured    Boolean    @default(false)
+  parentId    String?
+  parent      Category?  @relation("CategoryToCategory", fields: [parentId], references: [id])
+  children    Category[] @relation("CategoryToCategory")
+  products    Product[]
+  createdAt   DateTime   @default(now())
 }
 
 model Order {
@@ -208,6 +213,7 @@ model Banner {
   id        String   @id @default(cuid())
   title     String
   subtitle  String?
+  description String?
   image     String   // URL of the banner image
   link      String?  // Where the banner should redirect on click
   active    Boolean  @default(true)
@@ -222,4 +228,17 @@ model Setting {
   value     String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+
+model Brand {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  slug        String   @unique
+  logo        String?
+  description String?
+  featured    Boolean  @default(false)
+  products    Product[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }

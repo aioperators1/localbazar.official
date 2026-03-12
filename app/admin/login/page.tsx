@@ -64,7 +64,7 @@ export default function AdminLoginPage() {
                             <div className="space-y-2">
                                 <div className="flex items-center justify-between">
                                     <label htmlFor="username" className="text-[13px] font-medium text-[#303030]">
-                                        Username
+                                        Email or Username
                                     </label>
                                 </div>
                                 <div className="relative group">
@@ -76,7 +76,7 @@ export default function AdminLoginPage() {
                                         value={username}
                                         onChange={(e) => setUsername(e.target.value)}
                                         className="block w-full rounded-[8px] bg-white border border-[#D2D2D2] px-3 py-2 text-[#303030] text-[13px] placeholder-[#616161] focus:border-black focus:ring-1 focus:ring-black outline-none transition-all"
-                                        placeholder="Admin username"
+                                        placeholder="Admin email or username"
                                     />
                                 </div>
                             </div>
@@ -117,18 +117,6 @@ export default function AdminLoginPage() {
                             {loading ? "Logging in..." : "Log in"}
                         </Button>
                     </form>
-
-                    <div className="pt-4 flex flex-col items-center gap-4 text-[12px] text-[#616161]">
-                        <div className="flex items-center gap-4 w-full">
-                            <div className="flex-1 h-[1px] bg-[#E3E3E3]" />
-                            <span>Or</span>
-                            <div className="flex-1 h-[1px] bg-[#E3E3E3]" />
-                        </div>
-                        <button className="flex items-center justify-center gap-2 w-full h-10 border border-[#D2D2D2] rounded-[8px] bg-white text-[#303030] font-bold hover:bg-[#F9F9F9] transition-all">
-                            <Image src="/google.svg" alt="Google" width={16} height={16} unoptimized className="opacity-80" />
-                            Log in with Google
-                        </button>
-                    </div>
                 </div>
 
                 <div className="flex flex-col items-center gap-4 pt-4">

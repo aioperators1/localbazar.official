@@ -75,7 +75,7 @@ export async function placeOrder(data: CheckoutData) {
             const validItems = items.filter(i => foundIds.has(i.id));
 
             if (validItems.length === 0) {
-                throw new Error("Target units not detected in central database.");
+                throw new Error("Some items in your cart are no longer available. Please clear your cart and try again.");
             }
 
             // 3. Create Address Layer
@@ -85,11 +85,9 @@ export async function placeOrder(data: CheckoutData) {
                     street: address,
                     city,
                     zip,
-                    country: "Morocco",
+                    country: "Qatar",
                 }
             });
-
-            // 4. Create Order + OrderItems
             const order = await tx.order.create({
                 data: {
                     userId: user.id,

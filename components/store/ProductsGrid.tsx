@@ -23,7 +23,7 @@ export function ProductsGrid({ products }: ProductsGridProps) {
     if (products.length === 0) return null;
 
     return (
-        <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-12">
             {products.map((p) => (
                 <div key={p.id}>
                     <ProductCard
@@ -32,9 +32,11 @@ export function ProductsGrid({ products }: ProductsGridProps) {
                             name: p.name,
                             slug: p.slug,
                             price: Number(p.price),
-                            image: p.image || p.images || "",
+                            image: p.image,
+                            images: p.images,
                             category: p.category?.name || "Catégorie",
-                            specs: typeof p.specs === 'string' ? p.specs : JSON.stringify(p.specs || {})
+                            specs: typeof p.specs === 'string' ? p.specs : JSON.stringify(p.specs || {}),
+                            colors: typeof p.colors === 'string' ? p.colors : JSON.stringify(p.colors || [])
                         }}
                     />
                 </div>

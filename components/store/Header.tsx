@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
-import { ShoppingCart, Search, Menu, X, User, Phone, MapPin, ChevronDown, Minus, Plus, Trash2, ChevronRight } from "lucide-react";
+import { ShoppingCart, ShoppingBag, Heart, Search, Menu, X, User, Phone, MapPin, ChevronDown, Minus, Plus, Trash2, ChevronRight } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { useCart } from "@/hooks/use-cart";
 import { cn } from "@/lib/utils";
@@ -43,7 +43,16 @@ export function Header({ settings }: { settings?: Record<string, string> }) {
     const [searchQuery, setSearchQuery] = useState("");
     const [searchResults, setSearchResults] = useState<any[]>([]);
     const [isSearchFocused, setIsSearchFocused] = useState(false);
+    const [scrolled, setScrolled] = useState(false);
     const searchRef = useRef<HTMLFormElement>(null);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            setScrolled(window.scrollY > 20);
+        };
+        window.addEventListener("scroll", handleScroll);
+        return () => window.removeEventListener("scroll", handleScroll);
+    }, []);
 
     const handleSearch = (e?: React.FormEvent) => {
         if (e) e.preventDefault();
@@ -85,113 +94,135 @@ export function Header({ settings }: { settings?: Record<string, string> }) {
     if (pathname.startsWith("/admin")) return null;
 
     return (
-        <header className="w-full z-50 bg-white" dir={isAr ? "rtl" : "ltr"}>
+        <header 
+            className={cn(
+                "w-full z-[100] transition-all duration-500",
+                scrolled ? "fixed top-0 left-0 bg-white/90 backdrop-blur-xl shadow-sm" : "relative bg-white"
+            )} 
+            dir={isAr ? "rtl" : "ltr"}
+        >
             {/* 1. Top Bar */}
-            <div className="bg-[#111111] py-2.5 hidden lg:block">
-                <div className="container mx-auto px-4 flex justify-between items-center text-[10px] font-medium text-white/60 tracking-[0.2em] uppercase">
-                    <div className="flex items-center gap-8">
-                        <span>L'Excellence du Luxe & de l'Héritage</span>
-                        <div className="w-px h-3 bg-white/10" />
-                        <span>EST. 2013 — QATAR</span>
+            <div className="bg-[#181818] py-2.5 hidden lg:block">
+                <div className="container mx-auto px-6 flex justify-between items-center text-[11px] text-white/90 tracking-wider">
+                    <div className="flex items-center font-medium">
+                        <span>Enduring Grace for Every Moment</span>
                     </div>
-                    <div className="flex items-center gap-6">
-                        <div className="flex items-center gap-2">
-                            <Phone className="w-3 h-3 text-brand-burgundy" />
-                            <span>{settings?.site_phone || "+974 5055 8884"}</span>
+                    <div className="flex items-center gap-7 font-bold">
+                        <div className="flex items-center gap-1.5 cursor-pointer hover:text-white transition-colors">
+                            <span>English</span>
+                            <ChevronDown className="w-3 h-3 text-white/50" />
+                        </div>
+                        <div className="flex items-center gap-1.5 cursor-pointer hover:text-white transition-colors">
+                            <span>USD - US Dollar</span>
+                            <ChevronDown className="w-3 h-3 text-white/50" />
                         </div>
                     </div>
                 </div>
             </div>
 
-            {/* 2. Main Header */}
-            <div className="bg-white border-b py-6">
-                <div className="container mx-auto px-4 flex items-center justify-between gap-10">
-                    {/* Logo: LOCAL BAZAR SVG */}
-                    <Link href="/" className="flex items-center flex-shrink-0 group py-2">
-                        <div className="relative w-[200px] h-[50px]">
-                            <Image 
-                                src="/logo.svg" 
-                                alt="Local Bazar Logo" 
-                                fill 
-                                className="object-contain"
-                                priority
-                            />
+            {/* Main Header Container */}
+            <div className={cn(
+                "relative transition-all duration-700 ease-in-out border-b border-zinc-100",
+                scrolled ? "py-2 shadow-2xl bg-white/80 backdrop-blur-3xl" : "py-6 bg-white"
+            )}>
+                <div className="container mx-auto px-8 flex items-center justify-between">
+                    
+                    {/* LEFT: MINIMAL NAV / SIDEBAR TOGGLE */}
+                    <div className="flex items-center gap-8 flex-1">
+                        <button 
+                            className="group flex flex-col gap-1.5 focus:outline-none"
+                            onClick={() => setIsMenuOpen(true)}
+                        >
+                            <div className="w-8 h-[1px] bg-black group-hover:w-10 transition-all duration-500" />
+                            <div className="w-5 h-[1px] bg-black group-hover:w-10 transition-all duration-500" />
+                        </button>
+                        
+                        <div className="hidden lg:flex items-center gap-6">
+                            <Link href="/shop" className="text-[10px] font-black tracking-[0.3em] uppercase hover:text-brand-burgundy transition-all">Archivage</Link>
+                            <div className="w-px h-3 bg-zinc-200" />
+                            <Link href="/shop?category=new-arrivals" className="text-[10px] font-black tracking-[0.3em] uppercase hover:text-brand-burgundy transition-all">Éditions</Link>
                         </div>
-                    </Link>
+                    </div>
 
-                    {/* Search Bar */}
-                    <form ref={searchRef} onSubmit={handleSearch} className="hidden md:flex flex-grow max-w-[450px] relative h-10 z-[100]">
-                        <div className="flex w-full h-full overflow-hidden relative z-50 border-b border-zinc-200 focus-within:border-brand-burgundy transition-all duration-500">
-                            <input
-                                type="text"
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                onFocus={() => setIsSearchFocused(true)}
-                                placeholder="QUÊTE DE L'EXCELLENCE..."
-                                className="w-full h-full px-0 text-zinc-900 focus:outline-none text-[10px] font-black tracking-[0.3em] placeholder:text-zinc-300 border-0 bg-transparent uppercase"
-                            />
-                            <button type="submit" className="h-full bg-transparent px-2 hover:text-brand-burgundy transition-colors flex items-center justify-center">
-                                <Search className="w-4 h-4 text-[#111111]" />
-                            </button>
-                        </div>
-
-                        {/* Dropdown styling for fashion */}
-                        {isSearchFocused && searchQuery.trim().length > 1 && (
-                            <div className="absolute top-[calc(100%+1px)] left-0 right-0 bg-white border border-zinc-100 shadow-2xl z-40 animate-in fade-in slide-in-from-top-2 duration-300">
-                                <div className="max-h-[400px] overflow-y-auto">
-                                    {searchResults.length > 0 ? (
-                                        searchResults.map(product => {
-                                            const image = (() => {
-                                                try {
-                                                    const parsed = JSON.parse(product.images);
-                                                    return Array.isArray(parsed) && parsed.length > 0 ? parsed[0] : (product.images || '/placeholder.png');
-                                                } catch (e) {
-                                                    return product.images || '/placeholder.png';
-                                                }
-                                            })();
-                                            return (
-                                                <Link key={product.id} href={`/product/${product.slug || product.id}`} className="flex items-center gap-6 p-5 hover:bg-zinc-50 transition-colors border-b border-zinc-50 last:border-0" onClick={() => setIsSearchFocused(false)}>
-                                                    <div className="w-16 h-20 bg-[#f9f9f9] relative shrink-0">
-                                                        <Image src={image} alt={product.name} fill className="object-cover" />
-                                                    </div>
-                                                    <div className="flex flex-col flex-1">
-                                                        <span className="text-[12px] uppercase tracking-wider font-medium text-[#111111]">
-                                                            {highlightText(product.name, searchQuery)}
-                                                        </span>
-                                                        <span className="text-[11px] font-bold text-brand-burgundy mt-1">
-                                                            {Number(product.price).toLocaleString()}.00 dh
-                                                        </span>
-                                                    </div>
-                                                </Link>
-                                            );
-                                        })
-                                    ) : (
-                                        <div className="p-8 text-center text-[11px] text-zinc-400 font-medium tracking-widest uppercase">
-                                            Aucun résultat trouvé
-                                        </div>
-                                    )}
-                                </div>
+                    {/* CENTER: SPLIT LOGO BRANDING */}
+                    <div className="flex flex-col items-center">
+                        <Link href="/" className="group relative">
+                            <div className="flex items-center gap-4">
+                                <span className="text-[26px] font-serif font-light tracking-[-0.02em] text-black transition-all group-hover:tracking-[0.15em] duration-700">LOCAL</span>
+                                <div className="w-[1px] h-7 bg-zinc-200 rotate-[20deg] transition-transform duration-700 group-hover:rotate-[45deg]" />
+                                <span className="text-[26px] font-serif font-bold tracking-[-0.02em] text-brand-burgundy transition-all group-hover:tracking-[0.15em] duration-700">BAZAR</span>
                             </div>
-                        )}
-                    </form>
+                            <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-0 h-[1.5px] bg-brand-burgundy group-hover:w-full transition-all duration-700" />
+                        </Link>
+                    </div>
 
-                    {/* Actions */}
-                    <div className="flex items-center gap-10 text-[#111111]">
-                        <Link href="/login" className="hidden lg:flex items-center gap-3 group">
-                            <User className="w-5 h-5 group-hover:text-brand-burgundy transition-all duration-300" />
-                            <span className="text-[11px] font-medium uppercase tracking-[0.15em]">Compte</span>
+                    {/* RIGHT: SEARCH + ACTIONS */}
+                    <div className="flex items-center justify-end gap-1.5 lg:gap-6 flex-1">
+                        {/* Search Expandable */}
+                        <div className="relative group/search hidden sm:block">
+                            <form ref={searchRef} onSubmit={handleSearch} className="flex items-center bg-zinc-50 rounded-full px-4 py-2 border border-transparent focus-within:border-zinc-200 focus-within:bg-white transition-all duration-500">
+                                <Search className="w-4 h-4 text-zinc-400" />
+                                <input 
+                                    type="text"
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    onFocus={() => setIsSearchFocused(true)}
+                                    placeholder="EXPLORER..."
+                                    className="w-0 group-hover/search:w-32 focus:w-32 transition-all duration-700 bg-transparent text-[10px] font-bold tracking-widest placeholder:text-zinc-300 focus:outline-none ml-2"
+                                />
+                            </form>
+
+                            {/* Dropdown styling */}
+                            {isSearchFocused && searchQuery.trim().length > 1 && (
+                                <div className="absolute top-[calc(100%+15px)] right-0 w-[400px] bg-white border border-zinc-100 shadow-2xl z-[150] animate-in fade-in slide-in-from-top-2 duration-300">
+                                    <div className="max-h-[400px] overflow-y-auto">
+                                        {searchResults.length > 0 ? (
+                                            searchResults.map(product => {
+                                                const image = (() => {
+                                                    try {
+                                                        const parsed = JSON.parse(product.images);
+                                                        return Array.isArray(parsed) && parsed.length > 0 ? parsed[0] : (product.images || '/placeholder.png');
+                                                    } catch (e) {
+                                                        return product.images || '/placeholder.png';
+                                                    }
+                                                })();
+                                                return (
+                                                    <Link key={product.id} href={`/product/${product.slug || product.id}`} className="flex items-center gap-6 p-5 hover:bg-zinc-50 transition-colors border-b border-zinc-50 last:border-0" onClick={() => setIsSearchFocused(false)}>
+                                                        <div className="w-16 h-20 bg-[#f9f9f9] relative shrink-0">
+                                                            <Image src={image} alt={product.name} fill className="object-cover" unoptimized />
+                                                        </div>
+                                                        <div className="flex flex-col flex-1">
+                                                            <span className="text-[12px] uppercase tracking-wider font-medium text-[#111111]">
+                                                                {highlightText(product.name, searchQuery)}
+                                                            </span>
+                                                            <span className="text-[11px] font-bold text-brand-burgundy mt-1">
+                                                                {Number(product.price).toLocaleString()}.00 QAR
+                                                            </span>
+                                                        </div>
+                                                    </Link>
+                                                );
+                                            })
+                                        ) : (
+                                            <div className="p-8 text-center text-[11px] text-zinc-400 font-medium tracking-widest uppercase">
+                                                No results found
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        <Link href="/wishlist" className="relative p-2 group overflow-hidden">
+                            <Heart className="w-[22px] h-[22px] stroke-[1] text-zinc-400 group-hover:text-brand-burgundy transition-colors duration-500" />
+                            <span className="absolute top-0 right-0 w-2 h-2 bg-brand-burgundy rounded-full scale-0 group-hover:scale-100 transition-transform" />
                         </Link>
 
-                        {/* Cart */}
-                        <div className="group relative">
-                            <Link href="/cart" className="flex items-center gap-3 py-4">
-                                <div className="relative">
-                                    <ShoppingCart className="w-5 h-5 group-hover:text-brand-burgundy transition-all duration-300" />
-                                    <span className="absolute -top-2 -right-2 bg-brand-burgundy text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center border-2 border-white">
-                                        {itemCount}
-                                    </span>
-                                </div>
-                                <span className="text-[11px] font-medium uppercase tracking-[0.15em] hidden sm:block">Panier</span>
+                        <div className="group relative h-10 flex items-center">
+                            <Link href="/cart" className="relative p-2 group/bag">
+                                <ShoppingBag className="w-[22px] h-[22px] stroke-[1] text-zinc-400 group-hover:text-black transition-colors duration-500" />
+                                <span className="absolute -top-[1px] -right-[1px] bg-black text-white text-[8px] font-black w-4 h-4 rounded-full flex items-center justify-center">
+                                    {itemCount}
+                                </span>
                             </Link>
 
                             {/* Luxury Cart Dropdown */}
@@ -202,22 +233,28 @@ export function Header({ settings }: { settings?: Record<string, string> }) {
                                             {items.map((item, idx) => (
                                                 <div key={`${item.id}-${idx}`} className="flex gap-4 py-4 border-b border-zinc-50 last:border-0">
                                                     <div className="w-16 h-20 relative bg-[#f9f9f9] shrink-0">
-                                                        <Image src={item.image} alt={item.name} fill className="object-cover" />
+                                                        <Image 
+                                                            src={item.image || "https://images.unsplash.com/photo-1560362614-893c131f2421?q=80&w=400"} 
+                                                            alt={item.name} 
+                                                            fill 
+                                                            className="object-cover" 
+                                                            unoptimized
+                                                        />
                                                     </div>
                                                     <div className="flex-1 flex flex-col justify-center">
                                                         <span className="text-[11px] font-bold text-[#111111] uppercase tracking-wider line-clamp-1">{item.name}</span>
                                                         {(item.size || item.color) && (
                                                             <div className="flex gap-2 mt-1">
-                                                                {item.size && <span className="text-[9px] text-zinc-400 uppercase tracking-widest border border-zinc-100 px-1.5 py-0.5">Taille: {item.size}</span>}
-                                                                {item.color && <span className="text-[9px] text-zinc-400 uppercase tracking-widest border border-zinc-100 px-1.5 py-0.5">Couleur: {item.color}</span>}
+                                                                {item.size && <span className="text-[9px] text-zinc-400 uppercase tracking-widest border border-zinc-100 px-1.5 py-0.5">Size: {item.size}</span>}
+                                                                {item.color && <span className="text-[9px] text-zinc-400 uppercase tracking-widest border border-zinc-100 px-1.5 py-0.5">Color: {item.color}</span>}
                                                             </div>
                                                         )}
-                                                        <span className="text-[10px] text-zinc-500 mt-2 font-medium uppercase tracking-widest">{item.quantity} x {Number(item.price).toLocaleString()} dh</span>
+                                                        <span className="text-[10px] text-zinc-500 mt-2 font-medium uppercase tracking-widest">{item.quantity} x {Number(item.price).toLocaleString()} QAR</span>
                                                         <button 
                                                             onClick={() => removeItem(item.id, item.size, item.color)} 
                                                             className="text-[9px] text-brand-burgundy uppercase tracking-widest font-bold mt-2 text-left hover:underline"
                                                         >
-                                                            Retirer
+                                                            Remove
                                                         </button>
                                                     </div>
                                                 </div>
@@ -226,51 +263,126 @@ export function Header({ settings }: { settings?: Record<string, string> }) {
                                         <div className="mt-6 pt-6 border-t border-zinc-100">
                                             <div className="flex justify-between items-center mb-6">
                                                 <span className="text-[11px] font-bold uppercase tracking-[0.2em]">Total</span>
-                                                <span className="text-[14px] font-black">{totalPrice().toLocaleString()}.00 dh</span>
+                                                <span className="text-[14px] font-black">{totalPrice().toLocaleString()}.00 QAR</span>
                                             </div>
                                             <div className="grid grid-cols-2 gap-4">
-                                                <Link href="/cart" className="w-full border border-[#111111] text-[#111111] text-center font-bold text-[10px] py-4 uppercase tracking-widest hover:bg-[#111111] hover:text-white transition-all">Panier</Link>
-                                                <Link href="/checkout" className="w-full bg-[#111111] text-white text-center font-bold text-[10px] py-4 uppercase tracking-widest hover:bg-brand-burgundy transition-all">Commander</Link>
+                                                <Link href="/cart" className="w-full border border-[#111111] text-[#111111] text-center font-bold text-[10px] py-4 uppercase tracking-widest hover:bg-[#111111] hover:text-white transition-all">View Cart</Link>
+                                                <Link href="/checkout" className="w-full bg-[#111111] text-white text-center font-bold text-[10px] py-4 uppercase tracking-widest hover:bg-brand-burgundy transition-all">Checkout</Link>
                                             </div>
                                         </div>
                                     </div>
                                 ) : (
-                                    <div className="py-10 text-center text-[11px] text-zinc-400 uppercase tracking-widest">Le panier est vide</div>
+                                    <div className="py-10 text-center text-[11px] text-zinc-400 uppercase tracking-widest">Your cart is empty</div>
                                 )}
                             </div>
                         </div>
 
-                        <button className="lg:hidden" onClick={() => setIsMenuOpen(!isMenuOpen)}>
-                            {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-                        </button>
+                        <Link href="/login" className="p-2 group">
+                            <User className="w-[22px] h-[22px] stroke-[1] text-zinc-400 group-hover:text-black transition-colors" />
+                        </Link>
                     </div>
                 </div>
             </div>
 
-            {/* 3. Navigation Bar */}
-            <div className="bg-white border-b hidden lg:block overflow-x-auto no-scrollbar">
-                <div className="container mx-auto px-4 flex items-center justify-center">
-                    <nav className="flex items-center">
-                        <Link href="/shop" className="px-8 py-5 text-[11px] font-bold uppercase tracking-[0.2em] text-[#111111] hover:text-brand-burgundy transition-colors">Tout Voir</Link>
-                        <Link href="/shop?category=evening-wear" className="px-8 py-5 text-[11px] font-bold uppercase tracking-[0.2em] text-[#111111] hover:text-brand-burgundy transition-colors">Couture</Link>
-                        <Link href="/shop?category=suits" className="px-8 py-5 text-[11px] font-bold uppercase tracking-[0.2em] text-[#111111] hover:text-brand-burgundy transition-colors">Tailleur</Link>
-                        <Link href="/shop?category=traditional" className="px-8 py-5 text-[11px] font-bold uppercase tracking-[0.2em] text-[#111111] hover:text-brand-burgundy transition-colors">Héritage</Link>
-                        <Link href="/shop?category=accessories" className="px-8 py-5 text-[11px] font-bold uppercase tracking-[0.2em] text-[#111111] hover:text-brand-burgundy transition-colors">Accessoires</Link>
-                        <Link href="/shop?category=new-arrivals" className="px-8 py-5 text-[11px] font-bold uppercase tracking-[0.2em] text-brand-burgundy transition-colors">Nouveautés</Link>
-                    </nav>
+            {/* SIDE NAVIGATION DRAWER (Original Feature) */}
+            <div className={cn(
+                "fixed inset-0 z-[200] transition-all duration-700 pointer-events-none",
+                isMenuOpen ? "opacity-100" : "opacity-0 invisible"
+            )}>
+                <div 
+                    className="absolute inset-0 bg-black/60 backdrop-blur-md pointer-events-auto" 
+                    onClick={() => setIsMenuOpen(false)} 
+                />
+                <div className={cn(
+                    "absolute top-0 left-0 w-full lg:w-[450px] h-full bg-white shadow-2xl p-12 flex flex-col transition-transform duration-700 ease-in-out pointer-events-auto",
+                    isMenuOpen ? "translate-x-0" : "-translate-x-full"
+                )}>
+                    <button 
+                        onClick={() => setIsMenuOpen(false)}
+                        className="self-end p-4 hover:rotate-90 transition-transform duration-500"
+                    >
+                        <X className="w-8 h-8 stroke-[1]" />
+                    </button>
+                    
+                    <div className="mt-12 flex flex-col gap-6 px-4 overflow-y-auto no-scrollbar pb-10">
+                        <Link href="/shop" className="group flex items-center justify-between py-2 border-b border-zinc-50" onClick={() => setIsMenuOpen(false)}>
+                            <div className="relative">
+                                <span className="text-[32px] font-bold transition-all duration-700 group-hover:pl-4 group-hover:text-brand-burgundy uppercase">All Collections</span>
+                            </div>
+                            <ChevronRight className="w-6 h-6 opacity-0 group-hover:opacity-100 transition-all duration-700" />
+                        </Link>
+                        
+                        <Link href="/shop?category=abayas" className="group flex items-center justify-between py-2 border-b border-zinc-50" onClick={() => setIsMenuOpen(false)}>
+                            <div className="relative">
+                                <span className="text-[32px] font-bold transition-all duration-700 group-hover:pl-4 group-hover:text-brand-burgundy uppercase">Abayas</span>
+                            </div>
+                            <ChevronRight className="w-6 h-6 opacity-0 group-hover:opacity-100 transition-all duration-700" />
+                        </Link>
+
+                        <Link href="/shop?category=dresses-jalabiyas" className="group flex items-center justify-between py-2 border-b border-zinc-50" onClick={() => setIsMenuOpen(false)}>
+                            <div className="relative">
+                                <span className="text-[32px] font-bold transition-all duration-700 group-hover:pl-4 group-hover:text-brand-burgundy uppercase">Dresses & Jalabiyas</span>
+                            </div>
+                            <ChevronRight className="w-6 h-6 opacity-0 group-hover:opacity-100 transition-all duration-700" />
+                        </Link>
+
+                        <Link href="/shop?category=men" className="group flex items-center justify-between py-2 border-b border-zinc-50" onClick={() => setIsMenuOpen(false)}>
+                            <div className="relative">
+                                <span className="text-[32px] font-bold transition-all duration-700 group-hover:pl-4 group-hover:text-brand-burgundy uppercase">Men</span>
+                            </div>
+                            <ChevronRight className="w-6 h-6 opacity-0 group-hover:opacity-100 transition-all duration-700" />
+                        </Link>
+
+                        <Link href="/shop?category=perfumes-oud" className="group flex items-center justify-between py-2 border-b border-zinc-50" onClick={() => setIsMenuOpen(false)}>
+                            <div className="relative">
+                                <span className="text-[32px] font-bold transition-all duration-700 group-hover:pl-4 group-hover:text-brand-burgundy uppercase">Perfumes & Oud</span>
+                            </div>
+                            <ChevronRight className="w-6 h-6 opacity-0 group-hover:opacity-100 transition-all duration-700" />
+                        </Link>
+
+                        <Link href="/shop?category=jewelry" className="group flex items-center justify-between py-2 border-b border-zinc-50" onClick={() => setIsMenuOpen(false)}>
+                            <div className="relative">
+                                <span className="text-[32px] font-bold transition-all duration-700 group-hover:pl-4 group-hover:text-brand-burgundy uppercase">Jewelry</span>
+                            </div>
+                            <ChevronRight className="w-6 h-6 opacity-0 group-hover:opacity-100 transition-all duration-700" />
+                        </Link>
+
+                        <Link href="/shop?category=accessories" className="group flex items-center justify-between py-2 border-b border-zinc-50" onClick={() => setIsMenuOpen(false)}>
+                            <div className="relative">
+                                <span className="text-[32px] font-bold transition-all duration-700 group-hover:pl-4 group-hover:text-brand-burgundy uppercase">Accessories</span>
+                            </div>
+                            <ChevronRight className="w-6 h-6 opacity-0 group-hover:opacity-100 transition-all duration-700" />
+                        </Link>
+                    </div>
+
+                    <div className="mt-auto p-8 border-t border-zinc-100 bg-zinc-50/50">
+                        <p className="text-[10px] font-black tracking-[0.3em] text-zinc-400 uppercase mb-6">Concierge & Hub</p>
+                        <div className="space-y-4">
+                            <div className="flex flex-col">
+                                <span className="text-[10px] text-zinc-400 font-bold uppercase tracking-widest mb-1">24/7 SUPPORT</span>
+                                <span className="text-[15px] font-medium tracking-tight group-hover:text-brand-burgundy transition-colors">+974 5055 8884</span>
+                            </div>
+                            <div className="flex flex-col">
+                                <span className="text-[10px] text-zinc-400 font-bold uppercase tracking-widest mb-1">LOCATION</span>
+                                <span className="text-[15px] font-medium tracking-tight">QATAR — DOHA HUB CENTRAL</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
+
+            {/* 3. Navigation Bar (Hidden to match Bianca Nera style) */}
 
             {/* Mobile Menu */}
             {isMenuOpen && (
                 <div className="lg:hidden fixed inset-0 bg-white z-[200] p-10 flex flex-col items-center justify-center animate-in fade-in slide-in-from-bottom duration-500">
                     <button onClick={() => setIsMenuOpen(false)} className="absolute top-10 right-10"><X className="w-8 h-8" /></button>
                     <nav className="flex flex-col gap-8 text-center">
-                        <Link href="/shop" className="text-[18px] font-black uppercase tracking-[0.3em]" onClick={() => setIsMenuOpen(false)}>Tout Voir</Link>
-                        <Link href="/shop?category=evening-wear" className="text-[18px] font-black uppercase tracking-[0.3em]" onClick={() => setIsMenuOpen(false)}>Couture</Link>
-                        <Link href="/shop?category=suits" className="text-[18px] font-black uppercase tracking-[0.3em]" onClick={() => setIsMenuOpen(false)}>Tailleur</Link>
-                        <Link href="/shop?category=traditional" className="text-[18px] font-black uppercase tracking-[0.3em]" onClick={() => setIsMenuOpen(false)}>Héritage</Link>
-                        <Link href="/shop?category=accessories" className="text-[18px] font-black uppercase tracking-[0.3em]" onClick={() => setIsMenuOpen(false)}>Accessoires</Link>
+                        <Link href="/shop" className="text-[18px] font-black uppercase tracking-[0.3em]" onClick={() => setIsMenuOpen(false)}>Shop All</Link>
+                        <Link href="/shop?category=abayas" className="text-[18px] font-black uppercase tracking-[0.3em]" onClick={() => setIsMenuOpen(false)}>Abayas</Link>
+                        <Link href="/shop?category=dresses-jalabiyas" className="text-[18px] font-black uppercase tracking-[0.3em]" onClick={() => setIsMenuOpen(false)}>Dresses</Link>
+                        <Link href="/shop?category=men" className="text-[18px] font-black uppercase tracking-[0.3em]" onClick={() => setIsMenuOpen(false)}>Men</Link>
+                        <Link href="/shop?category=perfumes-oud" className="text-[18px] font-black uppercase tracking-[0.3em]" onClick={() => setIsMenuOpen(false)}>Perfumes</Link>
                     </nav>
                 </div>
             )}

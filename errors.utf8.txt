@@ -1,6 +1,0 @@
-﻿.next/dev/types/validator.ts(233,1): error TS1434: Unexpected keyword or identifier.
-.next/dev/types/validator.ts(235,8): error TS1005: ';' expected.
-.next/dev/types/validator.ts(236,1): error TS1128: Declaration or statement expected.
-lib/actions/product.ts(604,5): error TS1138: Parameter declaration expected.
-lib/actions/product.ts(605,5): error TS1390: 'if' is not allowed as a parameter name.
-lib/actions/product.ts(617,1): error TS1128: Declaration or statement expected.

@@ -9,9 +9,9 @@ export async function searchProducts(query: string) {
         const products = await prisma.product.findMany({
             where: {
                 OR: [
-                    { name: { contains: query } }, // Case insensitive by default in SQLite? usage dependent on provider, but usually yes for generic setup. Prisma explicit mode: 'insensitive' might be needed for Postgres.
+                    { name: { contains: query } },
                     { description: { contains: query } },
-                    { brand: { contains: query } },
+                    { brandName: { contains: query } },
                     { category: { name: { contains: query } } }
                 ]
             },

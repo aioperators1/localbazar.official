@@ -14,7 +14,9 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { ImageIcon, MoreHorizontal } from "lucide-react";
+import { ImageIcon, MoreHorizontal, Star } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
 
 import Link from "next/link";
 
@@ -43,6 +45,8 @@ export default function CategoryForm({ initialData, categories }: CategoryFormPr
             slug: name.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, ''),
             image: formData.get("image") as string,
             parentId: formData.get("parentId") as string,
+            description: formData.get("description") as string,
+            featured: formData.get("featured") === "on",
         };
 
         let res;
@@ -76,6 +80,16 @@ export default function CategoryForm({ initialData, categories }: CategoryFormPr
                             defaultValue={initialData?.name}
                             placeholder="e.g. Summer Collection"
                             className="bg-white border-[#D2D2D2] text-[13px] h-9 rounded-[8px] focus:ring-1 focus:ring-black"
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="description" className="text-[13px] font-medium text-[#303030]">Description (Optional)</Label>
+                        <Textarea
+                            id="description"
+                            name="description"
+                            defaultValue={initialData?.description || ""}
+                            placeholder="Describe this collection for the customer..."
+                            className="bg-white border-[#D2D2D2] text-[13px] min-h-[100px] rounded-[8px] focus:ring-1 focus:ring-black resize-none"
                         />
                     </div>
                 </div>
@@ -118,6 +132,10 @@ export default function CategoryForm({ initialData, categories }: CategoryFormPr
                                 <option key={cat.id} value={cat.id}>{cat.name}</option>
                             ))}
                         </select>
+                    </div>
+                    <div className="flex items-center justify-between pt-2">
+                        <Label className="text-[12px] text-[#616161]">Featured collection</Label>
+                        <Switch name="featured" defaultChecked={initialData?.featured} />
                     </div>
                 </div>
 

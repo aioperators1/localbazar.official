@@ -6,27 +6,26 @@ import { prisma } from "@/lib/prisma";
 const FALLBACK_PRODUCTS = [
   {
     id: 'fashion-001',
-    name: "Robe du Soir 'Midnight' en Soie",
-    slug: 'robe-soir-midnight-soie',
-    description: "Une pièce maîtresse de notre collection Couture. Cette robe longue en soie sauvage capte la lumière avec une élégance mystérieuse. Silhouette fluide et finitions main.",
-    price: 12500.00,
-    stock: 3,
+    name: "Velvet Couture Abaya",
+    slug: 'velvet-couture-abaya',
+    description: "A signature piece of Doha elegance. Crafted from premium Italian velvet with gold thread embroidery. Silhouette elegant and hand-finished.",
+    price: 4500.00,
+    stock: 5,
     inStock: true,
     images: JSON.stringify([
-      'https://images.unsplash.com/photo-1566174053879-31528523f8ae?q=80&w=1200',
-      'https://images.unsplash.com/photo-1595777457583-95e059d581b8?q=80&w=1200'
+      'https://images.unsplash.com/photo-1585487000160-afffbfc767ab?q=80&w=1200'
     ]),
     featured: true,
-    categoryId: 'evening-wear',
-    category: { id: 'evening-wear', name: 'Couture', slug: 'evening-wear' },
-    brand: "Local Bazar Couture",
-    sizes: JSON.stringify(["36", "38", "40", "42"]),
+    categoryId: 'abayas',
+    category: { id: 'abayas', name: 'Abayas', slug: 'abayas' },
+    brandName: "Local Bazar Signature",
+    sizes: JSON.stringify(["S", "M", "L", "XL"]),
     colors: JSON.stringify([
-      { name: "Burgundy", hex: "#592C2F" },
-      { name: "Midnight Black", hex: "#0a0a0a" }
+      { name: "Black", hex: "#000000" },
+      { name: "Gold", hex: "#D4AF37" }
     ]),
-    materials: "100% Soie de Milan",
-    careInstructions: "Nettoyage à sec uniquement. Manipuler avec soin.",
+    materials: "Premium Velvet",
+    careInstructions: "Dry clean only.",
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
   }
@@ -142,12 +141,12 @@ export async function getCategories() {
   }
   
   return [
-    { id: 'evening-wear', name: 'Couture', slug: 'evening-wear', image: 'https://images.unsplash.com/photo-1566174053879-31528523f8ae?q=80&w=1200', parentId: null, createdAt: new Date().toISOString() },
-    { id: 'suits', name: 'Tailleur', slug: 'suits', image: 'https://images.unsplash.com/photo-1594932224036-9c205771abb6?q=80&w=1200', parentId: null, createdAt: new Date().toISOString() },
-    { id: 'traditional', name: 'Héritage', slug: 'traditional', image: 'https://images.unsplash.com/photo-1618333234972-62295c846ba8?q=80&w=1200', parentId: null, createdAt: new Date().toISOString() },
-    { id: 'accessories', name: 'Accessoires', slug: 'accessories', image: 'https://images.unsplash.com/photo-1520903920243-00d872a2d1c9?q=80&w=1200', parentId: null, createdAt: new Date().toISOString() },
-    { id: 'essences', name: 'Parfums', slug: 'essences', image: 'https://images.unsplash.com/photo-1547887538-e3a2f32cb1cc?q=80&w=1200', parentId: null, createdAt: new Date().toISOString() },
-    { id: 'new-arrivals', name: 'Nouveautés', slug: 'new-arrivals', image: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=1200', parentId: null, createdAt: new Date().toISOString() }
+    { id: 'abayas', name: 'Abayas', slug: 'abayas', image: 'https://images.unsplash.com/photo-1585487000160-afffbfc767ab?q=80&w=1200', parentId: null, createdAt: new Date().toISOString() },
+    { id: 'dresses-jalabiyas', name: 'Dresses & Jalabiyas', slug: 'dresses-jalabiyas', image: 'https://images.unsplash.com/photo-1566174053879-31528523f8ae?q=80&w=1200', parentId: null, createdAt: new Date().toISOString() },
+    { id: 'men', name: 'Men', slug: 'men', image: 'https://images.unsplash.com/photo-1594932224036-9c205771abb6?q=80&w=1200', parentId: null, createdAt: new Date().toISOString() },
+    { id: 'perfumes-oud', name: 'Perfumes & Oud', slug: 'perfumes-oud', image: 'https://images.unsplash.com/photo-1547887538-e3a2f32cb1cc?q=80&w=1200', parentId: null, createdAt: new Date().toISOString() },
+    { id: 'jewelry', name: 'Jewelry', slug: 'jewelry', image: 'https://images.unsplash.com/photo-1610812383719-38379010461f?q=80&w=1200', parentId: null, createdAt: new Date().toISOString() },
+    { id: 'accessories', name: 'Accessories', slug: 'accessories', image: 'https://images.unsplash.com/photo-1520903920243-00d872a2d1c9?q=80&w=1200', parentId: null, createdAt: new Date().toISOString() }
   ];
 }
 

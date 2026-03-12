@@ -20,40 +20,40 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
+import { getDashboardStats, getMonthlyRevenue } from "@/lib/actions/admin";
+
 export const dynamic = 'force-dynamic';
 
 export default async function AdminPage() {
-    // Quick Metrics
-    const productsCount = await prisma.product.count();
-    const customersCount = await prisma.user.count({ where: { role: 'USER' } });
-    const ordersCount = await prisma.order.count();
+    const statsData = await getDashboardStats();
+    const monthlyRevenue = await getMonthlyRevenue();
 
     const stats = [
         {
             title: "Total sales",
-            value: "124,500.00 QAR",
-            change: "+12.5%",
-            trend: "up",
+            value: `${statsData.revenue.toLocaleString()}.00 QAR`,
+            change: statsData.trends?.revenue?.change || "0%",
+            trend: statsData.trends?.revenue?.trend || "neutral",
             icon: TrendingUp
         },
         {
             title: "Orders",
-            value: ordersCount.toString(),
-            change: "+5.2%",
-            trend: "up",
+            value: statsData.orders.toString(),
+            change: statsData.trends?.orders?.change || "0%",
+            trend: statsData.trends?.orders?.trend || "neutral",
             icon: ShoppingBag
         },
         {
             title: "Total customers",
-            value: customersCount.toString(),
-            change: "-2.1%",
-            trend: "down",
+            value: statsData.users.toString(),
+            change: statsData.trends?.users?.change || "0%",
+            trend: statsData.trends?.users?.trend || "neutral",
             icon: Users
         },
         {
             title: "Active products",
-            value: productsCount.toString(),
-            change: "0%",
+            value: statsData.products.toString(),
+            change: "Live",
             trend: "neutral",
             icon: Package
         }
@@ -67,11 +67,13 @@ export default async function AdminPage() {
                 </h1>
                 <div className="flex items-center gap-2">
                    <div className="text-[12px] text-[#616161] mr-4 hidden md:block">
-                     Last 7 days: <span className="font-bold text-[#303030]">Mar 4 - Mar 11</span>
+                     Current Month: <span className="font-bold text-[#303030]">vs Last Month</span>
                    </div>
-                   <Button variant="outline" className="h-8 text-[12px] border-[#D2D2D2] bg-white text-[#303030] font-bold rounded-[8px] px-3 shadow-none">
-                       Customize
-                   </Button>
+                   <Link href="/admin/analytics">
+                       <Button variant="outline" className="h-8 text-[12px] border-[#D2D2D2] bg-white text-[#303030] font-bold rounded-[8px] px-3 shadow-none">
+                           View Analytics
+                       </Button>
+                   </Link>
                 </div>
             </div>
 
@@ -110,12 +112,13 @@ export default async function AdminPage() {
                     </CardHeader>
                     <CardContent className="p-6">
                         <div className="flex items-end gap-2 mb-6">
-                            <span className="text-2xl font-bold text-[#303030]">QAR 124,500.00</span>
-                            <span className="text-[13px] text-[#008060] font-bold flex items-center mb-1">
-                                <ArrowUpRight className="w-3.5 h-3.5 mr-0.5" /> 12.5%
+                            <span className="text-2xl font-bold text-[#303030]">QAR {statsData.revenue.toLocaleString()}.00</span>
+                            <span className={`text-[13px] font-bold flex items-center mb-1 ${statsData.trends?.revenue?.trend === 'up' ? 'text-[#008060]' : statsData.trends?.revenue?.trend === 'down' ? 'text-[#D72C0D]' : 'text-[#616161]'}`}>
+                                {statsData.trends?.revenue?.trend === 'up' ? <ArrowUpRight className="w-3.5 h-3.5 mr-0.5" /> : statsData.trends?.revenue?.trend === 'down' ? <ArrowDownRight className="w-3.5 h-3.5 mr-0.5" /> : null} 
+                                {statsData.trends?.revenue?.change || "0%"}
                             </span>
                         </div>
-                        <Overview />
+                        <Overview data={monthlyRevenue} />
                     </CardContent>
                 </Card>
 
@@ -147,22 +150,35 @@ export default async function AdminPage() {
                         </CardContent>
                     </Card>
 
-                    <Card className="bg-[#482E2E] text-white border-none shadow-sm rounded-[12px] p-6 relative overflow-hidden group">
-                        <div className="relative z-10 space-y-4">
-                            <div className="inline-flex items-center gap-2 px-2 py-0.5 rounded-full bg-white/10 text-[10px] uppercase font-bold tracking-widest">
-                                Tip of the day
-                            </div>
-                            <h3 className="text-[16px] font-serif font-black italic">"Quality is not an act, it is a habit." - Aristotle</h3>
-                            <p className="text-[13px] text-white/70 leading-relaxed">
-                                Keep your inventory refined and exclusive to maintain your brand's prestige.
-                            </p>
-                            <Button variant="outline" className="h-9 bg-transparent border-white/20 hover:bg-white/10 text-white rounded-[8px] text-[12px] font-bold w-full">
-                                Learn more
-                            </Button>
-                        </div>
-                        {/* Abstract Background Decoration */}
-                        <div className="absolute -right-8 -bottom-8 w-32 h-32 bg-white/5 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-1000" />
-                        <div className="absolute -left-8 -top-8 w-24 h-24 bg-[#592C2F]/20 rounded-full blur-2xl" />
+                    <Card className="bg-white border-[#E3E3E3] shadow-sm rounded-[12px]">
+                        <CardHeader className="p-4 border-b border-[#F1F1F1] flex flex-row items-center justify-between">
+                            <CardTitle className="text-[14px] font-bold text-[#303030]">Recent orders</CardTitle>
+                            <Link href="/admin/orders" className="text-[11px] font-bold text-[#616161] hover:text-[#303030]">View all</Link>
+                        </CardHeader>
+                        <CardContent className="p-0">
+                            {statsData.recentOrders && statsData.recentOrders.length > 0 ? (
+                                <div className="divide-y divide-[#F1F1F1]">
+                                    {statsData.recentOrders.map(order => (
+                                        <div key={order.id} className="flex items-center justify-between p-4 hover:bg-[#F9F9F9] transition-colors">
+                                            <div className="flex flex-col">
+                                                <Link href={`/admin/orders/${order.id}`} className="text-[13px] font-bold text-[#303030] hover:underline">
+                                                    {(order as any).user?.name || "Guest Customer"}
+                                                </Link>
+                                                <span className="text-[11px] text-[#616161] mt-0.5">{(order as any).user?.email || "No email"}</span>
+                                            </div>
+                                            <div className="text-right flex flex-col items-end">
+                                                <span className="text-[13px] font-bold text-[#303030]">QAR {Number(order.total).toFixed(2)}</span>
+                                                <span className="text-[10px] uppercase font-bold text-[#8A8A8A] tracking-wider mt-0.5">{order.status}</span>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="p-8 text-center text-[#616161] text-[12px]">
+                                    No recent orders yet.
+                                </div>
+                            )}
+                        </CardContent>
                     </Card>
                 </div>
             </div>

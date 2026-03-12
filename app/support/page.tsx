@@ -40,7 +40,7 @@ export default function SupportPage() {
                         Concierge <br /> <span className="text-transparent text-stroke-black opacity-10">Support</span>
                     </h1>
                     <p className="text-zinc-400 uppercase tracking-[0.4em] text-[10px] font-black">
-                        L'Excellence du Luxe & de l'Héritage
+                        The Excellence of Luxury & Heritage
                     </p>
                 </div>
 

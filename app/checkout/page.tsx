@@ -258,11 +258,39 @@ export default function CheckoutPage() {
                                             <div className={cn("w-4 h-4 rounded-full border flex items-center justify-center", paymentMethod === "CARD" ? "border-[#111111]" : "border-zinc-400")}>
                                                 {paymentMethod === "CARD" && <div className="w-2.5 h-2.5 bg-[#111111] rounded-full" />}
                                             </div>
-                                            <span className="text-[14px] font-bold text-[#111111] uppercase tracking-tight">Credit Card</span>
+                                            <span className="text-[14px] font-bold text-[#111111] uppercase tracking-tight">Credit Card / VISA / Master</span>
                                         </div>
-                                        <div className="flex gap-2">
-                                            <ShieldCheck className="w-5 h-5 text-zinc-400" />
+                                        <ShieldCheck className="w-5 h-5 text-zinc-400" />
+                                    </div>
+                                    <div
+                                        onClick={() => setPaymentMethod("FAWRY")}
+                                        className={cn(
+                                            "p-5 border-t border-zinc-200 flex items-center justify-between cursor-pointer transition-colors",
+                                            paymentMethod === "FAWRY" ? "bg-[#f9f9f9]" : "hover:bg-zinc-50"
+                                        )}
+                                    >
+                                        <div className="flex items-center gap-3">
+                                            <div className={cn("w-4 h-4 rounded-full border flex items-center justify-center", paymentMethod === "FAWRY" ? "border-[#111111]" : "border-zinc-400")}>
+                                                {paymentMethod === "FAWRY" && <div className="w-2.5 h-2.5 bg-[#111111] rounded-full" />}
+                                            </div>
+                                            <span className="text-[14px] font-bold text-[#111111] uppercase tracking-tight">Fawry Pay</span>
                                         </div>
+                                        <div className="px-2 py-0.5 bg-orange-100 text-orange-600 text-[10px] font-black rounded uppercase">Fast</div>
+                                    </div>
+                                    <div
+                                        onClick={() => setPaymentMethod("SADAD")}
+                                        className={cn(
+                                            "p-5 border-t border-zinc-200 flex items-center justify-between cursor-pointer transition-colors",
+                                            paymentMethod === "SADAD" ? "bg-[#f9f9f9]" : "hover:bg-zinc-50"
+                                        )}
+                                    >
+                                        <div className="flex items-center gap-3">
+                                            <div className={cn("w-4 h-4 rounded-full border flex items-center justify-center", paymentMethod === "SADAD" ? "border-[#111111]" : "border-zinc-400")}>
+                                                {paymentMethod === "SADAD" && <div className="w-2.5 h-2.5 bg-[#111111] rounded-full" />}
+                                            </div>
+                                            <span className="text-[14px] font-bold text-[#111111] uppercase tracking-tight">Sadad / KNET / Debit</span>
+                                        </div>
+                                        <div className="p-1 border border-zinc-200 rounded text-[9px] font-bold text-zinc-400 uppercase">Local</div>
                                     </div>
                                 </div>
                             </section>
@@ -283,7 +311,7 @@ export default function CheckoutPage() {
                             {/* Product List */}
                             <div className="space-y-6">
                                 {items.map((item: any) => (
-                                    <div key={item.id} className="flex items-center gap-4">
+                                    <div key={`${item.id}-${item.size || 'nosize'}-${item.color || 'nocolor'}`} className="flex items-center gap-4">
                                         <div className="relative w-[64px] h-[64px] bg-white border border-zinc-200 rounded-[8px] flex items-center justify-center shrink-0 shadow-sm">
                                             <div className="absolute -top-2 -right-2 w-[22px] h-[22px] bg-[#111111] text-white text-[11px] font-bold rounded-full flex items-center justify-center z-10 shadow-sm leading-none">
                                                 {item.quantity}

@@ -7,8 +7,8 @@ import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 
 export const metadata = {
-    title: "Collections | Local Bazar",
-    description: "Découvrez nos collections exclusives de haute couture et prêt-à-porter de luxe.",
+    title: "Collections | Local Bazar Hub",
+    description: "Discover our exclusive collections of high fashion, abayas, and luxury scents in Qatar.",
 };
 
 export default async function ShopPage({
@@ -30,61 +30,67 @@ export default async function ShopPage({
     let categories = initialCategories;
 
     const catDescriptions: Record<string, string> = {
-        'evening-wear': "Notre collection Couture incarne l'élégance absolue. Des robes de soirée aux silhouettes sophistiquées, confectionnées dans les soies les plus fines pour vos moments d'exception.",
-        'suits': "L'art du Tailleur Local Bazar. Des coupes impeccables et des matières nobles pour une allure structurée et moderne, que ce soit pour le business ou les grandes occasions.",
-        'traditional': "Héritage célèbre le savoir-faire ancestral revisité. Des pièces uniques mêlant broderies artisanales et designs contemporains pour un style intemporel.",
-        'accessories': "Les essentiels du luxe. Découvrez notre sélection de maroquinerie, étoles en cachemire et accessoires raffinés pour parfaire votre silhouette.",
-        'new-arrivals': "Les dernières tendances de la saison. Explorez nos nouveautés et soyez les premiers à adopter les pièces maîtresses de nos nouvelles collections."
+        'abayas': "Experience the ultimate elegance with our signature Abaya collection. Crafted for the modern woman who values tradition and luxury.",
+        'dresses-jalabiyas': "Elegant dresses and Jalabiyas for your most unforgettable moments. Where fashion meets heritage in perfect harmony.",
+        'perfumes-oud': "A sensory journey through the scents of Arabia. Discover our premium selection of Oud, Perfumes, and Bukhoor.",
+        'men': "Premium menswear crafted with precision. From classic designs to modern essentials, experience luxury in every stitch.",
+        'jewelry': "Exquisite jewelry pieces that illuminate your grace. Discover our collection of precious gemstones and timeless designs.",
+        'accessories': "The perfect finishing touches. Explore our curated selection of luxury accessories to complement your unique style.",
+        'kids': "Luxury collections for the little ones. Timeless elegance and comfort for your children's special moments."
     };
 
     const categorySl = params.category?.toLowerCase() || '';
     const currentCategoryName = params.category
-        ? categories.find(c => c.slug === params.category)?.name || "Toutes les Collections"
-        : "Toutes les Collections";
+        ? categories.find(c => c.slug === params.category)?.name || "All Collections"
+        : "All Collections";
 
-    const descText = catDescriptions[categorySl] || "Découvrez l'univers Local Bazar : une sélection rigoureuse de pièces de luxe alliant tradition et modernité.";
+    const descText = catDescriptions[categorySl] || "Welcome to the world of Local Bazar Hub: a curated selection of luxury pieces merging tradition with modern aesthetics.";
 
     return (
-        <div className="bg-white min-h-screen pb-32 pt-10">
-            <main className="container mx-auto px-4 lg:px-20">
-                {/* Breadcrumbs */}
-                <div className="text-[12px] text-zinc-500 font-medium mb-6 flex items-center gap-2">
-                    <Link href="/" className="hover:text-[#592C2F] transition-colors">Accueil</Link>
-                    <span>/</span>
-                    <span className="text-zinc-900 capitalize">{currentCategoryName === "Full Catalogue" ? "Boutique" : currentCategoryName}</span>
+        <div className="bg-white min-h-screen pb-32 pt-12">
+            <main className="container mx-auto px-4 lg:px-12 xl:px-24">
+                {/* Breadcrumbs - Minimalist */}
+                <div className="flex items-center gap-3 text-[11px] font-bold uppercase tracking-[0.2em] text-[#919191] mb-12">
+                    <Link href="/" className="hover:text-black transition-colors">Home</Link>
+                    <ChevronRight className="w-3 h-3" />
+                    <span className="text-black">{currentCategoryName === "Full Catalogue" ? "Shop" : currentCategoryName}</span>
                 </div>
 
-                <div className="flex flex-col lg:flex-row gap-8 items-start">
-                    {/* Sidebar */}
+                <div className="flex flex-col lg:flex-row gap-16 items-start">
+                    {/* Sidebar - Precision Width */}
                     <div className="w-full lg:w-64 flex-shrink-0">
                         <ShopSidebar categories={categories} />
                     </div>
 
                     {/* Catalog Content Area */}
                     <div className="flex-1 min-w-0">
-                        {/* Header Box */}
-                        <div className="bg-white p-6 md:p-8 rounded-[4px] shadow-sm mb-6 border border-zinc-100">
-                            <ShopHeader
-                                categoryName={currentCategoryName}
-                                productCount={products.length}
-                            />
-                            <p className="text-[#677279] text-[13px] leading-relaxed max-w-4xl mt-4">
+                        {/* High-End Editorial Header */}
+                        <div className="mb-16">
+                            <h1 className="font-serif text-[42px] sm:text-[56px] text-[#111111] leading-tight tracking-tight mb-6 uppercase">
+                                {currentCategoryName}
+                            </h1>
+                            <p className="text-[#616161] text-[15px] leading-relaxed max-w-3xl font-medium">
                                 {descText}
                             </p>
                         </div>
 
-                        <ShopToolbar totalProducts={products.length} />
+                        {/* Professional Toolbar */}
+                        <div className="border-t border-[#F1F1F1] pt-8">
+                           <ShopToolbar totalProducts={products.length} />
+                        </div>
 
                         {products.length === 0 ? (
-                            <div className="bg-white p-12 text-center rounded-[4px] shadow-sm border border-zinc-100 mt-6 flex flex-col items-center">
-                                <span className="text-2xl font-bold text-zinc-900 mb-2">Aucun produit trouvé</span>
-                                <p className="text-zinc-500 text-sm mb-6">Essayez de modifier vos filtres ou de chercher autre chose.</p>
-                                <Link href="/shop" className="bg-[#592C2F] text-white px-6 py-2.5 rounded-[4px] text-xs font-bold uppercase hover:bg-black transition-colors">
-                                    Réinitialiser les filtres
+                            <div className="max-w-md mx-auto py-32 text-center">
+                                <h2 className="font-serif text-2xl text-black mb-4">No results found</h2>
+                                <p className="text-[#616161] text-sm mb-8">We couldn't find any pieces matching your current criteria.</p>
+                                <Link href="/shop" className="inline-block bg-black text-white px-10 py-4 text-[11px] font-bold uppercase tracking-widest hover:bg-[#333] transition-colors rounded-sm">
+                                    Explore the Boutique
                                 </Link>
                             </div>
                         ) : (
-                            <ProductsGrid products={products} />
+                            <div className="mt-8">
+                                <ProductsGrid products={products as any} />
+                            </div>
                         )}
                     </div>
                 </div>
