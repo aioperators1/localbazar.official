@@ -1,28 +1,34 @@
 "use client";
 
 import { useState } from "react";
-import { Image as ImageIcon, Plus, Trash2, Edit2, Check, X, Link as LinkIcon, MoreHorizontal, Layout } from "lucide-react";
+import { Image as ImageIcon, Plus, Trash2, Edit2, X, MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { createBanner, deleteBanner, updateBanner } from "@/lib/actions/admin";
 import { toast } from "sonner";
 import Image from "next/image";
-import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { ImageUpload } from "@/components/admin/ImageUpload";
+import { usePermissions } from "@/hooks/use-permissions";
 
 type Banner = {
     id: string;
     title: string;
+    titleAr?: string | null;
     subtitle: string | null;
+    subtitleAr?: string | null;
+    description?: string | null;
+    descriptionAr?: string | null;
     image: string;
-    link: string| null;
+    mobileImage: string | null;
+    link: string | null;
     active: boolean;
     order: number;
 };
 
 export default function BannersClient({ initialBanners }: { initialBanners: Banner[] }) {
+    const { canEdit } = usePermissions();
     const [banners, setBanners] = useState<Banner[]>(initialBanners);
     const [isEditing, setIsEditing] = useState<string | null>(null);
     const [isCreating, setIsCreating] = useState(false);
@@ -30,21 +36,26 @@ export default function BannersClient({ initialBanners }: { initialBanners: Bann
 
     const [formData, setFormData] = useState({
         title: "",
+        titleAr: "",
         subtitle: "",
+        subtitleAr: "",
         description: "",
+        descriptionAr: "",
         image: "",
+        mobileImage: "",
         link: "",
         active: true,
         order: 0
     });
 
     const resetForm = () => {
-        setFormData({ title: "", subtitle: "", description: "", image: "", link: "", active: true, order: 0 });
+        setFormData({ title: "", titleAr: "", subtitle: "", subtitleAr: "", description: "", descriptionAr: "", image: "", mobileImage: "", link: "", active: true, order: 0 });
         setIsEditing(null);
         setIsCreating(false);
     };
 
     const handleCreate = async () => {
+        if (!canEdit('banners')) return toast.error("Access Denied: Editor permission required");
         if (!formData.title || !formData.image) return toast.error("Title and image are required");
         setLoading(true);
         const res = await createBanner(formData);
@@ -53,12 +64,13 @@ export default function BannersClient({ initialBanners }: { initialBanners: Bann
             resetForm();
             window.location.reload();
         } else {
-            toast.error("Error creating banner");
+            toast.error(res.error || "Error creating banner");
         }
         setLoading(false);
     };
 
     const handleUpdate = async (id: string) => {
+        if (!canEdit('banners')) return toast.error("Access Denied: Editor permission required");
         setLoading(true);
         const res = await updateBanner(id, formData);
         if (res.success) {
@@ -66,12 +78,13 @@ export default function BannersClient({ initialBanners }: { initialBanners: Bann
             resetForm();
             window.location.reload();
         } else {
-            toast.error("Error updating banner");
+            toast.error(res.error || "Error updating banner");
         }
         setLoading(false);
     };
 
     const handleDelete = async (id: string) => {
+        if (!canEdit('banners')) return toast.error("Access Denied: Editor permission required");
         if (!confirm("Are you sure you want to delete this banner?")) return;
         setLoading(true);
         const res = await deleteBanner(id);
@@ -84,12 +97,17 @@ export default function BannersClient({ initialBanners }: { initialBanners: Bann
         setLoading(false);
     };
 
-    const startEditing = (banner: any) => {
+    const startEditing = (banner: Banner) => {
+        if (!canEdit('banners')) return toast.error("Access Denied: Editor permission required");
         setFormData({
             title: banner.title,
+            titleAr: banner.titleAr || "",
             subtitle: banner.subtitle || "",
+            subtitleAr: banner.subtitleAr || "",
             description: banner.description || "",
+            descriptionAr: banner.descriptionAr || "",
             image: banner.image,
+            mobileImage: banner.mobileImage || "",
             link: banner.link || "",
             active: banner.active,
             order: banner.order
@@ -99,154 +117,250 @@ export default function BannersClient({ initialBanners }: { initialBanners: Bann
     };
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-8 pb-12 animate-in fade-in duration-1000">
             <div className="flex flex-col gap-4">
                 <div className="flex items-center justify-between">
-                    <h1 className="text-xl font-bold text-[#303030]">Storefront Banners</h1>
-                    {!isCreating && (
-                        <Button onClick={() => setIsCreating(true)} className="bg-black text-white hover:bg-[#303030] h-9 rounded-[8px] px-4 font-bold text-[13px]">
-                            <Plus className="w-4 h-4 mr-2" /> Create banner
+                    <div>
+                        <h1 className="text-2xl font-black text-white uppercase tracking-tight italic">Visual Campaigns</h1>
+                        <p className="text-[13px] text-white/40 font-medium mt-1">Orchestrate high-impact hero banners for the digital storefront.</p>
+                    </div>
+                    {!isCreating && canEdit('banners') && (
+                        <Button 
+                            onClick={() => setIsCreating(true)} 
+                            className="bg-white text-black hover:bg-white/80 h-10 rounded-xl px-6 font-black text-[11px] uppercase tracking-widest shadow-xl shadow-white/5 transition-all"
+                        >
+                            <Plus className="w-4 h-4 mr-2" /> Initialize Campaign
                         </Button>
                     )}
                 </div>
             </div>
 
             {isCreating && (
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-in fade-in slide-in-from-top-4">
-                    <div className="lg:col-span-2 space-y-6">
-                        <div className="bg-white p-5 rounded-[12px] border border-[#E3E3E3] shadow-sm space-y-4">
-                            <h2 className="text-[14px] font-bold text-[#303030]">
-                                {isEditing ? "Edit banner" : "New banner"}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 animate-in fade-in slide-in-from-top-6 duration-700">
+                    <div className="lg:col-span-2 space-y-8">
+                        <div className="glass-card p-8 rounded-[32px] border border-white/5 shadow-2xl space-y-8 bg-white/[0.01]">
+                            <h2 className="text-[14px] font-black text-white uppercase tracking-[0.2em] italic">
+                                {isEditing ? "Modify Campaign Asset" : "New Visual Strategy"}
                             </h2>
-                            <div className="grid gap-4">
-                                <div className="space-y-2">
-                                    <Label className="text-[13px] font-medium text-[#303030]">Title</Label>
-                                    <Input
-                                        value={formData.title}
-                                        onChange={e => setFormData({ ...formData, title: e.target.value })}
-                                        placeholder="Banner Title"
-                                        className="bg-white border-[#D2D2D2] h-9 rounded-[8px] text-[13px]"
-                                    />
+                            <div className="grid gap-6">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div className="space-y-2">
+                                        <Label className="text-[11px] font-black text-white/70 uppercase tracking-widest">Global Title (EN)</Label>
+                                        <Input
+                                            value={formData.title}
+                                            onChange={e => setFormData({ ...formData, title: e.target.value })}
+                                            placeholder="IMPERIAL COLLECTION"
+                                            className="bg-white/5 border-white/10 h-10 rounded-xl text-white text-[14px] uppercase tracking-tighter italic font-black placeholder:text-white/10 outline-none"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label className="text-[11px] font-black text-white/70 uppercase tracking-widest block text-right">العنوان الاستراتيجي (AR)</Label>
+                                        <Input
+                                            value={formData.titleAr}
+                                            onChange={e => setFormData({ ...formData, titleAr: e.target.value })}
+                                            placeholder="مجموعة النخبة"
+                                            dir="rtl"
+                                            className="bg-white/5 border-white/10 h-10 rounded-xl text-white text-[18px] text-right font-bold placeholder:text-white/10 outline-none"
+                                        />
+                                    </div>
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div className="space-y-2">
+                                        <Label className="text-[11px] font-black text-white/70 uppercase tracking-widest">Subtitle (EN)</Label>
+                                        <Input
+                                            value={formData.subtitle}
+                                            onChange={e => setFormData({ ...formData, subtitle: e.target.value })}
+                                            placeholder="Elegance redefined for the modern elite."
+                                            className="bg-white/5 border-white/10 h-10 rounded-xl text-white/80 text-[13px] font-medium placeholder:text-white/10 outline-none"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label className="text-[11px] font-black text-white/70 uppercase tracking-widest block text-right">العنوان الفرعي (AR)</Label>
+                                        <Input
+                                            value={formData.subtitleAr}
+                                            onChange={e => setFormData({ ...formData, subtitleAr: e.target.value })}
+                                            placeholder="إعادة تعريف الأناقة للنخبة الحديثة."
+                                            dir="rtl"
+                                            className="bg-white/5 border-white/10 h-10 rounded-xl text-white/80 text-[15px] text-right font-medium placeholder:text-white/10 outline-none"
+                                        />
+                                    </div>
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div className="space-y-2">
+                                        <Label className="text-[11px] font-black text-white/70 uppercase tracking-widest">Strategic Narrative (EN)</Label>
+                                        <textarea
+                                            value={formData.description}
+                                            onChange={e => setFormData({ ...formData, description: e.target.value })}
+                                            placeholder="Detailed campaign narrative..."
+                                            className="w-full flex min-h-[100px] rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-[13px] text-white/80 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20 transition-all outline-none"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label className="text-[11px] font-black text-white/70 uppercase tracking-widest block text-right">السرد القصصي (AR)</Label>
+                                        <textarea
+                                            value={formData.descriptionAr}
+                                            onChange={e => setFormData({ ...formData, descriptionAr: e.target.value })}
+                                            placeholder="سرد مفصل للحملة..."
+                                            dir="rtl"
+                                            className="w-full flex min-h-[100px] rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-[15px] text-white/80 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20 text-right transition-all outline-none"
+                                        />
+                                    </div>
                                 </div>
                                 <div className="space-y-2">
-                                    <Label className="text-[13px] font-medium text-[#303030]">Subtitle (Optional)</Label>
-                                    <Input
-                                        value={formData.subtitle}
-                                        onChange={e => setFormData({ ...formData, subtitle: e.target.value })}
-                                        placeholder="Optional caption"
-                                        className="bg-white border-[#D2D2D2] h-9 rounded-[8px] text-[13px]"
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <Label className="text-[13px] font-medium text-[#303030]">Description</Label>
-                                    <textarea
-                                        value={formData.description}
-                                        onChange={e => setFormData({ ...formData, description: e.target.value })}
-                                        placeholder="Detailed description for the hero slide..."
-                                        className="w-full flex min-h-[80px] w-full rounded-[8px] border border-[#D2D2D2] bg-white px-3 py-2 text-[13px] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black"
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <Label className="text-[13px] font-medium text-[#303030]">Link URL</Label>
+                                    <Label className="text-[11px] font-black text-white/70 uppercase tracking-widest">Hyperlink Destination</Label>
                                     <Input
                                         value={formData.link}
                                         onChange={e => setFormData({ ...formData, link: e.target.value })}
                                         placeholder="/collection/new-arrivals"
-                                        className="bg-white border-[#D2D2D2] h-9 rounded-[8px] text-[13px]"
+                                        className="bg-white/5 border-white/10 h-10 rounded-xl text-white/80 text-[13px] font-medium outline-none"
                                     />
                                 </div>
                             </div>
                         </div>
 
-                        <div className="bg-white p-5 rounded-[12px] border border-[#E3E3E3] shadow-sm space-y-4">
-                            <Label className="text-[13px] font-medium text-[#303030]">Media</Label>
-                            <ImageUpload 
-                                value={formData.image ? [formData.image] : []}
-                                onChange={(urls) => setFormData({ ...formData, image: urls[0] || "" })}
-                                onRemove={() => setFormData({ ...formData, image: "" })}
-                            />
+                        <div className="glass-card p-8 rounded-[32px] border border-white/5 shadow-2xl space-y-8 bg-white/[0.01]">
+                            <div className="flex items-center gap-4 mb-2">
+                                <div className="w-10 h-10 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center">
+                                    <ImageIcon className="w-5 h-5 text-white/40" />
+                                </div>
+                                <h3 className="text-[14px] font-black text-white uppercase tracking-[0.2em] italic">Responsive Media Assets</h3>
+                            </div>
+                            
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                                <div className="space-y-4">
+                                    <div className="flex items-center justify-between">
+                                        <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-white/60">Cinema Display</Label>
+                                        <span className="text-[9px] text-white/30 font-black uppercase tracking-widest">561x248px Optimal</span>
+                                    </div>
+                                    <ImageUpload 
+                                        value={formData.image ? [formData.image] : []}
+                                        onChange={(urls) => setFormData({ ...formData, image: urls[0] || "" })}
+                                        onRemove={() => setFormData({ ...formData, image: "" })}
+                                    />
+                                </div>
+
+                                <div className="space-y-4">
+                                    <div className="flex items-center justify-between">
+                                        <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-white/60">Mobile Vertical</Label>
+                                        <span className="text-[9px] text-white/30 font-black uppercase tracking-widest">540x675px Optimal</span>
+                                    </div>
+                                    <ImageUpload 
+                                        value={formData.mobileImage ? [formData.mobileImage] : []}
+                                        onChange={(urls) => setFormData({ ...formData, mobileImage: urls[0] || "" })}
+                                        onRemove={() => setFormData({ ...formData, mobileImage: "" })}
+                                    />
+                                </div>
+                            </div>
+                            
+                            <div className="bg-white/[0.02] p-6 rounded-2xl flex items-start gap-4 border border-white/5">
+                                <div className="w-2 h-2 rounded-full bg-emerald-500 mt-2 shrink-0 animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
+                                <p className="text-[11px] text-white/70 font-medium leading-relaxed uppercase tracking-tight italic">
+                                    UPLOAD GUIDELINE: For maximum prestige, use high-resolution photography without baked-in text. The system dynamically overlays strategic copy for optimal accessibility.
+                                </p>
+                            </div>
                         </div>
                     </div>
 
-                    <div className="space-y-6">
-                        <div className="bg-white p-4 rounded-[12px] border border-[#E3E3E3] shadow-sm space-y-4">
-                            <Label className="text-[13px] font-semibold text-[#303030]">Organization</Label>
-                            <div className="space-y-3">
+                    <div className="space-y-8">
+                        <div className="glass-card p-6 rounded-[32px] border border-white/5 shadow-2xl space-y-6 bg-white/[0.01]">
+                            <Label className="text-[11px] font-black text-white uppercase tracking-[0.3em] mb-4 block italic">Campaign Parameters</Label>
+                            <div className="space-y-4">
                                 <div className="space-y-2">
-                                    <Label className="text-[12px] text-[#616161]">Display order</Label>
+                                    <Label className="text-[10px] font-bold text-white/20 uppercase tracking-widest">Sequence Order</Label>
                                     <Input
                                         type="number"
                                         value={formData.order}
                                         onChange={e => setFormData({ ...formData, order: parseInt(e.target.value) || 0 })}
-                                        className="h-8 text-[12px] border-[#D2D2D2] rounded-[6px]"
+                                        className="h-10 text-[13px] bg-white/5 border-white/10 rounded-xl text-white font-black italic outline-none"
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label className="text-[12px] text-[#616161]">Visibility</Label>
+                                    <Label className="text-[10px] font-bold text-white/20 uppercase tracking-widest">Active State</Label>
                                     <select
-                                        className="w-full h-8 bg-white border border-[#D2D2D2] rounded-[6px] px-2 text-[12px] focus:ring-1 focus:ring-black outline-none"
+                                        className="w-full h-10 bg-white/5 border border-white/10 rounded-xl px-4 text-[13px] text-white font-black italic focus:ring-1 focus:ring-white/20 outline-none appearance-none"
                                         value={formData.active ? "true" : "false"}
                                         onChange={e => setFormData({ ...formData, active: e.target.value === "true" })}
                                     >
-                                        <option value="true">Active</option>
-                                        <option value="false">Hidden</option>
+                                        <option value="true" className="bg-[#0A0A0A]">Public Deployment</option>
+                                        <option value="false" className="bg-[#0A0A0A]">Encrypted / Stealth</option>
                                     </select>
                                 </div>
                             </div>
                         </div>
 
-                        <div className="pt-4 flex gap-3">
-                            <Button variant="outline" onClick={resetForm} disabled={loading} className="flex-1 h-10 border-[#D2D2D2] text-[#303030] rounded-[8px] text-[13px] font-medium">Cancel</Button>
-                            <Button
+                        <div className="pt-4 flex flex-col gap-4">
+                            <Button 
                                 onClick={() => isEditing ? handleUpdate(isEditing) : handleCreate()}
                                 disabled={loading}
-                                className="flex-1 bg-black text-white hover:bg-[#303030] h-10 rounded-[8px] text-[13px] font-bold"
+                                className="w-full bg-white text-black hover:bg-white/80 h-12 rounded-xl text-[12px] font-black uppercase tracking-[0.2em] shadow-2xl shadow-white/5 transition-all active:scale-95"
                             >
-                                {loading ? "Saving..." : (isEditing ? "Save changes" : "Publish banner")}
+                                {loading ? "Synchronizing..." : (isEditing ? "Apply Global Changes" : "Deploy Campaign")}
+                            </Button>
+                            <Button variant="ghost" onClick={resetForm} disabled={loading} className="w-full h-12 text-white/40 hover:text-white hover:bg-white/5 rounded-xl text-[11px] font-black uppercase tracking-[0.3em] transition-all">
+                                Abort Mission
                             </Button>
                         </div>
                     </div>
                 </div>
             )}
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {banners.length === 0 && !isCreating ? (
-                    <div className="col-span-full bg-white border border-[#E3E3E3] p-12 text-center rounded-[12px] shadow-sm">
-                        <ImageIcon className="w-10 h-10 text-[#D2D2D2] mx-auto mb-3" />
-                        <h3 className="text-[#616161] font-medium">No banners configured yet.</h3>
+                    <div className="col-span-full py-32 text-center group">
+                        <div className="w-24 h-24 rounded-full bg-white/5 border border-white/5 flex items-center justify-center mx-auto mb-8 group-hover:scale-110 transition-transform duration-700">
+                            <ImageIcon className="w-10 h-10 text-white/10 group-hover:text-white/40 transition-colors" />
+                        </div>
+                        <h3 className="text-white font-black uppercase tracking-[0.3em] text-[13px] italic">Strategic Void Detected</h3>
+                        <p className="text-white/20 text-[11px] font-bold mt-2 uppercase tracking-widest">No active campaigns in the registry.</p>
                     </div>
                 ) : (
                     banners.map(banner => (
-                        <div key={banner.id} className="bg-white border border-[#E3E3E3] rounded-[12px] shadow-sm overflow-hidden group hover:border-[#D2D2D2] transition-all flex flex-col">
-                            <div className="aspect-[16/9] relative bg-[#F1F1F1] overflow-hidden">
+                        <div key={banner.id} className="glass-card border border-white/5 rounded-[32px] shadow-2xl overflow-hidden group hover:border-white/20 transition-all duration-700 flex flex-col bg-white/[0.01]">
+                            <div className="aspect-[16/9] relative bg-white/5 overflow-hidden">
                                 <Image
                                     src={banner.image}
                                     alt={banner.title}
                                     fill
-                                    className={cn("object-cover transition-transform duration-500 group-hover:scale-105", !banner.active && "opacity-50 grayscale")}
+                                    className={cn("object-cover transition-transform duration-1000 group-hover:scale-110", !banner.active && "opacity-30 grayscale")}
                                     unoptimized
                                 />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60" />
+                                
                                 {!banner.active && (
-                                    <div className="absolute top-2 right-2 bg-white/90 px-2 py-0.5 rounded-full border border-[#E3E3E3] text-[10px] font-bold text-[#616161] flex items-center gap-1 shadow-sm">
-                                        <X className="w-2.5 h-2.5" /> Hidden
+                                    <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-md px-4 py-1.5 rounded-full border border-white/10 text-[9px] font-black text-white/60 uppercase tracking-widest flex items-center gap-2">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-white/20" /> Stealth Mode
                                     </div>
                                 )}
-                            </div>
-                            <div className="p-4 flex flex-1 flex-col">
-                                <div className="flex items-start justify-between gap-4 mb-2">
-                                    <h3 className="font-bold text-[#303030] text-[14px] line-clamp-1">{banner.title}</h3>
-                                    <span className="shrink-0 text-[10px] font-medium bg-[#F1F1F1] px-1.5 py-0.5 rounded text-[#616161]">#{banner.order}</span>
-                                </div>
-                                {banner.subtitle && <p className="text-[#616161] text-[12px] line-clamp-2 mb-4 flex-1">{banner.subtitle}</p>}
                                 
-                                <div className="flex items-center gap-2 mt-auto">
-                                    <Button variant="outline" size="sm" onClick={() => startEditing(banner)} className="flex-1 h-8 text-[11px] font-bold border-[#D2D2D2] text-[#303030] hover:bg-[#F1F1F1]">
-                                        <Edit2 className="w-3 h-3 mr-1.5" /> Edit
-                                    </Button>
-                                    <Button variant="outline" size="sm" onClick={() => handleDelete(banner.id)} className="h-8 w-8 text-[#616161] hover:text-rose-600 hover:bg-rose-50 border-[#D2D2D2]">
-                                        <Trash2 className="w-3 h-3" />
-                                    </Button>
+                                <div className="absolute bottom-4 left-6 z-10">
+                                    <span className="text-[10px] font-black text-white/40 uppercase tracking-[0.4em] leading-none mb-1 block">Level {banner.order}</span>
+                                    <h3 className="font-black text-white text-[18px] uppercase tracking-tighter italic leading-none">{banner.title}</h3>
                                 </div>
+                            </div>
+                            <div className="p-8 flex flex-1 flex-col">
+                                {banner.subtitle && (
+                                    <p className="text-white/40 text-[12px] font-medium leading-relaxed italic mb-8 line-clamp-2">
+                                        &quot;{banner.subtitle}&quot;
+                                    </p>
+                                )}
+                                
+                                {canEdit('banners') && (
+                                    <div className="flex items-center gap-3 mt-auto">
+                                        <Button 
+                                            onClick={() => startEditing(banner)} 
+                                            className="flex-1 h-10 text-[10px] font-black uppercase tracking-[0.2em] bg-white/5 hover:bg-white hover:text-black border border-white/10 rounded-xl transition-all"
+                                        >
+                                            <Edit2 className="w-3.5 h-3.5 mr-2" /> Modify
+                                        </Button>
+                                        <Button 
+                                            variant="ghost"
+                                            onClick={() => handleDelete(banner.id)} 
+                                            className="w-10 h-10 p-0 text-white/20 hover:text-rose-500 hover:bg-rose-500/10 rounded-xl border border-white/5"
+                                        >
+                                            <Trash2 className="w-4 h-4" />
+                                        </Button>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     ))

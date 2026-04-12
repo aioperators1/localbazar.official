@@ -11,7 +11,7 @@ import Image from "next/image";
 export default async function AdminConversationsPage() {
     const session = await getServerSession(authOptions);
 
-    if (!session || session.user.role !== "ADMIN") {
+    if (!session || !["ADMIN", "SUPER_ADMIN"].includes(session.user.role)) {
         redirect("/");
     }
 

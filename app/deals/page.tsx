@@ -22,36 +22,29 @@ export default async function DealsPage() {
     const products = await getDeals();
 
     return (
-        <div className="bg-[#030303] min-h-screen pt-32 pb-40">
+        <div className="bg-transparent min-h-screen pt-32 pb-40">
             <div className="container mx-auto px-6 mb-20">
                 <FlashSaleHero />
             </div>
 
             <div className="container mx-auto px-6">
-                <div className="flex items-center gap-4 mb-12 border-b border-white/5 pb-8">
-                    <div className="p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-xl">
-                        <Zap className="w-6 h-6 text-yellow-500 fill-current animate-pulse" />
+                <div className="flex items-center gap-4 mb-12 border-b border-white/10 pb-8">
+                    <div className="p-3 bg-white/10 border border-white/20 rounded-xl">
+                        <Zap className="w-6 h-6 text-white animate-pulse" />
                     </div>
                     <div>
                         <h2 className="text-4xl font-black text-white uppercase italic tracking-tighter">
-                            Tactical Drops
+                            Exquisite <span className="text-white/50">Collections</span>
                         </h2>
-                        <p className="text-zinc-500 text-sm font-bold uppercase tracking-widest">
-                            Limited supply. High priority acquisition.
+                        <p className="text-white/40 text-sm font-bold uppercase tracking-widest">
+                            Limited availability. Curated with heritage.
                         </p>
                     </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                     {products.map((p) => (
-                        <ProductCard key={p.id} product={{
-                            id: p.id,
-                            name: p.name,
-                            slug: p.slug,
-                            price: p.price,
-                            image: p.images,
-                            category: p.categoryId || 'Product'
-                        }} />
+                        <ProductCard key={p.id} product={p as any} />
                     ))}
                 </div>
             </div>

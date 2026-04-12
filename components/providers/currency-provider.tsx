@@ -32,11 +32,14 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
-        const savedCurrency = localStorage.getItem("localbazar-currency") as Currency;
-        if (savedCurrency && EXCHANGE_RATES[savedCurrency]) {
-            setCurrency(savedCurrency);
-        }
-        setMounted(true);
+        const timer = setTimeout(() => {
+            const savedCurrency = localStorage.getItem("localbazar-currency") as Currency;
+            if (savedCurrency && EXCHANGE_RATES[savedCurrency]) {
+                setCurrency(savedCurrency);
+            }
+            setMounted(true);
+        }, 0);
+        return () => clearTimeout(timer);
     }, []);
 
     const handleSetCurrency = (cur: Currency) => {

@@ -9,9 +9,12 @@ import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+import { Product, Category, Brand } from "@/lib/types";
+
 interface ShopContentProps {
-    products: any[];
-    categories: any[];
+    products: Product[];
+    categories: Category[];
+    brands?: Brand[];
     params: {
         category?: string;
         sort?: string;
@@ -23,7 +26,7 @@ interface ShopContentProps {
     currentCategoryName: string;
 }
 
-export function ShopContent({ products, categories, params, currentCategoryName }: ShopContentProps) {
+export function ShopContent({ products, categories, brands, params, currentCategoryName }: ShopContentProps) {
     const { t, language } = useLanguage();
 
     const catDescriptions: Record<string, string> = {
@@ -39,35 +42,35 @@ export function ShopContent({ products, categories, params, currentCategoryName 
     const descText = catDescriptions[categorySl] || t('footer.about');
 
     return (
-        <div className="bg-white min-h-screen pb-32 pt-12" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+        <div className="bg-transparent min-h-screen pb-32 pt-12" dir={language === 'ar' ? 'rtl' : 'ltr'}>
             <main className="container mx-auto px-4 lg:px-12 xl:px-24">
                 {/* Breadcrumbs - Minimalist */}
-                <div className="flex items-center gap-3 text-[11px] font-bold uppercase tracking-[0.2em] text-[#919191] mb-12">
-                    <Link href="/" className="hover:text-black transition-colors">{t('shop.breadcrumb.home')}</Link>
-                    <ChevronRight className={cn("w-3 h-3", language === 'ar' && "rotate-180")} />
-                    <span className="text-black">{currentCategoryName === "Full Catalogue" ? t('shop.breadcrumb.shop') : currentCategoryName}</span>
+                <div className="flex items-center gap-3 text-[11px] font-bold uppercase tracking-[0.2em] text-white/50 mb-12">
+                    <Link href="/" className="hover:text-white transition-colors">{t('shop.breadcrumb.home')}</Link>
+                    <ChevronRight className={cn("w-3 h-3 text-white/50", language === 'ar' && "rotate-180")} />
+                    <span className="text-white">{currentCategoryName === "Full Catalogue" ? t('shop.breadcrumb.shop') : currentCategoryName}</span>
                 </div>
 
                 <div className="flex flex-col lg:flex-row gap-16 items-start">
                     {/* Sidebar - Precision Width */}
                     <div className="w-full lg:w-64 flex-shrink-0">
-                        <ShopSidebar categories={categories} />
+                        <ShopSidebar categories={categories} brands={brands} />
                     </div>
 
                     {/* Catalog Content Area */}
                     <div className="flex-1 min-w-0">
                         {/* High-End Editorial Header */}
                         <div className="mb-16">
-                            <h1 className="font-serif text-[42px] sm:text-[56px] text-[#111111] leading-tight tracking-tight mb-6 uppercase">
+                            <h1 className="font-serif text-[42px] sm:text-[56px] text-white leading-tight tracking-tight mb-6 uppercase">
                                 {currentCategoryName === "Full Catalogue" ? t('shop.allCollections') : currentCategoryName}
                             </h1>
-                            <p className="text-[#616161] text-[15px] leading-relaxed max-w-3xl font-medium">
+                            <p className="text-white/80 text-[15px] leading-relaxed max-w-3xl font-medium">
                                 {descText}
                             </p>
                         </div>
 
                         {/* Professional Toolbar */}
-                        <div className="border-t border-[#F1F1F1] pt-8">
+                        <div className="border-t border-white/10 pt-8">
                            <ShopToolbar totalProducts={products.length} />
                         </div>
 

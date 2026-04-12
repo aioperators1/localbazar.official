@@ -22,34 +22,92 @@ interface CheckoutData {
     zip: string;
     paymentMethod: string;
     items: CheckoutItem[];
-    total: number;
+    total: number; // Provided total (requested)
+    voucherId?: string;
 }
 
-// Fallback IDs allowed for demo mode
-const ALLOWED_DEMO_IDS = ['1', '2', '3', '4', '5', '6', '7', '8'];
+const SHIPPING_COST = 35; // Standard Qatar Shipping
 
 export async function placeOrder(data: CheckoutData) {
     try {
-        const { firstName, lastName, email, items, total, address, city, zip, paymentMethod } = data;
+        const { firstName, lastName, email, items, address, city, zip, paymentMethod, voucherId } = data;
 
         if (!items || items.length === 0) {
-            return { success: false, error: "Empty acquisition matrix." };
+            return { success: false, error: "Empty cart. Please add items before checking out." };
         }
 
         const name = `${firstName} ${lastName}`.trim();
 
         // RUN EVERYTHING IN A TRANSACTION FOR ATOMICITY
         const result = await prisma.$transaction(async (tx) => {
-            // 1. Find or Create User
+            // 1. Server-Side Total Verification (Security)
+            const productIds = items.map(i => i.id);
+            const products = await tx.product.findMany({
+                where: { id: { in: productIds } },
+                select: { id: true, price: true }
+            });
+
+            const productPriceMap = new Map(products.map(p => [p.id, Number(p.price)]));
+            
+            // Re-calculate subtotal
+            let calculatedSubtotal = 0;
+            const validItems = [];
+
+            for (const item of items) {
+                const dbPrice = productPriceMap.get(item.id);
+                if (dbPrice !== undefined) {
+                    calculatedSubtotal += dbPrice * item.quantity;
+                    validItems.push({
+                        ...item,
+                        price: dbPrice // Use DB price for security
+                    });
+                }
+            }
+
+            if (validItems.length === 0) {
+                throw new Error("Product availability has changed. Please refresh your cart.");
+            }
+
+            // Handle Voucher
+            let discount = 0;
+            if (voucherId) {
+                const voucher = await tx.voucher.findUnique({
+                    where: { id: voucherId }
+                });
+
+                if (voucher && voucher.active) {
+                    const voucherValue = Number(voucher.value);
+                    if (voucher.type === 'PERCENTAGE') {
+                        discount = (calculatedSubtotal * voucherValue) / 100;
+                    } else {
+                        discount = voucherValue;
+                    }
+
+                    // Update voucher usage
+                    const newUsedCount = (voucher.usedCount || 0) + 1;
+                    const shouldAutoDeactivate = voucher.usageLimit > 0 && newUsedCount >= voucher.usageLimit;
+
+                    await tx.voucher.update({
+                        where: { id: voucherId },
+                        data: {
+                            usedCount: newUsedCount,
+                            active: !shouldAutoDeactivate
+                        }
+                    });
+                }
+            }
+
+            const finalTotal = Math.max(0, calculatedSubtotal - discount + SHIPPING_COST);
+
+            // 2. Find or Create User
             let user = await tx.user.findUnique({
                 where: { email },
             });
 
             if (!user) {
-                const password = await hash(Math.random().toString(36).slice(-8) + (process.env.NEXTAUTH_SECRET || "default_secret"), 10);
-
-                // Ensure unique username
-                let username = email.split('@')[0].toLowerCase();
+                const password = await hash(Math.random().toString(36).slice(-8) + (process.env.NEXTAUTH_SECRET || "lb_secret"), 10);
+                let username = email.split('@')[0].toLowerCase().replace(/[^a-z0-9]/g, '');
+                
                 const existingUsername = await tx.user.findUnique({ where: { username } });
                 if (existingUsername) {
                     username += Math.random().toString(36).slice(2, 6);
@@ -59,28 +117,14 @@ export async function placeOrder(data: CheckoutData) {
                     data: {
                         email,
                         name,
-                        username: username,
+                        username,
                         password,
                         role: "USER",
                     }
                 });
             }
 
-            // 2. Verified Product Existence - Prevents Foreign Key Failures
-            const productIds = items.map(i => i.id);
-            const foundProducts = await tx.product.findMany({
-                where: { id: { in: productIds } },
-                select: { id: true }
-            });
-
-            const foundIds = new Set(foundProducts.map(p => p.id));
-            const validItems = items.filter(i => foundIds.has(i.id));
-
-            if (validItems.length === 0) {
-                throw new Error("Some items in your cart are no longer available. Please clear your cart and try again.");
-            }
-
-            // 3. Create Address Layer
+            // 3. Create Address
             await tx.address.create({
                 data: {
                     userId: user.id,
@@ -90,12 +134,15 @@ export async function placeOrder(data: CheckoutData) {
                     country: "Qatar",
                 }
             });
+
+            // 4. Create Order
             const order = await tx.order.create({
                 data: {
                     userId: user.id,
-                    total: total,
+                    total: finalTotal,
                     status: "PENDING",
                     paymentMethod: paymentMethod || "COD",
+                    voucherId: voucherId || null,
                     items: {
                         create: validItems.map(item => ({
                             productId: item.id,
@@ -108,36 +155,68 @@ export async function placeOrder(data: CheckoutData) {
                 }
             });
 
-            return { success: true, orderId: order.id };
+            return { 
+                success: true, 
+                orderId: order.id,
+                userEmail: user.email as string,
+                userName: user.name as string,
+                totalAmount: finalTotal
+            };
         });
 
-        // Revalidate admin paths to reflect new order immediately
+        // 5. Post-transaction: External Payment Initiation
+        if (result.success && paymentMethod && (paymentMethod === "MYFATOORAH" || paymentMethod === "CARD")) {
+            try {
+                const { initiatePayment } = await import("@/lib/utils/myfatoorah");
+                const paymentInfo = await initiatePayment(
+                    result.totalAmount,
+                    result.orderId,
+                    result.userEmail,
+                    result.userName
+                );
+
+                // Update order with external payment ID
+                await prisma.order.update({
+                    where: { id: result.orderId },
+                    data: { paymentId: paymentInfo.invoiceId }
+                });
+
+                return { 
+                    success: true, 
+                    orderId: result.orderId, 
+                    paymentUrl: paymentInfo.paymentUrl 
+                };
+            } catch (paymentError: unknown) {
+                const errMsg = paymentError instanceof Error ? paymentError.message : "Payment provider could not be reached.";
+                console.error("Payment Initiation Failure:", paymentError);
+                return {
+                    success: false,
+                    error: errMsg
+                };
+            }
+        }
+
+        // Global Revalidation
         revalidatePath('/admin');
         revalidatePath('/admin/orders');
         revalidatePath('/admin/dashboard');
 
-        return result;
+        return { success: true, orderId: result.orderId };
 
     } catch (error: unknown) {
-        console.error("Zenith Checkout Failure:", error);
+        console.error("Checkout Engine Error:", error);
 
-        const message = error instanceof Error ? error.message : "idk";
-        const isDbError = message.includes("Can't reach database server") ||
-            message.includes("password authentication failed") ||
-            message.includes("connect ECONNREFUSED") ||
-            message.includes("P1001");
-
-        if (isDbError) {
-            console.log("⚠️ DATABASE UNREACHABLE. ACTIVATING ZENITH DEMO MODE.");
+        const msg = error instanceof Error ? error.message : "";
+        if (msg.includes("P1001") || msg.includes("Can't reach database")) {
             return {
-                success: true,
-                orderId: "DEMO-" + Math.random().toString(36).substring(2, 9).toUpperCase()
+                success: false,
+                error: "Store is currently in read-only mode (Database connection issue). Please try again in 1 minute."
             };
         }
 
         return {
             success: false,
-            error: error instanceof Error ? error.message : "Protocol failure during order allocation."
+            error: error instanceof Error ? error.message : "Internal system error during order processing."
         };
     }
 }

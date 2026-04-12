@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Outfit, Cairo } from "next/font/google";
+import { Outfit, Amiri } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/store/Header";
 import { Footer } from "@/components/store/Footer";
@@ -10,7 +10,11 @@ const font = Outfit({
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700", "800", "900"]
 });
-const arabicFont = Cairo({ subsets: ["arabic"], variable: "--font-cairo" });
+const arabicFont = Amiri({ 
+  subsets: ["arabic", "latin"], 
+  weight: ["400", "700"],
+  variable: "--font-amiri" 
+});
 
 export const metadata: Metadata = {
   title: {
@@ -56,6 +60,7 @@ export const metadata: Metadata = {
 
 import { LayoutWrapper } from "@/components/providers/layout-wrapper";
 import { getAdminSettings } from "@/lib/actions/admin";
+import { WatermarkBackground } from "@/components/store/WatermarkBackground";
 
 export default async function RootLayout({
   children,
@@ -71,10 +76,13 @@ export default async function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet" />
       </head>
-      <body className={`${font.className} ${arabicFont.variable} bg-[#f3f5f6]`}>
+      <body className={`${font.className} ${arabicFont.variable} bg-[#20080B] text-white relative antialiased selection:bg-white/10 selection:text-white`} suppressHydrationWarning>
+        <WatermarkBackground />
         <Providers>
           <LayoutWrapper settings={settings}>
-            {children}
+            <div className="relative z-10 w-full">
+              {children}
+            </div>
           </LayoutWrapper>
         </Providers>
       </body>

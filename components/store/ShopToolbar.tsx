@@ -25,16 +25,16 @@ export function ShopToolbar({ totalProducts }: ShopToolbarProps) {
 
     return (
         <div className="flex items-center justify-between py-6">
-            <span className="text-[12px] font-bold text-[#111111] uppercase tracking-[0.1em]">
+            <span className="text-[12px] font-bold text-white uppercase tracking-[0.1em]">
                 {totalProducts} {t('shop.items')}
             </span>
 
             <div className="flex items-center gap-6">
                 <div className="flex items-center gap-2">
-                    <span className="text-[11px] font-bold text-[#919191] uppercase tracking-widest">{t('shop.sortBy')}</span>
+                    <span className="text-[11px] font-bold text-white/50 uppercase tracking-widest">{t('shop.sortBy')}</span>
                     <select 
                         onChange={(e) => updateSort(e.target.value)}
-                        className="text-[11px] font-bold uppercase tracking-widest bg-transparent border-none focus:ring-0 cursor-pointer text-[#111111]"
+                        className="text-[11px] font-bold uppercase tracking-widest bg-transparent border-none focus:ring-0 cursor-pointer text-white [&>option]:text-black"
                         defaultValue={searchParams.get("sort") || "default"}
                     >
                         <option value="default">{t('shop.featured')}</option>

@@ -9,15 +9,11 @@ import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn, formatPrice } from "@/lib/utils";
 
+import { Order, AppUser } from "@/lib/types";
+
 interface AccountViewProps {
-    user: {
-        id?: string;
-        name?: string | null;
-        email?: string | null;
-        image?: string | null;
-        role?: string;
-    };
-    orders: any[];
+    user: AppUser;
+    orders: Order[];
 }
 
 export default function AccountView({ user, orders }: AccountViewProps) {
@@ -41,11 +37,11 @@ export default function AccountView({ user, orders }: AccountViewProps) {
                             className={cn(
                                 "flex items-center gap-4 px-6 py-4 rounded-2xl transition-all duration-300 group relative overflow-hidden",
                                 activeTab === tab.id
-                                    ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20"
-                                    : "text-zinc-500 hover:text-zinc-300 hover:bg-white/5"
+                                    ? "bg-white text-[#592C2F] shadow-lg shadow-white/10"
+                                    : "text-white/50 hover:text-white hover:bg-white/5"
                             )}
                         >
-                            <tab.icon className={cn("w-5 h-5 transition-transform group-hover:scale-110", activeTab === tab.id ? "text-white" : "text-zinc-600")} />
+                            <tab.icon className={cn("w-5 h-5 transition-transform group-hover:scale-110", activeTab === tab.id ? "text-[#592C2F]" : "text-white/60")} />
                             <span className="font-black uppercase italic tracking-tighter text-sm">{tab.label}</span>
                             {activeTab === tab.id && (
                                 <motion.div
@@ -59,10 +55,10 @@ export default function AccountView({ user, orders }: AccountViewProps) {
                     {user.role === "ADMIN" && (
                         <Link
                             href="/admin"
-                            className="flex items-center gap-4 px-6 py-4 rounded-2xl text-blue-400 hover:text-blue-300 hover:bg-blue-400/5 transition-all mt-4 border border-blue-400/10"
+                            className="flex items-center gap-4 px-6 py-4 rounded-2xl text-white/80 hover:text-white hover:bg-white/10 transition-all mt-4 border border-white/10"
                         >
                             <LayoutDashboard className="w-5 h-5" />
-                            <span className="font-black uppercase italic tracking-tighter text-sm">Command Center</span>
+                            <span className="font-black uppercase italic tracking-tighter text-sm">Dashboard</span>
                         </Link>
                     )}
                 </div>
@@ -80,14 +76,14 @@ export default function AccountView({ user, orders }: AccountViewProps) {
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
-                        className="bg-zinc-900/40 border border-zinc-800/50 p-10 rounded-[2.5rem] backdrop-blur-2xl shadow-2xl min-h-[600px] flex flex-col"
+                        className="bg-black/20 border border-white/10 p-10 rounded-[2.5rem] backdrop-blur-2xl shadow-2xl min-h-[600px] flex flex-col"
                     >
                         {/* Tab Content Header */}
                         <div className="flex items-center justify-between mb-10 border-b border-white/5 pb-10">
                             <div className="flex items-center gap-6">
                                 <div className="relative">
-                                    <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full blur opacity-50" />
-                                    <div className="relative w-24 h-24 bg-black rounded-full border-2 border-white/10 flex items-center justify-center overflow-hidden">
+                                    <div className="absolute -inset-1 bg-white/10 rounded-full blur opacity-50" />
+                                    <div className="relative w-24 h-24 bg-white/5 rounded-full border-2 border-white/20 flex items-center justify-center overflow-hidden">
                                         {user.image ? (
                                             <Image src={user.image} alt={user.name || "User"} fill className="object-cover" />
                                         ) : (
@@ -98,19 +94,19 @@ export default function AccountView({ user, orders }: AccountViewProps) {
                                 </div>
                                 <div>
                                     <h2 className="text-3xl font-black text-white italic uppercase tracking-tighter leading-none mb-2">
-                                        {user.name || "OPERATIVE"}
+                                        {user.name || "CLIENT"}
                                     </h2>
                                     <div className="flex items-center gap-3">
-                                        <div className="px-2 py-0.5 bg-blue-500/10 border border-blue-500/20 rounded text-[10px] font-black text-blue-500 uppercase tracking-[0.2em]">
+                                        <div className="px-2 py-0.5 bg-white/10 border border-white/20 rounded text-[10px] font-black text-white uppercase tracking-[0.2em]">
                                             {user.role || "USER"}
                                         </div>
-                                        <span className="text-zinc-600 text-xs font-medium">{user.email}</span>
+                                        <span className="text-white/60 text-xs font-medium">{user.email}</span>
                                     </div>
                                 </div>
                             </div>
 
                             <div className="hidden md:flex flex-col items-end">
-                                <span className="text-zinc-600 text-[10px] font-black uppercase tracking-[0.2em] mb-1">Status</span>
+                                <span className="text-white/50 text-[10px] font-black uppercase tracking-[0.2em] mb-1">Status</span>
                                 <div className="flex items-center gap-2 text-emerald-500 font-bold text-xs">
                                     <Activity className="w-3 h-3 animate-pulse" /> SYNCED
                                 </div>
@@ -121,35 +117,35 @@ export default function AccountView({ user, orders }: AccountViewProps) {
                         {activeTab === "profile" && (
                             <div className="space-y-8 flex-1">
                                 <div className="grid md:grid-cols-2 gap-6">
-                                    <div className="p-8 rounded-3xl bg-black/40 border border-white/5 space-y-4">
+                                    <div className="p-8 rounded-3xl bg-white/5 border border-white/10 space-y-4">
                                         <div className="flex items-center gap-3 mb-2">
-                                            <Shield className="w-4 h-4 text-blue-500" />
+                                            <Shield className="w-4 h-4 text-white/50" />
                                             <h3 className="text-sm font-black text-white uppercase italic tracking-wider">Identity Core</h3>
                                         </div>
                                         <div className="space-y-4">
                                             <div>
-                                                <p className="text-[10px] font-black text-zinc-600 uppercase tracking-widest mb-1">Public Alias</p>
+                                                <p className="text-[10px] font-black text-white/50 uppercase tracking-widest mb-1">Public Alias</p>
                                                 <p className="text-white font-bold">{user.name || "None"}</p>
                                             </div>
                                             <div>
-                                                <p className="text-[10px] font-black text-zinc-600 uppercase tracking-widest mb-1">Comm Channel</p>
+                                                <p className="text-[10px] font-black text-white/50 uppercase tracking-widest mb-1">Comm Channel</p>
                                                 <p className="text-white font-bold">{user.email}</p>
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div className="p-8 rounded-3xl bg-black/40 border border-white/5 space-y-4">
+                                    <div className="p-8 rounded-3xl bg-white/5 border border-white/10 space-y-4">
                                         <div className="flex items-center gap-3 mb-2">
-                                            <Calendar className="w-4 h-4 text-indigo-500" />
+                                            <Calendar className="w-4 h-4 text-white/50" />
                                             <h3 className="text-sm font-black text-white uppercase italic tracking-wider">Activity Log</h3>
                                         </div>
                                         <div className="space-y-4">
                                             <div>
-                                                <p className="text-[10px] font-black text-zinc-600 uppercase tracking-widest mb-1">Total Acquisitions</p>
+                                                <p className="text-[10px] font-black text-white/50 uppercase tracking-widest mb-1">Total Acquisitions</p>
                                                 <p className="text-white font-bold">{orders.length} Units</p>
                                             </div>
                                             <div>
-                                                <p className="text-[10px] font-black text-zinc-600 uppercase tracking-widest mb-1">Last Transmission</p>
+                                                <p className="text-[10px] font-black text-white/50 uppercase tracking-widest mb-1">Last Transmission</p>
                                                 <p className="text-white font-bold">{orders[0] ? new Date(orders[0].createdAt).toLocaleDateString() : "Never"}</p>
                                             </div>
                                         </div>
@@ -163,10 +159,10 @@ export default function AccountView({ user, orders }: AccountViewProps) {
                             <div className="space-y-4 flex-1">
                                 <div className="flex items-center justify-between mb-6">
                                     <h3 className="text-xl font-black text-white uppercase italic tracking-tighter">Recent Transmissions</h3>
-                                    <Link href="/orders" className="text-xs text-blue-500 font-bold hover:underline">Full Log &rarr;</Link>
+                                    <Link href="/orders" className="text-xs text-white/80 font-bold hover:underline">Full Log &rarr;</Link>
                                 </div>
                                 {orders.length === 0 ? (
-                                    <div className="flex-1 flex flex-col items-center justify-center border-2 border-dashed border-zinc-800 rounded-3xl">
+                                    <div className="flex-1 flex flex-col items-center justify-center border-2 border-dashed border-white/20 rounded-3xl">
                                         <Package className="w-12 h-12 text-zinc-800 mb-4" />
                                         <p className="text-zinc-600 text-sm font-bold uppercase tracking-widest">No Acquisition Records Found</p>
                                     </div>
@@ -176,16 +172,16 @@ export default function AccountView({ user, orders }: AccountViewProps) {
                                             <Link
                                                 key={order.id}
                                                 href={`/orders/${order.id}`}
-                                                className="group flex items-center justify-between p-6 bg-black/20 border border-white/5 rounded-2xl hover:bg-black/40 hover:border-blue-500/20 transition-all"
+                                                className="group flex items-center justify-between p-6 bg-white/5 border border-white/10 rounded-2xl hover:bg-white/10 transition-all"
                                             >
                                                 <div className="flex items-center gap-6">
                                                     <div className="text-left">
-                                                        <p className="text-[10px] font-black text-zinc-600 uppercase tracking-widest mb-1">REF_ID</p>
+                                                        <p className="text-[10px] font-black text-white/50 uppercase tracking-widest mb-1">REF_ID</p>
                                                         <p className="text-white font-mono font-bold">#{order.id.slice(-6).toUpperCase()}</p>
                                                     </div>
-                                                    <div className="h-8 w-px bg-white/5" />
+                                                    <div className="h-8 w-px bg-white/20" />
                                                     <div>
-                                                        <p className="text-[10px] font-black text-zinc-600 uppercase tracking-widest mb-1">Status</p>
+                                                        <p className="text-[10px] font-black text-white/50 uppercase tracking-widest mb-1">Status</p>
                                                         <span className={cn(
                                                             "text-[10px] font-black uppercase tracking-wider",
                                                             order.status === 'DELIVERED' ? 'text-emerald-500' : 'text-amber-500'
@@ -196,12 +192,12 @@ export default function AccountView({ user, orders }: AccountViewProps) {
                                                 </div>
                                                 <div className="flex items-center gap-8">
                                                     <div className="text-right">
-                                                        <p className="text-[10px] font-black text-zinc-600 uppercase tracking-widest mb-1">Value</p>
+                                                        <p className="text-[10px] font-black text-white/50 uppercase tracking-widest mb-1">Value</p>
                                                         <p className="text-white font-black italic tracking-tighter">
                                                             {formatPrice(order.total)}
                                                         </p>
                                                     </div>
-                                                    <ChevronRight className="w-5 h-5 text-zinc-800 group-hover:text-blue-500 transition-colors" />
+                                                    <ChevronRight className="w-5 h-5 text-white/30 group-hover:text-white transition-colors" />
                                                 </div>
                                             </Link>
                                         ))}
@@ -213,11 +209,11 @@ export default function AccountView({ user, orders }: AccountViewProps) {
                         {/* SETTINGS TAB */}
                         {activeTab === "settings" && (
                             <div className="flex-1 flex flex-col items-center justify-center space-y-4">
-                                <div className="w-16 h-16 bg-amber-500/10 border border-amber-500/20 rounded-full flex items-center justify-center mb-4">
-                                    <Settings className="w-8 h-8 text-amber-500 animate-spin-slow" />
+                                <div className="w-16 h-16 bg-white/10 border border-white/20 rounded-full flex items-center justify-center mb-4">
+                                    <Settings className="w-8 h-8 text-white/50 animate-spin-slow" />
                                 </div>
                                 <h3 className="text-2xl font-black text-white italic uppercase tracking-tighter">System Protocols Locked</h3>
-                                <p className="text-zinc-600 text-sm font-medium">Identity modification service is currently offline for maintenance.</p>
+                                <p className="text-white/60 text-sm font-medium">Identity modification service is currently offline for maintenance.</p>
                             </div>
                         )}
 

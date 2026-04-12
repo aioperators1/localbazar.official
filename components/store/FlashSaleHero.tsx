@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useScroll, useTransform, useSpring } from "framer-motion";
+import { motion, useTransform, useSpring } from "framer-motion";
 import { Sparkles, ArrowRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -36,11 +36,6 @@ export function FlashSaleHero({ product = defaultProduct }: FlashSaleHeroProps) 
     const { t, language } = useLanguage();
     const isAr = language === 'ar';
 
-    const { scrollYProgress } = useScroll({
-        target: containerRef,
-        offset: ["start end", "end start"]
-    });
-
     const springConfig = { damping: 20, stiffness: 100 };
     const mouseX = useSpring(mousePos.x, springConfig);
     const mouseY = useSpring(mousePos.y, springConfig);
@@ -70,7 +65,7 @@ export function FlashSaleHero({ product = defaultProduct }: FlashSaleHeroProps) 
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
-                className="relative w-full min-h-[550px] lg:h-[70vh] rounded-[2rem] overflow-hidden bg-[#111111] shadow-2xl flex items-center"
+                className="relative w-full min-h-[550px] lg:h-[70vh] rounded-[2rem] overflow-hidden bg-black/20 border border-white/10 shadow-2xl flex items-center"
             >
                 {/* AMBIENT LUXURY GRADIENT */}
                 <div className="absolute inset-0 pointer-events-none overflow-hidden">
@@ -159,6 +154,7 @@ export function FlashSaleHero({ product = defaultProduct }: FlashSaleHeroProps) 
                         <motion.div
                             initial={{ scale: 0.8, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
+                            style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
                             transition={{ delay: 1, duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
                             className="relative w-full h-full max-w-[450px] lg:max-w-none"
                         >

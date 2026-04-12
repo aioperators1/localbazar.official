@@ -3,6 +3,7 @@ import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { prisma } from "@/lib/prisma";
 import { compare } from "bcryptjs";
+import { PagePermission } from "@/types/next-auth";
 
 export const authOptions: NextAuthOptions = {
     session: {
@@ -62,6 +63,7 @@ export const authOptions: NextAuthOptions = {
                         name: user.name,
                         role: user.role,
                         image: user.image,
+                        permissions: user.permissions,
                     };
                 } catch (error) {
                     console.error("[Auth] Critical error during authorization:", error);
@@ -76,6 +78,14 @@ export const authOptions: NextAuthOptions = {
                 token.role = user.role;
                 token.id = user.id;
                 token.picture = user.image;
+                // Store permissions as JSON object in the token
+                try {
+                    token.permissions = typeof user.permissions === 'string' && user.permissions.startsWith('[') 
+                        ? JSON.parse(user.permissions) 
+                        : user.permissions;
+                } catch {
+                    token.permissions = user.permissions;
+                }
             }
             if (trigger === "update" && session) {
                 return { ...token, ...session };
@@ -87,6 +97,7 @@ export const authOptions: NextAuthOptions = {
                 session.user.role = token.role as string;
                 session.user.id = token.id as string;
                 session.user.image = token.picture as string;
+                session.user.permissions = Array.isArray(token.permissions) ? (token.permissions as PagePermission[]) : null;
             }
             return session;
         }

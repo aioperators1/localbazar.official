@@ -11,3 +11,5 @@ export function formatPrice(price: number | string) {
         minimumFractionDigits: 2
     }).format(Number(price));
 }
+
+export const formatCurrency = formatPrice;

@@ -6,24 +6,61 @@ const prisma = new PrismaClient()
 async function main() {
     console.log('Seeding database for Local Bazar Doha Hub...')
 
-    // 0. Create Admin User
-    const password = await hash('localbazar_admin_2024!', 12)
-    const admin = await prisma.user.upsert({
+    // 0. Create Management Hierarchy
+    const defaultPassword = await hash('localbazaraio', 12)
+    
+    // Super Admin (Boutique Core Control)
+    await prisma.user.upsert({
+        where: { username: 'superadmin' },
+        update: { password: defaultPassword, role: 'SUPER_ADMIN', email: 'super@localbazar.com' },
+        create: {
+            email: 'super@localbazar.com',
+            name: 'Super Admin',
+            password: defaultPassword,
+            role: 'SUPER_ADMIN',
+            username: 'superadmin'
+        }
+    })
+
+    // Admin (Store Management)
+    await prisma.user.upsert({
         where: { username: 'admin' },
-        update: {
-            password,
-            role: 'ADMIN',
-            email: 'admin@localbazar.com'
-        },
+        update: { password: defaultPassword, role: 'ADMIN', email: 'admin@localbazar.com' },
         create: {
             email: 'admin@localbazar.com',
-            name: 'Admin User',
-            password,
+            name: 'Store Admin',
+            password: defaultPassword,
             role: 'ADMIN',
             username: 'admin'
         }
     })
-    console.log('Admin seeded.')
+
+    // Manager (Operations Management)
+    await prisma.user.upsert({
+        where: { username: 'manager' },
+        update: { password: defaultPassword, role: 'MANAGER', email: 'manager@localbazar.com' },
+        create: {
+            email: 'manager@localbazar.com',
+            name: 'Operations Manager',
+            password: defaultPassword,
+            role: 'MANAGER',
+            username: 'manager'
+        }
+    })
+
+    // Staff (Floor/Concierge Staff)
+    await prisma.user.upsert({
+        where: { username: 'staff' },
+        update: { password: defaultPassword, role: 'STAFF', email: 'staff@localbazar.com' },
+        create: {
+            email: 'staff@localbazar.com',
+            name: 'Concierge Staff',
+            password: defaultPassword,
+            role: 'STAFF',
+            username: 'staff'
+        }
+    })
+    console.log('Management hierarchy seeded.')
 
     // 1. Create Luxury Categories (Doha Hub Style)
     const categories = [

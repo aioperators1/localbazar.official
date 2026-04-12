@@ -8,12 +8,13 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/components/providers/language-provider";
 
+import { Product } from "@/lib/types";
+
 interface ProductCarouselProps {
-    title?: string;
-    products: any[];
+    products: Product[];
 }
 
-export function ProductCarousel({ title, products }: ProductCarouselProps) {
+export function ProductCarousel({ products }: ProductCarouselProps) {
     const { language } = useLanguage();
     const isAr = language === 'ar';
 
@@ -52,12 +53,12 @@ export function ProductCarousel({ title, products }: ProductCarouselProps) {
         <section className={cn("relative group/main py-12", isAr ? "rtl" : "ltr")}>
             <div className="container mx-auto px-4 lg:px-24">
                 <div className="relative">
-                    <div className="overflow-visible" ref={emblaRef}>
-                        <div className="flex -ml-8">
+                    <div className="overflow-hidden" ref={emblaRef}>
+                        <div className="flex -ml-4 lg:-ml-8">
                             {products.map((product) => (
                                 <div
                                     key={product.id}
-                                    className="pl-8 pb-12 min-w-[280px] sm:min-w-[340px] md:min-w-[45%] lg:min-w-[33.333%] xl:min-w-[25%] flex-[0_0_auto]"
+                                    className="pl-4 lg:pl-8 pb-12 min-w-[85%] sm:min-w-[45%] lg:min-w-[33.333%] xl:min-w-[25%] flex-[0_0_auto]"
                                 >
                                     <ProductCard product={product} />
                                 </div>
@@ -72,7 +73,7 @@ export function ProductCarousel({ title, products }: ProductCarouselProps) {
                              {Array.from({ length: Math.min(products.length, 5) }).map((_, i) => (
                                 <div key={i} className={cn(
                                     "h-[2px] w-8 transition-all duration-700",
-                                    i === 0 ? "bg-brand-burgundy w-16" : "bg-zinc-100"
+                                    i === 0 ? "bg-white w-16" : "bg-white/20"
                                 )} />
                              ))}
                         </div>
@@ -81,7 +82,7 @@ export function ProductCarousel({ title, products }: ProductCarouselProps) {
                             <button
                                 onClick={scrollPrev}
                                 className={cn(
-                                    "w-12 h-12 lg:w-14 lg:h-14 rounded-full border border-zinc-100 flex items-center justify-center transition-all duration-500 hover:bg-black hover:text-white group/btn",
+                                    "w-12 h-12 lg:w-14 lg:h-14 rounded-full text-white border border-white/20 flex items-center justify-center transition-all duration-500 hover:bg-white hover:text-[#592C2F] group/btn",
                                     !prevBtnEnabled && "opacity-30 cursor-not-allowed"
                                 )}
                                 disabled={!prevBtnEnabled}
@@ -91,7 +92,7 @@ export function ProductCarousel({ title, products }: ProductCarouselProps) {
                             <button
                                 onClick={scrollNext}
                                 className={cn(
-                                    "w-14 h-14 rounded-full border border-zinc-100 flex items-center justify-center transition-all duration-500 hover:bg-black hover:text-white group/btn",
+                                    "w-14 h-14 rounded-full text-white border border-white/20 flex items-center justify-center transition-all duration-500 hover:bg-white hover:text-[#592C2F] group/btn",
                                     !nextBtnEnabled && "opacity-30 cursor-not-allowed"
                                 )}
                                 disabled={!nextBtnEnabled}

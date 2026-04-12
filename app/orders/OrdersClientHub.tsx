@@ -33,12 +33,12 @@ export default function OrdersClientHub({ initialOrders, isGuest }: OrdersClient
             {/* Header */}
             <div className="mb-12">
                 <h1 className="text-4xl md:text-6xl font-black text-white uppercase italic tracking-tighter mb-4">
-                    Order Center
+                    Orders <span className="text-white/50">History</span>
                 </h1>
-                <p className="text-zinc-500 max-w-lg">
+                <p className="text-white/60 max-w-lg">
                     {isGuest
                         ? "Enter your tracking ID below to monitor your order shipment in real-time."
-                        : "Manage your acquisition history and track active order transmissions."}
+                        : "Manage your purchase history and track active order shipments."}
                 </p>
             </div>
 
@@ -48,28 +48,27 @@ export default function OrdersClientHub({ initialOrders, isGuest }: OrdersClient
                     "space-y-8",
                     isGuest ? "lg:col-span-12 max-w-2xl" : "lg:col-span-4"
                 )}>
-                    <div className="bg-zinc-900/40 border border-white/5 p-8 rounded-[2rem] backdrop-blur-xl">
+                    <div className="bg-black/20 border border-white/10 p-8 rounded-[2rem] backdrop-blur-xl">
                         <div className="flex items-center gap-3 mb-6">
-                            <div className="w-10 h-10 bg-blue-500/10 rounded-xl flex items-center justify-center border border-blue-500/20">
-                                <Search className="w-5 h-5 text-blue-500" />
+                            <div className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center border border-white/20">
+                                <Search className="w-5 h-5 text-white" />
                             </div>
-                            <h2 className="text-xl font-bold text-white uppercase italic tracking-tight">Direct Track</h2>
+                            <h2 className="text-xl font-bold text-white uppercase italic tracking-tight">Track Record</h2>
                         </div>
 
                         <form onSubmit={handleSearch} className="space-y-4">
                             <div className="relative group">
-                                <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-xl opacity-0 group-focus-within:opacity-100 transition duration-500 blur-md" />
                                 <Input
                                     value={orderId}
                                     onChange={(e) => setOrderId(e.target.value)}
                                     placeholder="ENTER ORDER ID"
-                                    className="relative h-14 bg-black border-zinc-800 text-white placeholder:text-zinc-700 rounded-xl font-mono uppercase tracking-widest focus:border-blue-500 transition-all"
+                                    className="relative h-14 bg-black/20 border-white/20 text-white placeholder:text-white/20 rounded-xl font-mono uppercase tracking-widest focus:border-white transition-all"
                                 />
                             </div>
                             <Button
                                 type="submit"
                                 disabled={loading}
-                                className="w-full h-14 bg-white text-black hover:bg-zinc-200 font-black uppercase tracking-widest rounded-xl transition-all group"
+                                className="w-full h-14 bg-white text-[#592C2F] hover:bg-white/90 font-black uppercase tracking-widest rounded-[2px] transition-all group"
                             >
                                 {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : (
                                     <>
@@ -82,11 +81,11 @@ export default function OrdersClientHub({ initialOrders, isGuest }: OrdersClient
                     </div>
 
                     {!isGuest && (
-                        <div className="bg-blue-600/5 border border-blue-500/10 p-6 rounded-2xl flex gap-4">
-                            <div className="p-2 bg-blue-500/10 rounded-lg h-fit">
-                                <Tag className="w-4 h-4 text-blue-500" />
+                        <div className="bg-white/5 border border-white/10 p-6 rounded-2xl flex gap-4">
+                            <div className="p-2 bg-white/10 rounded-lg h-fit">
+                                <Tag className="w-4 h-4 text-white/50" />
                             </div>
-                            <p className="text-xs text-blue-300/60 leading-relaxed font-medium">
+                            <p className="text-xs text-white/60 leading-relaxed font-medium">
                                 Account synchronization active. All orders placed while logged in are listed in your dashboard.
                             </p>
                         </div>
@@ -98,12 +97,12 @@ export default function OrdersClientHub({ initialOrders, isGuest }: OrdersClient
                     <div className="lg:col-span-8">
                         <div className="space-y-4">
                             {initialOrders.length === 0 ? (
-                                <div className="flex flex-col items-center justify-center py-20 border border-dashed border-zinc-800 rounded-[2rem] bg-zinc-900/10">
-                                    <PackageX className="w-12 h-12 text-zinc-700 mb-4" />
-                                    <h3 className="text-xl font-bold text-zinc-500 uppercase italic">No Orders Found</h3>
-                                    <p className="text-zinc-600 text-sm mt-1">Initialize your first acquisition in the shop.</p>
-                                    <Button variant="link" onClick={() => router.push('/shop')} className="mt-4 text-blue-500 uppercase tracking-widest font-black text-xs">
-                                        Open Shop &rarr;
+                                <div className="flex flex-col items-center justify-center py-20 border border-dashed border-white/20 rounded-[2rem] bg-black/10">
+                                    <PackageX className="w-12 h-12 text-white/20 mb-4" />
+                                    <h3 className="text-xl font-bold text-white/40 uppercase italic">No Orders Found</h3>
+                                    <p className="text-white/30 text-sm mt-1">Start your luxury collection in the store.</p>
+                                    <Button variant="link" onClick={() => router.push('/shop')} className="mt-4 text-white uppercase tracking-widest font-black text-xs hover:text-white/80">
+                                        Open Store &rarr;
                                     </Button>
                                 </div>
                             ) : (
@@ -114,19 +113,19 @@ export default function OrdersClientHub({ initialOrders, isGuest }: OrdersClient
                                         animate={{ opacity: 1, x: 0 }}
                                         transition={{ delay: idx * 0.05 }}
                                         onClick={() => router.push(`/orders/${order.id}`)}
-                                        className="group flex flex-col md:flex-row md:items-center justify-between p-6 bg-zinc-900/30 border border-white/5 rounded-3xl hover:bg-zinc-900/60 transition-all cursor-pointer hover:border-blue-500/30 shadow-sm hover:shadow-2xl hover:shadow-blue-500/5"
+                                        className="group flex flex-col md:flex-row md:items-center justify-between p-6 bg-black/20 border border-white/10 rounded-3xl hover:bg-black/30 transition-all cursor-pointer shadow-sm"
                                     >
                                         <div className="flex items-center gap-6">
-                                            <div className="w-14 h-14 bg-black rounded-2xl border border-white/5 flex items-center justify-center relative shadow-inner overflow-hidden">
+                                            <div className="w-14 h-14 bg-white/5 rounded-2xl border border-white/10 flex items-center justify-center relative shadow-inner overflow-hidden">
                                                 {order.items[0]?.product?.images ? (
                                                     <Image
                                                         src={order.items[0].product.images.startsWith('[') ? JSON.parse(order.items[0].product.images)[0] : order.items[0].product.images}
                                                         alt="Product Image"
                                                         fill
                                                         sizes="56px"
-                                                        className="w-full h-full object-cover opacity-60 group-hover:scale-110 transition-transform duration-500"
+                                                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                                                     />
-                                                ) : <Package className="w-6 h-6 text-zinc-700" />}
+                                                ) : <Package className="w-6 h-6 text-white/30" />}
                                             </div>
                                             <div>
                                                 <div className="flex items-center gap-3 mb-1">
@@ -142,7 +141,7 @@ export default function OrdersClientHub({ initialOrders, isGuest }: OrdersClient
                                                         {order.status}
                                                     </span>
                                                 </div>
-                                                <div className="flex items-center gap-4 text-zinc-500 text-[10px] font-bold uppercase tracking-widest">
+                                                <div className="flex items-center gap-4 text-white/50 text-[10px] font-bold uppercase tracking-widest">
                                                     <div className="flex items-center gap-1.5"><Calendar className="w-3 h-3" /> {new Date(order.createdAt).toLocaleDateString()}</div>
                                                     <div className="flex items-center gap-1.5"><Package className="w-3 h-3" /> {order.items.length} items</div>
                                                 </div>
@@ -151,13 +150,13 @@ export default function OrdersClientHub({ initialOrders, isGuest }: OrdersClient
 
                                         <div className="mt-4 md:mt-0 flex items-center justify-between md:justify-end gap-8 border-t md:border-t-0 border-white/5 pt-4 md:pt-0">
                                             <div className="text-right">
-                                                <p className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest mb-0.5">Total Value</p>
+                                                <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest mb-0.5">Total Value</p>
                                                 <p className="text-xl font-black text-white italic tracking-tighter">
                                                     {formatPrice(order.total)}
                                                 </p>
                                             </div>
-                                            <div className="w-10 h-10 rounded-full border border-white/5 flex items-center justify-center group-hover:bg-white group-hover:border-white transition-all">
-                                                <ChevronRight className="w-5 h-5 text-zinc-500 group-hover:text-black transition-colors" />
+                                            <div className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center group-hover:bg-white transition-all">
+                                                <ChevronRight className="w-5 h-5 text-white/30 group-hover:text-[#592C2F] transition-colors" />
                                             </div>
                                         </div>
                                     </motion.div>

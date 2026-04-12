@@ -43,3 +43,18 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# lint and logs
+lint_results*
+lint_output*
+store_lint.txt
+tsc_output.txt
+cloudflare.log
+proxy.ts
+path_machine.txt
+path_user.txt
+
+# prisma and uploads
+/prisma/generated/
+/public/uploads/
+/tmp/

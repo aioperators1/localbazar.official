@@ -26,12 +26,15 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     };
 
     useEffect(() => {
-        const savedLang = localStorage.getItem("electro-lang") as Language;
-        if (savedLang && ["en", "fr", "ar"].includes(savedLang)) {
-            setLanguage(savedLang);
-            updateDirection(savedLang);
-        }
-        setMounted(true);
+        const timer = setTimeout(() => {
+            const savedLang = localStorage.getItem("electro-lang") as Language;
+            if (savedLang && ["en", "fr", "ar"].includes(savedLang)) {
+                setLanguage(savedLang);
+                updateDirection(savedLang);
+            }
+            setMounted(true);
+        }, 0);
+        return () => clearTimeout(timer);
     }, []);
 
 

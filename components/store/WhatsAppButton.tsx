@@ -2,7 +2,7 @@
 
 import { MessageCircle } from "lucide-react";
 
-export function WhatsAppButton({ settings }: { settings?: any }) {
+export function WhatsAppButton({ settings }: { settings?: { whatsappNumber?: string } }) {
     const whatsapp = settings?.whatsappNumber || "97450558884";
     // Remove any non-numeric characters for the link
     const cleanWhatsapp = whatsapp.replace(/\D/g, '');

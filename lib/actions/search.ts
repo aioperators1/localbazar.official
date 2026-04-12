@@ -1,8 +1,18 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { Product } from "@/lib/types";
 
-export async function searchProducts(query: string) {
+export interface SearchResult {
+    id: string;
+    name: string;
+    slug: string;
+    price: number;
+    category: { name: string } | null;
+    image: string;
+}
+
+export async function searchProducts(query: string): Promise<SearchResult[]> {
     if (!query || query.trim().length === 0) return [];
 
     try {
@@ -26,7 +36,7 @@ export async function searchProducts(query: string) {
             name: p.name,
             slug: p.slug,
             price: Number(p.price),
-            category: p.category,
+            category: p.category ? { name: p.category.name } : null,
             image: p.images ? (p.images.startsWith('[') ? JSON.parse(p.images)[0] : p.images.split(',')[0]) : '/placeholder.jpg'
         }));
 

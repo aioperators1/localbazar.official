@@ -30,16 +30,16 @@ const faqItems = [
 
 export default function SupportPage() {
     return (
-        <div className="bg-white min-h-screen pt-32 pb-20 relative overflow-hidden text-[#111111]">
+        <div className="bg-transparent min-h-screen pt-32 pb-20 relative overflow-hidden text-white">
             {/* 🌌 SOFT ACCENT */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[500px] bg-brand-burgundy/5 blur-[120px] pointer-events-none" />
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[500px] bg-white/5 blur-[120px] pointer-events-none" />
 
             <div className="container mx-auto px-6 max-w-4xl relative z-10">
                 <div className="text-center mb-20">
-                    <h1 className="text-6xl md:text-8xl font-black text-[#111111] uppercase italic tracking-tighter mb-6 leading-none">
-                        Concierge <br /> <span className="text-transparent text-stroke-black opacity-10">Support</span>
+                    <h1 className="text-6xl md:text-8xl font-black text-white uppercase italic tracking-tighter mb-6 leading-none">
+                        Concierge <br /> <span className="text-white/10">Support</span>
                     </h1>
-                    <p className="text-zinc-400 uppercase tracking-[0.4em] text-[10px] font-black">
+                    <p className="text-white/40 uppercase tracking-[0.4em] text-[10px] font-black">
                         The Excellence of Luxury & Heritage
                     </p>
                 </div>
@@ -47,17 +47,17 @@ export default function SupportPage() {
                 <div className="grid lg:grid-cols-12 gap-16">
                     <div className="lg:col-span-8 space-y-12">
                         <div className="space-y-6">
-                            <h2 className="text-xs font-black text-brand-burgundy uppercase tracking-[0.5em] flex items-center gap-4">
-                                <div className="h-px w-8 bg-brand-burgundy/50" /> FAQ // Information
+                            <h2 className="text-xs font-black text-white/60 uppercase tracking-[0.5em] flex items-center gap-4">
+                                <div className="h-px w-8 bg-white/20" /> FAQ // Information
                             </h2>
 
                             <Accordion type="single" collapsible className="w-full space-y-4">
                                 {faqItems.map((item, idx) => (
-                                    <AccordionItem key={idx} value={`item-${idx}`} className="border border-zinc-100 bg-[#FAFAFA] rounded-[8px] overflow-hidden px-6 transition-all hover:bg-zinc-50 hover:border-zinc-200">
-                                        <AccordionTrigger className="text-[#111111] hover:no-underline font-bold uppercase tracking-widest text-[11px] py-6 text-left">
+                                    <AccordionItem key={idx} value={`item-${idx}`} className="border border-white/10 bg-black/20 rounded-[8px] overflow-hidden px-6 transition-all hover:bg-black/30 hover:border-white/20">
+                                        <AccordionTrigger className="text-white hover:no-underline font-bold uppercase tracking-widest text-[11px] py-6 text-left">
                                             {item.q}
                                         </AccordionTrigger>
-                                        <AccordionContent className="text-zinc-500 font-medium leading-relaxed pb-6 text-[13px]">
+                                        <AccordionContent className="text-white/60 font-medium leading-relaxed pb-6 text-[13px]">
                                             {item.a}
                                         </AccordionContent>
                                     </AccordionItem>
@@ -67,18 +67,18 @@ export default function SupportPage() {
                     </div>
 
                     <div className="lg:col-span-4">
-                        <div className="sticky top-32 p-10 bg-brand-burgundy/[0.03] border border-brand-burgundy/10 rounded-[12px] text-center space-y-8 relative overflow-hidden group">
-                            <div className="absolute inset-0 bg-brand-burgundy/5 blur-3xl rounded-full scale-150 group-hover:scale-200 transition-transform duration-1000" />
+                        <div className="sticky top-32 p-10 bg-white/5 border border-white/10 rounded-[12px] text-center space-y-8 relative overflow-hidden group">
+                            <div className="absolute inset-0 bg-white/5 blur-3xl rounded-full scale-150 group-hover:scale-200 transition-transform duration-1000" />
 
                             <div className="relative z-10">
-                                <div className="w-16 h-16 bg-brand-burgundy/10 rounded-full flex items-center justify-center mx-auto mb-6 border border-brand-burgundy/20">
-                                    <MessageCircle className="w-8 h-8 text-brand-burgundy" />
+                                <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-6 border border-white/20">
+                                    <MessageCircle className="w-8 h-8 text-white" />
                                 </div>
-                                <h3 className="text-xl font-black text-[#111111] uppercase italic mb-4">Live Concierge</h3>
-                                <p className="text-[11px] text-zinc-500 uppercase tracking-[0.2em] leading-relaxed mb-8 font-medium">
+                                <h3 className="text-xl font-black text-white uppercase italic mb-4">Live Concierge</h3>
+                                <p className="text-[11px] text-white/50 uppercase tracking-[0.2em] leading-relaxed mb-8 font-medium">
                                     Real-time assistance for our most exclusive collections.
                                 </p>
-                                <Button size="lg" className="w-full h-16 bg-[#111111] text-white hover:bg-brand-burgundy transition-all duration-500 font-bold uppercase tracking-[0.3em] text-[10px] rounded-[2px] shadow-2xl" asChild>
+                                <Button size="lg" className="w-full h-16 bg-white text-[#592C2F] hover:bg-white/90 transition-all duration-500 font-bold uppercase tracking-[0.3em] text-[10px] rounded-[2px] shadow-2xl" asChild>
                                     <Link href="https://wa.me/97450558884">
                                         Initiate WhatsApp
                                     </Link>

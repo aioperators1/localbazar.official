@@ -1,10 +1,10 @@
 "use client";
 
 import { motion, useMotionValue, useSpring, useTransform, AnimatePresence } from "framer-motion";
-import { Scissors, Sparkles, Shirt, ShoppingBag, Activity, Shield, Zap, Target } from "lucide-react";
+import { Scissors, Sparkles, Shirt, ShoppingBag, Activity, Shield, Zap, Target, LucideIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import React, { useRef, useState } from "react";
+import React, { useRef } from "react";
 import { useLanguage } from "@/components/providers/language-provider";
 import { cn } from "@/lib/utils";
 
@@ -38,13 +38,12 @@ function CategoryCard({
     href: string;
     title: string;
     image: string;
-    icon: any;
+    icon: LucideIcon;
     className?: string;
     accentColor?: "blue" | "zinc" | "slate";
     dataPoints?: { label: string, value: string }[];
 }) {
     const ref = useRef<HTMLDivElement>(null);
-    const [isHovered, setIsHovered] = useState(false);
     const { t, language } = useLanguage();
     const isAr = language === "ar";
 
@@ -64,9 +63,9 @@ function CategoryCard({
     };
 
     const colors = {
-        blue: "var(--color-brand-charcoal)",
-        zinc: "#71717a",
-        slate: "#64748b"
+        blue: "rgba(255,255,255,0.4)",
+        zinc: "rgba(255,255,255,0.4)",
+        slate: "rgba(255,255,255,0.4)"
     };
 
     const activeColor = colors[accentColor];
@@ -75,11 +74,10 @@ function CategoryCard({
         <motion.div
             ref={ref}
             onMouseMove={handleMouseMove}
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => { x.set(0); y.set(0); setIsHovered(false); }}
+            onMouseLeave={() => { x.set(0); y.set(0); }}
             style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
             className={cn(
-                "group relative overflow-hidden rounded-xl border border-black/5 dark:border-white/5 bg-zinc-100 dark:bg-zinc-900/50 shadow-pro",
+                "group relative overflow-hidden rounded-xl border border-white/10 bg-black/20 shadow-pro",
                 className
             )}
         >
@@ -87,7 +85,7 @@ function CategoryCard({
                 <ProFrame color={activeColor} />
 
                 {/* Background Layer */}
-                <div className="absolute inset-0 z-0 bg-zinc-100 dark:bg-zinc-900">
+                <div className="absolute inset-0 z-0 bg-black/40">
                     <Image
                         src={image}
                         alt={title}
@@ -104,29 +102,29 @@ function CategoryCard({
                             "font-black text-white mix-blend-difference flex items-center gap-2",
                             isAr ? "text-[10px]" : "text-[8px] uppercase tracking-widest"
                         )}>
-                            <Activity className="w-3 h-3 text-brand-burgundy" /> {t("home.protocol")}
+                            <Activity className="w-3 h-3 text-white/50" /> {t("home.protocol")}
                         </span>
-                        <div className="h-px w-16 bg-brand-burgundy/50" />
+                        <div className="h-px w-16 bg-white/20" />
                     </div>
 
-                    <div className="p-3 rounded-lg border border-black/5 dark:border-white/5 bg-white/50 backdrop-blur-xl transition-all duration-500">
-                        <Icon style={{ color: activeColor }} className="w-5 h-5 transition-transform" />
+                    <div className="p-3 rounded-lg border border-white/10 bg-white/5 backdrop-blur-xl transition-all duration-500">
+                        <Icon style={{ color: "white" }} className="w-5 h-5 transition-transform" />
                     </div>
                 </div>
 
                 {/* Title */}
                 <div className="relative z-40 mt-12 mb-8" style={{ transform: "translateZ(40px)" }}>
                     <motion.div
-                        className="inline-block p-4 rounded-2xl bg-white/60 dark:bg-black/40 backdrop-blur-md border border-white/20 dark:border-white/5"
+                        className="inline-block p-4 rounded-2xl bg-black/40 backdrop-blur-md border border-white/10"
                     >
                         <h3
                             className={cn(
-                                "font-black text-zinc-900 dark:text-white",
+                                "font-black text-white",
                                 isAr ? "text-4xl leading-tight" : "text-5xl uppercase tracking-tighter leading-none"
                             )}
                         >
                             {title.split(' ')[0]} <br />
-                            <span className="text-brand-burgundy">{title.split(' ').slice(1).join(' ')}</span>
+                            <span className="text-white/40">{title.split(' ').slice(1).join(' ')}</span>
                         </h3>
                     </motion.div>
                 </div>
@@ -134,21 +132,21 @@ function CategoryCard({
                 {/* Stats */}
                 <div className="relative z-50 flex flex-wrap gap-4 pt-6 mt-auto" style={{ transform: "translateZ(20px)" }}>
                     {dataPoints.map((point, i) => (
-                        <div key={i} className="flex flex-col gap-0.5 bg-white/70 dark:bg-black/50 backdrop-blur-md px-3 py-2 rounded-lg border border-white/20 dark:border-white/5 shadow-sm">
+                        <div key={i} className="flex flex-col gap-0.5 bg-black/50 backdrop-blur-md px-3 py-2 rounded-lg border border-white/10 shadow-sm">
                             <span className={cn(
-                                "font-black text-zinc-600 dark:text-zinc-400",
+                                "font-black text-white/40",
                                 isAr ? "text-[9px]" : "text-[7px] uppercase tracking-widest"
                             )}>{point.label}</span>
-                            <span className="text-[10px] font-bold text-zinc-900 dark:text-white">
+                            <span className="text-[10px] font-bold text-white">
                                 {point.value}
                             </span>
                         </div>
                     ))}
                     <div className="ms-auto mt-auto">
-                        <div className="flex items-center gap-2 px-3 py-1 bg-white border border-brand-burgundy/20 rounded-full">
-                            <Target className="w-2.5 h-2.5 text-brand-burgundy" />
+                        <div className="flex items-center gap-2 px-3 py-1 bg-white/10 border border-white/20 rounded-full">
+                            <Target className="w-2.5 h-2.5 text-white/50" />
                             <span className={cn(
-                                "font-black text-foreground",
+                                "font-black text-white",
                                 isAr ? "text-[10px]" : "text-[8px] tracking-widest uppercase"
                             )}>{t("cat.selectTier")}</span>
                         </div>
@@ -171,29 +169,29 @@ export function CategoryGrid() {
                     <motion.div
                         initial={{ opacity: 0, y: 10 }}
                         whileInView={{ opacity: 1, y: 0 }}
-                        className="flex items-center gap-4 text-brand-burgundy"
+                        className="flex items-center gap-4 text-white/50"
                     >
-                        <Shield className="w-5 h-5" />
-                        <span className="text-[10px] font-black uppercase tracking-[0.5em]">{t("home.hardwarePriority")}</span>
+                        <Shield className="w-5 h-5 text-white/30" />
+                        <span className="text-[10px] font-black uppercase tracking-[0.5em]">The Artisanal Selection</span>
                     </motion.div>
                     <h2 className={cn(
-                        "font-black text-foreground [text-wrap:balance]",
+                        "font-black text-white [text-wrap:balance]",
                         isAr ? "text-5xl md:text-7xl lg:text-8xl leading-tight" : "text-5xl md:text-8xl uppercase tracking-tighter leading-[0.8]"
                     )}>
-                        {t("home.globalGear").split(' ')[0]} <br />
-                        <span className="text-brand-burgundy opacity-30">{t("home.matrix")}</span>
+                        Exclusive <br />
+                        <span className="text-white/10 italic">Heritage</span>
                     </h2>
                 </div>
-                <div className="p-8 bg-card border border-black/5 dark:border-white/5 backdrop-blur-3xl rounded-xl space-y-4 max-w-md shadow-pro">
+                <div className="p-8 bg-black/20 border border-white/10 backdrop-blur-3xl rounded-xl space-y-4 max-w-md shadow-pro">
                     <div className="flex items-center gap-3">
-                        <Zap className="w-4 h-4 text-brand-burgundy" />
+                        <Zap className="w-4 h-4 text-white/30" />
                         <span className={cn(
-                            "font-black text-muted-foreground",
+                            "font-black text-white/40",
                             isAr ? "text-[10px]" : "text-[8px] uppercase tracking-widest"
-                        )}>{t("home.protocol")}</span>
+                        )}>Curated Collection</span>
                     </div>
-                    <p className="text-muted-foreground text-sm font-bold leading-relaxed uppercase tracking-widest">
-                        {t("home.navigateGrid")}
+                    <p className="text-white/60 text-sm font-bold leading-relaxed uppercase tracking-widest">
+                        Exquisite pieces from the finest luxury houses and heritage ateliers.
                     </p>
                 </div>
             </div>

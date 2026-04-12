@@ -12,12 +12,8 @@ const Accordion = React.forwardRef<
 ))
 Accordion.displayName = "Accordion"
 
-const AccordionContext = React.createContext<{
-    openItems: string[];
-    toggleItem: (value: string) => void;
-}>({ openItems: [], toggleItem: () => { } });
-// @ts-ignore
-const _AccordionContext = AccordionContext;
+// Accordion context was here but was not being used in this simple mock version.
+
 
 const AccordionItem = React.forwardRef<
     HTMLDivElement,
@@ -43,8 +39,8 @@ AccordionItem.displayName = "AccordionItem"
 
 const AccordionTrigger = React.forwardRef<
     HTMLButtonElement,
-    React.ButtonHTMLAttributes<HTMLButtonElement> & { isOpen?: boolean; setIsOpen?: (v: boolean) => void; }
->(({ className, children, isOpen, setIsOpen, ...props }, ref) => (
+    React.ButtonHTMLAttributes<HTMLButtonElement> & { isOpen?: boolean; setIsOpen?: (v: boolean) => void; value?: string; }
+>(({ className, children, isOpen, setIsOpen, value, ...props }, ref) => (
     <div className="flex">
         <button
             ref={ref}

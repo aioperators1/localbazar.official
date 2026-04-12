@@ -9,44 +9,65 @@ import { useCart } from "@/hooks/use-cart";
 import { useCurrency } from "@/components/providers/currency-provider";
 import { useLanguage } from "@/components/providers/language-provider";
 import { motion } from "framer-motion";
+import { useWishlist } from "@/hooks/use-wishlist";
+import { toast } from "sonner";
+
+import { Product } from "@/lib/types";
 
 interface ProductProps {
-    product: {
-        id: string;
-        name: string;
-        slug: string;
-        price: number;
-        image?: string;
-        images?: string;
-        category: any;
-        specs?: string | null;
-        colors?: string | null;
-    }
+    product: Product;
     className?: string;
 }
 
 export function ProductCard({ product, className }: ProductProps) {
     const { addItem } = useCart();
+    const { toggleItem, isInWishlist } = useWishlist();
     const { formatPrice: formatCurrency } = useCurrency();
     const { t, language } = useLanguage();
     const [isAdded, setIsAdded] = useState(false);
+    const isWishlisted = isInWishlist(product.id);
 
-    const categoryName = typeof product.category === 'object'
-        ? product.category?.name
-        : (product.category || "Fashion");
+    const toggleWishlist = (e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        toggleItem({
+            id: product.id,
+            name: displayTitle,
+            price: product.price,
+            image: imagesList[0],
+            slug: product.slug,
+            category: displayCategory
+        });
+        
+        if (!isWishlisted) {
+            toast.success(t('wishlist.added'));
+        } else {
+            toast.info(t('wishlist.removed'));
+        }
+    };
+
+    const categoryObject = product.category;
+    const displayCategory = (language === 'ar' && categoryObject?.nameAr 
+        ? categoryObject.nameAr 
+        : (categoryObject?.name || "Fashion")) as string;
+    
+    const displayTitle = (language === 'ar' && product.nameAr 
+        ? product.nameAr 
+        : product.name) as string;
 
     // Parse images
     let imagesList: string[] = [];
     try {
-        if (product.images && typeof product.images === 'string' && product.images.startsWith('[')) {
+        if (product.images && typeof product.images === 'string' && product.images.trim().startsWith('[')) {
             imagesList = JSON.parse(product.images);
-        } else if (product.image) {
-            imagesList = [product.image];
         } else if (product.images) {
             imagesList = product.images.split(',').map(img => img.trim());
         }
     } catch {
-        imagesList = product.image ? [product.image] : [];
+        // Fallback for non-JSON strings
+        if (product.images) {
+            imagesList = product.images.split(',').map(img => img.trim());
+        }
     }
 
     if (imagesList.length === 0) {
@@ -58,11 +79,11 @@ export function ProductCard({ product, className }: ProductProps) {
         e.stopPropagation();
         addItem({
             id: product.id,
-            name: product.name,
+            name: displayTitle,
             price: product.price,
             image: imagesList[0],
             quantity: 1,
-            category: categoryName,
+            category: displayCategory,
             size: null,
             color: null
         });
@@ -76,10 +97,10 @@ export function ProductCard({ product, className }: ProductProps) {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
-            className={cn("bg-white flex flex-col group relative overflow-hidden h-full border border-zinc-50 transition-all duration-700 hover:shadow-2xl hover:-translate-y-2 rounded-[2px]", className)}
+            className={cn("bg-transparent flex flex-col group relative overflow-hidden h-full border border-white/10 transition-all duration-700 hover:shadow-2xl hover:-translate-y-2 hover:border-white/30 rounded-[2px]", className)}
         >
             {/* Image Container */}
-            <div className="relative aspect-[4/5] w-full overflow-hidden bg-zinc-50">
+            <div className="relative aspect-[4/5] w-full overflow-hidden bg-black/20">
                 <Link href={`/product/${product.slug}`} className="block h-full w-full relative group/image">
                     {/* Primary Image with Ken Burns Hover */}
                     <div className={cn(
@@ -108,21 +129,26 @@ export function ProductCard({ product, className }: ProductProps) {
                         </div>
                     )}
 
-                    {/* Luxury Floating Frame Overlay */}
-                    <div className="absolute inset-4 border border-white/0 group-hover:border-white/20 transition-all duration-700 z-20 pointer-events-none" />
+                    {/* Luxury Floating Frame Overlay - Ultra Minimal */}
+                    <div className="absolute inset-0 border-[0.5px] border-white/0 group-hover:border-white/10 transition-all duration-1000 z-20 pointer-events-none m-4 rounded-[2px]" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000 z-10" />
                 </Link>
 
-                {/* Wishlist Icon */}
-                <button className={cn(
-                    "absolute top-4 z-30 w-10 h-10 glass rounded-full flex items-center justify-center text-black/60 lg:opacity-0 lg:group-hover:opacity-100 transition-all duration-700 hover:bg-white hover:text-brand-burgundy",
-                    language === 'ar' ? "left-4" : "right-4"
-                )}>
-                    <Heart className="w-4 h-4 stroke-[1.5]" />
+                {/* Wishlist Icon - Premium Positioning */}
+                <button 
+                    onClick={toggleWishlist}
+                    className={cn(
+                        "absolute top-6 z-30 w-12 h-12 glass rounded-full flex items-center justify-center transition-all duration-1000 lg:opacity-0 lg:group-hover:opacity-100",
+                        isWishlisted ? "bg-white text-rose-500 scale-110 opacity-100" : "text-white/40 hover:bg-white hover:text-[#0A0A0A] hover:scale-110",
+                        language === 'ar' ? "left-6" : "right-6"
+                    )}
+                >
+                    <Heart className={cn("w-5 h-5 stroke-[1.5]", isWishlisted && "fill-current")} />
                 </button>
 
                 {/* Status Badge */}
                 <div className={cn("absolute top-4 z-30", language === 'ar' ? "right-4" : "left-4")}>
-                    <span className="bg-[#111] text-white text-[8px] font-black tracking-[0.4em] uppercase px-3 py-1 pb-1.5 lg:opacity-0 lg:group-hover:opacity-100 transition-all duration-700">
+                    <span className="bg-[#111] text-white text-[11px] font-black tracking-[0.4em] uppercase px-4 py-1.5 pb-2 lg:opacity-0 lg:group-hover:opacity-100 transition-all duration-700">
                         {t('product.signature')}
                     </span>
                 </div>
@@ -130,18 +156,18 @@ export function ProductCard({ product, className }: ProductProps) {
 
             {/* Content Container */}
             <div className={cn(
-                "flex flex-col flex-1 px-6 py-6 space-y-4",
+                "flex flex-col flex-1 p-4 sm:p-5 space-y-3",
                 language === 'ar' ? "text-right" : "text-left"
             )}>
-                <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-black tracking-[0.3em] text-zinc-300 uppercase">
-                        {categoryName}
+                <div className="flex items-center justify-between mb-1">
+                    <span className="text-[12px] font-black tracking-[0.4em] text-white/30 uppercase">
+                        {displayCategory}
                     </span>
 
                     {/* Minimal Color Swatches */}
                     <div className="flex gap-1.5">
                         {(() => {
-                            let colorList: any[] = [];
+                            let colorList: Array<{ hex?: string; color?: string; name?: string }> = [];
                             try {
                                 if (product.colors && typeof product.colors === 'string' && product.colors.startsWith('[')) {
                                     colorList = JSON.parse(product.colors);
@@ -161,18 +187,21 @@ export function ProductCard({ product, className }: ProductProps) {
 
                 {/* Title */}
                 <Link href={`/product/${product.slug}`} className="block">
-                    <h3 className="font-serif text-[18px] text-[#111] tracking-tight group-hover:text-brand-burgundy transition-colors line-clamp-2 min-h-[50px] leading-snug">
-                        {product.name}
+                    <h3 className={cn(
+                        "text-[18px] sm:text-[20px] text-white tracking-tight group-hover:text-white/70 transition-colors line-clamp-2 min-h-[44px] leading-snug",
+                        language === 'ar' ? "font-sans font-black" : "font-serif"
+                    )}>
+                        {displayTitle}
                     </h3>
                 </Link>
 
                 {/* Footer Section */}
-                <div className="pt-2 flex flex-col gap-6">
-                    <div className="flex items-end justify-between">
-                        <span className="text-[#111] font-black text-[20px] tracking-tighter">
+                <div className="pt-1 flex flex-col gap-4">
+                    <div className="flex items-baseline justify-between gap-4">
+                        <span className="text-white font-serif italic text-[26px] sm:text-[32px] tracking-tighter leading-none">
                             {formatCurrency(product.price)}
                         </span>
-                        <span className="text-[9px] text-zinc-400 font-bold uppercase tracking-widest mb-1.5">
+                        <span className="text-[11px] text-white/30 font-bold uppercase tracking-[0.2em]">
                             {t('product.exclVat')}
                         </span>
                     </div>
@@ -181,17 +210,26 @@ export function ProductCard({ product, className }: ProductProps) {
                         onClick={handleAddToCart}
                         disabled={isAdded}
                         className={cn(
-                            "w-full h-[58px] flex items-center justify-center gap-4 font-black text-[10px] tracking-[0.4em] uppercase transition-all duration-700 relative overflow-hidden border border-zinc-100 hover:border-[#111] group/btn",
-                            isAdded ? "bg-black text-white" : "bg-white text-[#111]"
+                            "w-full h-[60px] flex items-center justify-center gap-4 font-black text-[13px] tracking-[0.5em] uppercase transition-all duration-1000 relative overflow-hidden border border-white/10 hover:border-white/40 group/btn rounded-[2px]",
+                            isAdded ? "bg-white text-[#0A0A0A]" : "bg-[#111]/40 text-white"
                         )}
                     >
-                        <span className="relative z-10 flex items-center gap-3 transition-colors duration-700 group-hover/btn:text-white">
-                            <ShoppingBag className="w-4 h-4 stroke-[1.5]" />
-                            {isAdded ? t('product.addedShort') : t('product.acquirePiece')}
+                        <span className="relative z-10 flex items-center gap-4 transition-colors duration-1000 group-hover/btn:text-[#0A0A0A]">
+                            {isAdded ? (
+                                <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="flex items-center gap-2">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                                    {t('product.addedShort')}
+                                </motion.div>
+                            ) : (
+                                <>
+                                    <ShoppingBag className="w-5 h-5 stroke-[1.2]" />
+                                    {t('product.acquirePiece')}
+                                </>
+                            )}
                         </span>
 
                         {!isAdded && (
-                            <div className="absolute inset-0 bg-[#111] translate-y-full group-hover/btn:translate-y-0 transition-transform duration-700" />
+                            <div className="absolute inset-0 bg-white translate-y-full group-hover/btn:translate-y-0 transition-transform duration-1000 ease-[0.19,1,0.22,1]" />
                         )}
                     </button>
                 </div>

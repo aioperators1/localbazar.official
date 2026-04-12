@@ -2,7 +2,7 @@
 
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { Check, Plus, Minus } from "lucide-react";
+import { Check } from "lucide-react";
 import { 
     Accordion, 
     AccordionContent, 
@@ -12,16 +12,11 @@ import {
 import { Slider } from "@/components/ui/slider";
 import { useState, useEffect } from "react";
 import { useLanguage } from "@/components/providers/language-provider";
-
-interface Category {
-    id: string;
-    slug: string;
-    name: string;
-    [key: string]: unknown;
-}
+import { Category, Brand } from "@/lib/types";
 
 interface ShopSidebarProps {
     categories: Category[];
+    brands?: Brand[];
 }
 
 const LUXURY_COLORS = [
@@ -34,14 +29,14 @@ const LUXURY_COLORS = [
     { name: "Navy", hex: "#000080" },
 ];
 
-export function ShopSidebar({ categories }: ShopSidebarProps) {
+export function ShopSidebar({ categories, brands = [] }: ShopSidebarProps) {
     const searchParams = useSearchParams();
     const router = useRouter();
     const pathname = usePathname();
 
     const { t } = useLanguage();
     const currentCategory = searchParams.get("category");
-    const currentFilter = searchParams.get("filter");
+    const currentBrand = searchParams.get("brand");
     const currentColor = searchParams.get("color");
 
     const [priceRange, setPriceRange] = useState([0, 5000]);
@@ -49,13 +44,23 @@ export function ShopSidebar({ categories }: ShopSidebarProps) {
     useEffect(() => {
         const min = Number(searchParams.get("minPrice")) || 0;
         const max = Number(searchParams.get("maxPrice")) || 5000;
-        setPriceRange([min, max]);
+        const timer = setTimeout(() => {
+            setPriceRange([min, max]);
+        }, 0);
+        return () => clearTimeout(timer);
     }, [searchParams]);
 
     const updateCategory = (slug: string | null) => {
         const params = new URLSearchParams(searchParams.toString());
         if (slug) params.set("category", slug);
         else params.delete("category");
+        router.push(`${pathname}?${params.toString()}`);
+    };
+
+    const updateBrand = (slug: string | null) => {
+        const params = new URLSearchParams(searchParams.toString());
+        if (slug) params.set("brand", slug);
+        else params.delete("brand");
         router.push(`${pathname}?${params.toString()}`);
     };
 
@@ -70,15 +75,15 @@ export function ShopSidebar({ categories }: ShopSidebarProps) {
         <aside className="w-full hidden lg:block sticky top-32">
             <div className="space-y-8">
                 <div>
-                    <h2 className="text-[20px] font-serif font-black tracking-tight text-[#111111] mb-6">{t('shop.filters')}</h2>
-                    <div className="h-0.5 w-8 bg-black mb-8" />
+                    <h2 className="text-[20px] font-serif font-black tracking-tight text-white mb-6">{t('shop.filters')}</h2>
+                    <div className="h-0.5 w-8 bg-white/50 mb-8" />
                 </div>
 
-                <Accordion type="multiple" defaultValue={["categories", "price", "colors"]} className="w-full space-y-2">
+                <Accordion type="multiple" defaultValue={["categories", "brands", "price", "colors"]} className="w-full space-y-2">
                     {/* Categories */}
-                    <AccordionItem value="categories" className="border-b border-[#F1F1F1]">
+                    <AccordionItem value="categories" className="border-b border-white/10">
                         <AccordionTrigger className="hover:no-underline py-4 group">
-                            <span className="text-[12px] font-bold text-[#111111] uppercase tracking-[0.2em]">{t('shop.collections')}</span>
+                            <span className="text-[12px] font-bold text-white/80 uppercase tracking-[0.2em]">{t('shop.collections')}</span>
                         </AccordionTrigger>
                         <AccordionContent className="pb-6">
                             <ul className="space-y-3">
@@ -87,7 +92,7 @@ export function ShopSidebar({ categories }: ShopSidebarProps) {
                                         onClick={() => updateCategory(null)}
                                         className={cn(
                                             "text-[13px] transition-all duration-300 hover:pl-2",
-                                            !currentCategory ? "font-bold text-black" : "text-[#616161] hover:text-black"
+                                            !currentCategory ? "font-bold text-white" : "text-white/60 hover:text-white"
                                         )}
                                     >
                                         {t('shop.allCollections')}
@@ -98,8 +103,8 @@ export function ShopSidebar({ categories }: ShopSidebarProps) {
                                         <button
                                             onClick={() => updateCategory(cat.slug)}
                                             className={cn(
-                                                "text-[13px] transition-all duration-300 hover:pl-2",
-                                                currentCategory === cat.slug ? "font-bold text-black" : "text-[#616161] hover:text-black"
+                                                "text-[13px] transition-all duration-300 hover:pl-2 text-left",
+                                                currentCategory === cat.slug ? "font-bold text-white" : "text-white/60 hover:text-white"
                                             )}
                                         >
                                             {cat.name}
@@ -110,10 +115,47 @@ export function ShopSidebar({ categories }: ShopSidebarProps) {
                         </AccordionContent>
                     </AccordionItem>
 
+                    {/* Brands */}
+                    {brands && brands.length > 0 && (
+                        <AccordionItem value="brands" className="border-b border-white/10">
+                            <AccordionTrigger className="hover:no-underline py-4 group">
+                                <span className="text-[12px] font-bold text-white/80 uppercase tracking-[0.2em]">Brands</span>
+                            </AccordionTrigger>
+                            <AccordionContent className="pb-6">
+                                <ul className="space-y-3">
+                                    <li>
+                                        <button
+                                            onClick={() => updateBrand(null)}
+                                            className={cn(
+                                                "text-[13px] transition-all duration-300 hover:pl-2 text-left",
+                                                !currentBrand ? "font-bold text-white" : "text-white/60 hover:text-white"
+                                            )}
+                                        >
+                                            All Brands
+                                        </button>
+                                    </li>
+                                    {brands.map((brand) => (
+                                        <li key={brand.id}>
+                                            <button
+                                                onClick={() => updateBrand(brand.slug)}
+                                                className={cn(
+                                                    "text-[13px] transition-all duration-300 hover:pl-2 text-left",
+                                                    currentBrand === brand.slug ? "font-bold text-white" : "text-white/60 hover:text-white"
+                                                )}
+                                            >
+                                                {brand.name}
+                                            </button>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </AccordionContent>
+                        </AccordionItem>
+                    )}
+
                     {/* Price */}
-                    <AccordionItem value="price" className="border-b border-[#F1F1F1]">
+                    <AccordionItem value="price" className="border-b border-white/10">
                         <AccordionTrigger className="hover:no-underline py-4">
-                            <span className="text-[12px] font-bold text-[#111111] uppercase tracking-[0.2em]">{t('shop.price')}</span>
+                            <span className="text-[12px] font-bold text-white/80 uppercase tracking-[0.2em]">{t('shop.price')}</span>
                         </AccordionTrigger>
                         <AccordionContent className="pb-8 pt-4">
                             <Slider
@@ -129,7 +171,7 @@ export function ShopSidebar({ categories }: ShopSidebarProps) {
                                     router.push(`${pathname}?${params.toString()}`);
                                 }}
                             />
-                            <div className="flex justify-between mt-6 text-[12px] font-bold text-[#111111]">
+                            <div className="flex justify-between mt-6 text-[12px] font-bold text-white">
                                 <span>{priceRange[0]} QAR</span>
                                 <span>{priceRange[1]} QAR</span>
                             </div>
@@ -137,9 +179,9 @@ export function ShopSidebar({ categories }: ShopSidebarProps) {
                     </AccordionItem>
 
                     {/* Colors - Visual Swatches */}
-                    <AccordionItem value="colors" className="border-b border-[#F1F1F1]">
+                    <AccordionItem value="colors" className="border-b border-white/10">
                         <AccordionTrigger className="hover:no-underline py-4">
-                            <span className="text-[12px] font-bold text-[#111111] uppercase tracking-[0.2em]">{t('shop.color')}</span>
+                            <span className="text-[12px] font-bold text-white/80 uppercase tracking-[0.2em]">{t('shop.color')}</span>
                         </AccordionTrigger>
                         <AccordionContent className="pb-6">
                             <div className="flex flex-wrap gap-3 pt-2">
@@ -170,7 +212,7 @@ export function ShopSidebar({ categories }: ShopSidebarProps) {
                 {/* Reset Filters */}
                 <button 
                     onClick={() => router.push(pathname)}
-                    className="text-[11px] font-bold uppercase tracking-widest text-black hover:underline pt-4"
+                    className="text-[11px] font-bold uppercase tracking-widest text-white/80 hover:text-white hover:underline pt-4"
                 >
                     {t('shop.reset')}
                 </button>

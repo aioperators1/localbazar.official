@@ -23,21 +23,21 @@ export function ProductGallery({ images, name }: ProductGalleryProps) {
             isAr ? "lg:flex-row" : "lg:flex-row-reverse"
         )} dir={isAr ? "rtl" : "ltr"}>
             {/* Primary Visual Stage */}
-            <div className="relative aspect-[3/4] w-full grow overflow-hidden bg-[#F9F9F9] group rounded-xl shadow-sm border border-zinc-100">
-                <AnimatePresence mode="wait">
+            <div className="relative aspect-[3/4] w-full grow overflow-hidden bg-black/20 group shadow-sm transition-all duration-700">
+                <AnimatePresence>
                     <motion.div
                         key={selectedImage}
-                        initial={{ opacity: 0, scale: 1.05 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.95 }}
-                        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-                        className="relative w-full h-full"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.8, ease: "easeInOut" }}
+                        className="absolute inset-0 w-full h-full"
                     >
                         <Image
                             src={images[selectedImage]}
                             alt={name}
                             fill
-                            className="object-cover transition-transform duration-1000 group-hover:scale-110 ease-out"
+                            className="object-cover transition-transform duration-1000 group-hover:scale-105 ease-out"
                             priority
                         />
                     </motion.div>
@@ -48,7 +48,7 @@ export function ProductGallery({ images, name }: ProductGalleryProps) {
                     "absolute bottom-6 px-3 py-1.5 bg-white/90 backdrop-blur-md rounded-full border border-zinc-100/50 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300",
                     isAr ? "left-6" : "right-6"
                 )}>
-                    <span className="text-[9px] font-black uppercase tracking-[0.2em] text-[#111111]">{t("product.luxeFocus" as any)}</span>
+                    <span className="text-[9px] font-black uppercase tracking-[0.2em] text-[#111111]">{t("product.luxeFocus")}</span>
                 </div>
             </div>
 
@@ -59,10 +59,10 @@ export function ProductGallery({ images, name }: ProductGalleryProps) {
                         key={index}
                         onClick={() => setSelectedImage(index)}
                         className={cn(
-                            "relative flex-shrink-0 w-20 lg:w-24 aspect-[3/4] overflow-hidden rounded-lg border-2 transition-all duration-500",
+                            "relative flex-shrink-0 w-20 lg:w-24 aspect-[3/4] overflow-hidden transition-all duration-500",
                             selectedImage === index
-                                ? "border-[#111111] shadow-md ring-4 ring-[#111111]/5"
-                                : "border-transparent bg-zinc-50 hover:border-zinc-200"
+                                ? "ring-1 ring-white shadow-xl opacity-100"
+                                : "opacity-30 bg-black/5 hover:opacity-100"
                         )}
                     >
                         <Image

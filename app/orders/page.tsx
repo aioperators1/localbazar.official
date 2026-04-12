@@ -41,7 +41,7 @@ export default async function OrdersPage() {
     }
 
     return (
-        <div className="min-h-screen bg-black pt-32 pb-20">
+        <div className="min-h-screen bg-transparent pt-32 pb-20">
             <OrdersClientHub initialOrders={orders} isGuest={!session} />
         </div>
     );

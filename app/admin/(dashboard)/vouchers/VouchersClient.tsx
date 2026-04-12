@@ -10,7 +10,10 @@ import { createVoucher, deleteVoucher, updateVoucher } from "@/lib/actions/admin
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
+import { usePermissions } from "@/hooks/use-permissions";
+
 export default function VouchersClient({ initialVouchers }: { initialVouchers: any[] }) {
+    const { canEdit } = usePermissions();
     const [vouchers, setVouchers] = useState<any[]>(initialVouchers);
     const [isEditing, setIsEditing] = useState<string | null>(null);
     const [isCreating, setIsCreating] = useState(false);
@@ -32,6 +35,7 @@ export default function VouchersClient({ initialVouchers }: { initialVouchers: a
     };
 
     const handleCreate = async () => {
+        if (!canEdit('vouchers')) return toast.error("Access Denied: Editor permission required");
         if (!formData.code || formData.value <= 0) return toast.error("Please fill all required fields");
         setLoading(true);
         const res = await createVoucher(formData);
@@ -45,6 +49,7 @@ export default function VouchersClient({ initialVouchers }: { initialVouchers: a
     };
 
     const handleUpdate = async (id: string) => {
+        if (!canEdit('vouchers')) return toast.error("Access Denied: Editor permission required");
         setLoading(true);
         const res = await updateVoucher(id, formData);
         if (res.success) {
@@ -57,6 +62,7 @@ export default function VouchersClient({ initialVouchers }: { initialVouchers: a
     };
 
     const handleDelete = async (id: string) => {
+        if (!canEdit('vouchers')) return toast.error("Access Denied: Editor permission required");
         if (!confirm("Are you sure?")) return;
         setLoading(true);
         const res = await deleteVoucher(id);
@@ -70,6 +76,7 @@ export default function VouchersClient({ initialVouchers }: { initialVouchers: a
     };
 
     const startEditing = (voucher: any) => {
+        if (!canEdit('vouchers')) return toast.error("Access Denied: Editor permission required");
         setFormData({
             code: voucher.code,
             type: voucher.type,
@@ -89,7 +96,7 @@ export default function VouchersClient({ initialVouchers }: { initialVouchers: a
                     <h1 className="text-2xl font-black text-[#111111] uppercase tracking-tight">Promotions & Vouchers</h1>
                     <p className="text-[13px] text-[#616161] font-medium mt-1">Manage discount codes and special offers.</p>
                 </div>
-                {!isCreating && (
+                {!isCreating && canEdit('vouchers') && (
                     <Button onClick={() => setIsCreating(true)} className="bg-black text-white hover:bg-[#303030] h-11 px-6 rounded-xl font-bold text-[13px] uppercase tracking-widest shadow-lg">
                         <Plus className="w-4 h-4 mr-2" /> Add Voucher
                     </Button>
@@ -207,14 +214,16 @@ export default function VouchersClient({ initialVouchers }: { initialVouchers: a
                             </div>
                         </div>
 
-                        <div className="flex items-center gap-3 pt-4 border-t border-[#F1F1F1]">
-                            <Button variant="outline" size="sm" onClick={() => startEditing(voucher)} className="flex-1 h-10 rounded-xl text-[11px] font-black uppercase tracking-widest hover:bg-black hover:text-white transition-all">
-                                <Edit2 className="w-3.5 h-3.5 mr-2" /> Edit
-                            </Button>
-                            <Button variant="outline" size="sm" onClick={() => handleDelete(voucher.id)} className="w-10 h-10 rounded-xl text-rose-500 hover:text-rose-600 hover:bg-rose-50 border-[#F1F1F1]">
-                                <Trash2 className="w-4 h-4" />
-                            </Button>
-                        </div>
+                        {canEdit('vouchers') && (
+                            <div className="flex items-center gap-3 pt-4 border-t border-[#F1F1F1]">
+                                <Button variant="outline" size="sm" onClick={() => startEditing(voucher)} className="flex-1 h-10 rounded-xl text-[11px] font-black uppercase tracking-widest hover:bg-black hover:text-white transition-all">
+                                    <Edit2 className="w-3.5 h-3.5 mr-2" /> Edit
+                                </Button>
+                                <Button variant="outline" size="sm" onClick={() => handleDelete(voucher.id)} className="w-10 h-10 rounded-xl text-rose-500 hover:text-rose-600 hover:bg-rose-50 border-[#F1F1F1]">
+                                    <Trash2 className="w-4 h-4" />
+                                </Button>
+                            </div>
+                        )}
                     </div>
                 ))}
 

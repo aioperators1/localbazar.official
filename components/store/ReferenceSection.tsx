@@ -70,25 +70,25 @@ export function ReferenceSection({
             )}>
                 {/* Left Side: Banner */}
                 <div className={cn(
-                    "w-full lg:w-[340px] p-10 flex flex-col relative shrink-0 rounded-t-[160px] rounded-b-[4px] overflow-hidden shadow-sm border border-zinc-100 group transition-all duration-700 hover:shadow-xl",
-                    dark ? "bg-[#111111] text-white" : "bg-white text-[#111111]"
+                    "w-full lg:w-[340px] p-10 flex flex-col relative shrink-0 rounded-t-[160px] rounded-b-[4px] overflow-hidden shadow-sm border border-white/10 group transition-all duration-700 hover:shadow-xl",
+                    dark ? "bg-black/20 text-white" : "bg-white/5 text-white"
                 )}>
                     {/* Background Pattern */}
                     <div className="absolute inset-0 opacity-[0.05] bg-[url('https://www.transparenttextures.com/patterns/black-linen.png')] bg-repeat mix-blend-multiply"></div>
                     <div className="absolute inset-0 opacity-[0.02] bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] bg-repeat"></div>
 
                     <div className={cn("space-y-6 relative z-10 mb-8 mt-12 text-center", isAr ? "lg:text-right" : "lg:text-left")}>
-                        <h2 className="text-[28px] font-black uppercase tracking-tight leading-tight font-serif">
+                        <h2 className="text-[28px] font-black uppercase tracking-tight leading-tight font-serif text-white">
                             {title}
                         </h2>
-                        <div className={cn("w-12 h-px bg-brand-burgundy mx-auto", isAr ? "lg:mr-0 lg:ml-auto" : "lg:ml-0 lg:mr-auto")}></div>
-                        <p className={cn("text-[11px] font-medium leading-relaxed uppercase tracking-widest", dark ? "text-zinc-400" : "text-zinc-500")}>
+                        <div className={cn("w-12 h-px bg-white/30 mx-auto", isAr ? "lg:mr-0 lg:ml-auto" : "lg:ml-0 lg:mr-auto")}></div>
+                        <p className={cn("text-[11px] font-medium leading-relaxed uppercase tracking-widest text-white/60")}>
                             {description}
                         </p>
                         <div className="pt-8">
                             <Link
                                 href="/shop"
-                                className="inline-block bg-[#111111] hover:bg-brand-burgundy text-white px-10 py-4 rounded-[2px] text-[10px] font-bold uppercase tracking-[0.3em] transition-all shadow-xl hover:scale-105"
+                                className="inline-block bg-white hover:bg-white/80 text-[#592C2F] px-10 py-4 rounded-[2px] text-[10px] font-bold uppercase tracking-[0.3em] transition-all shadow-xl hover:scale-105"
                             >
                                 {t('common.explore')}
                             </Link>
@@ -113,7 +113,7 @@ export function ReferenceSection({
                         <button
                             onClick={() => scroll("left")}
                             className={cn(
-                                "absolute top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white text-[#111111] flex items-center justify-center shadow-xl border border-zinc-100 z-20 hover:scale-110 hover:bg-[#111111] hover:text-white transition-all hidden lg:flex",
+                                "absolute top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white text-[#592C2F] flex items-center justify-center shadow-xl border border-white/20 z-20 hover:scale-110 hover:bg-white/80 transition-all hidden lg:flex",
                                 isAr ? "right-[-20px]" : "left-[-20px]"
                             )}
                         >
@@ -131,7 +131,7 @@ export function ReferenceSection({
                             <div key={product.id} className="w-[calc(50%-8px)] lg:w-[calc(25%-12px)] shrink-0 snap-start flex flex-col items-stretch h-full">
                                 <ProductCard
                                     product={product}
-                                    className="h-full border border-zinc-100 shadow-sm rounded-xl overflow-hidden hover:shadow-xl transition-all"
+                                    className="h-full border-none shadow-none rounded-xl overflow-hidden hover:shadow-xl transition-all"
                                 />
                             </div>
                         ))}
@@ -142,7 +142,7 @@ export function ReferenceSection({
                         <button
                             onClick={() => scroll("right")}
                             className={cn(
-                                "absolute top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white text-[#111111] flex items-center justify-center shadow-xl border border-zinc-100 z-20 hover:scale-110 hover:bg-[#111111] hover:text-white transition-all hidden lg:flex",
+                                "absolute top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white text-[#592C2F] flex items-center justify-center shadow-xl border border-white/20 z-20 hover:scale-110 hover:bg-white/80 transition-all hidden lg:flex",
                                 isAr ? "left-[-20px]" : "right-[-20px]"
                             )}
                         >

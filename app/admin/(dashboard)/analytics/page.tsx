@@ -1,4 +1,4 @@
-import { Activity, CreditCard, DollarSign, Package, Users } from "lucide-react";
+import { CreditCard, DollarSign, Package, Users } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { prisma } from "@/lib/prisma";
 import { getDashboardStats, getMonthlyRevenue } from "@/lib/actions/admin";
@@ -26,7 +26,7 @@ export default async function AnalyticsPage() {
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-2xl font-black text-[#111111] uppercase tracking-tight">Analytics Overview</h1>
-                    <p className="text-[13px] text-[#616161] font-medium mt-1">Track your boutique's performance and sales.</p>
+                    <p className="text-[13px] text-[#616161] font-medium mt-1">Track your boutique&apos;s performance and sales.</p>
                 </div>
             </div>
 

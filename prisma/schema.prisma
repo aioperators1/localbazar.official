@@ -3,7 +3,6 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "./generated/client"
 }
 
 datasource db {
@@ -19,7 +18,8 @@ model User {
   emailVerified DateTime?
   image         String?
   password      String
-  role          String    @default("USER") // ADMIN, USER
+  role          String    @default("USER") // SUPER_ADMIN, ADMIN, MANAGER, STAFF, USER
+  permissions   String?   // JSON or comma-separated list of allowed pages
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   orders    Order[]
@@ -83,10 +83,12 @@ model Address {
 model Product {
   id          String      @id @default(cuid())
   name        String
+  nameAr      String?
   slug        String      @unique
   sku         String?     @unique
   brandName   String?
   description String
+  descriptionAr String?
   price       Decimal
   salePrice   Decimal?
   stock       Int         @default(0)
@@ -96,7 +98,9 @@ model Product {
   sizes       String?     // JSON string of available sizes (e.g. ["S", "M", "L"])
   colors      String?     // JSON string of available colors (e.g. [{"name": "Black", "hex": "#000000"}])
   materials   String?     // Material composition
+  materialsAr String?
   careInstructions String? // Care instructions
+  careInstructionsAr String?
   featured    Boolean     @default(false)
   categoryId  String
   category    Category    @relation(fields: [categoryId], references: [id])
@@ -119,17 +123,23 @@ model Product {
 }
 
 model Category {
-  id          String     @id @default(cuid())
-  name        String
-  slug        String     @unique
-  description String?
-  image       String?
-  featured    Boolean    @default(false)
-  parentId    String?
-  parent      Category?  @relation("CategoryToCategory", fields: [parentId], references: [id])
-  children    Category[] @relation("CategoryToCategory")
-  products    Product[]
-  createdAt   DateTime   @default(now())
+  id                 String     @id @default(cuid())
+  name               String
+  nameAr             String?
+  slug               String     @unique
+  description        String?
+  descriptionAr      String?
+  image              String?
+  featured           Boolean    @default(false)
+  showInHomeTabs     Boolean    @default(false)
+  orderInHomeTabs    Int        @default(0)
+  showInHomeCurated  Boolean    @default(false)
+  orderInHomeCurated Int        @default(0)
+  parentId           String?
+  parent             Category?  @relation("CategoryToCategory", fields: [parentId], references: [id])
+  children           Category[] @relation("CategoryToCategory")
+  products           Product[]
+  createdAt          DateTime   @default(now())
 }
 
 model Order {
@@ -138,9 +148,12 @@ model Order {
   user      User?       @relation(fields: [userId], references: [id])
   status    String      @default("PENDING") 
   paymentMethod String  @default("COD") // COD, CARD
+  paymentId String?     // ID from payment gateway (e.g. MyFatoorah InvoiceId)
   total     Decimal
   items     OrderItem[]
   messages  Message[]
+  voucherId String?
+  voucher   Voucher?    @relation(fields: [voucherId], references: [id])
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
 
@@ -214,9 +227,13 @@ model DirectMessage {
 model Banner {
   id        String   @id @default(cuid())
   title     String
+  titleAr   String?
   subtitle  String?
+  subtitleAr String?
   description String?
-  image     String   // URL of the banner image
+  descriptionAr String?
+  image       String   // URL of the banner image (Desktop)
+  mobileImage String?  // URL of the mobile-specific banner image
   link      String?  // Where the banner should redirect on click
   active    Boolean  @default(true)
   order     Int      @default(0)
@@ -236,10 +253,13 @@ model Setting {
 model Brand {
   id          String   @id @default(cuid())
   name        String   @unique
+  nameAr      String?
   slug        String   @unique
   logo        String?
   description String?
+  descriptionAr String?
   featured    Boolean  @default(false)
+  showInHome  Boolean  @default(false)
   products    Product[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -254,6 +274,7 @@ model Voucher {
   usageLimit  Int      @default(0) // 0 means unlimited
   usedCount   Int      @default(0)
   active      Boolean  @default(true)
+  orders      Order[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }

@@ -14,7 +14,16 @@ import {
     Search,
     Share2,
     CheckCircle2,
-    Loader2
+    Loader2,
+    Shield,
+    Zap,
+    Cpu,
+    Activity,
+    Smartphone,
+    Monitor,
+    Instagram,
+    Facebook,
+    Twitter
 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ImageUpload } from "@/components/admin/ImageUpload";
@@ -24,8 +33,12 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { getAdminSettings, updateAdminSettings } from "@/lib/actions/admin";
+import { usePermissions } from "@/hooks/use-permissions";
+import { cn } from "@/lib/utils";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function SettingsPage() {
+    const { canEdit } = usePermissions();
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [settings, setSettings] = useState<Record<string, string>>({
@@ -73,16 +86,17 @@ export default function SettingsPage() {
     };
 
     const handleSave = async () => {
+        if (!canEdit('settings')) return toast.error("ACCESS DENIED: EDITOR PERMISSION REQUIRED");
         setSaving(true);
         try {
             const res = await updateAdminSettings(settings);
             if (res.success) {
-                toast.success("Settings updated successfully");
+                toast.success("SYSTEM STATE SYNCHRONIZED");
             } else {
-                toast.error("Failed to update settings");
+                toast.error("SYNCHRONIZATION FAILED");
             }
         } catch (error) {
-            toast.error("A critical error occurred while saving");
+            toast.error("CRITICAL KERNEL ERROR");
         } finally {
             setSaving(false);
         }
@@ -90,305 +104,320 @@ export default function SettingsPage() {
 
     if (loading) {
         return (
-            <div className="flex items-center justify-center min-h-[400px]">
-                <Loader2 className="w-8 h-8 text-black animate-spin" />
+            <div className="flex flex-col items-center justify-center min-h-[600px] gap-6 animate-pulse">
+                <div className="w-16 h-16 rounded-[24px] bg-white/5 border border-white/10 flex items-center justify-center">
+                    <Cpu className="w-8 h-8 text-white/40 animate-spin" />
+                </div>
+                <p className="text-[10px] font-black uppercase tracking-[0.5em] text-white/20">Synthesizing Core Configuration...</p>
             </div>
         );
     }
 
     return (
-        <div className="space-y-8 pb-12">
-            <div className="flex items-center justify-between">
-                <div>
-                    <h1 className="text-2xl font-black text-[#111111] uppercase tracking-tight">System Settings</h1>
-                    <p className="text-[13px] text-[#616161] font-medium mt-1">Manage your boutique's global configuration and identity.</p>
+        <div className="space-y-12 pb-20 animate-in fade-in duration-1000 max-w-7xl mx-auto">
+            {/* 🌌 ULTRA PRO HEADER */}
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-10">
+                <div className="space-y-4">
+                    <div className="flex items-center gap-4">
+                        <div className="w-14 h-14 bg-white/5 rounded-[22px] flex items-center justify-center border border-white/10 shadow-2xl">
+                            <Cpu className="w-7 h-7 text-white/40" />
+                        </div>
+                        <div>
+                            <h1 className="text-4xl font-black text-white tracking-tighter uppercase italic leading-none">Core Parameters</h1>
+                            <p className="text-[12px] font-bold text-white/30 uppercase tracking-[0.4em] mt-3 ml-1">Universal System Configuration Hub</p>
+                        </div>
+                    </div>
                 </div>
-                <Button 
-                    onClick={handleSave} 
-                    disabled={saving}
-                    className="bg-black text-white hover:bg-[#333] h-10 px-6 rounded-lg font-bold flex items-center gap-2 shadow-lg transition-all active:scale-95"
-                >
-                    {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                    {saving ? "Saving Changes..." : "Publish Settings"}
-                </Button>
+                {canEdit('settings') && (
+                    <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                        <Button 
+                            onClick={handleSave} 
+                            disabled={saving}
+                            className="bg-white text-black hover:bg-white/90 h-14 px-10 rounded-[22px] font-black text-[12px] uppercase tracking-widest shadow-2xl flex items-center gap-4 transition-all"
+                        >
+                            {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
+                            {saving ? "PROPAGATING..." : "Publish Specifications"}
+                        </Button>
+                    </motion.div>
+                )}
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <div className="lg:col-span-2 space-y-8">
-                    {/* General Branding */}
-                    <Card className="border-[#E3E3E3] shadow-sm rounded-xl overflow-hidden">
-                        <CardHeader className="bg-[#F9F9F9] border-b border-[#F1F1F1] p-6">
-                            <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-lg bg-white border border-[#E3E3E3] flex items-center justify-center shadow-sm">
-                                    <Type className="w-5 h-5 text-black" />
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+                <div className="lg:col-span-2 space-y-12">
+                    {/* General Branding Section */}
+                    <div className="glass-card rounded-[48px] border border-white/5 shadow-2xl overflow-hidden bg-[#0A0A0A]/40 backdrop-blur-3xl">
+                        <div className="bg-white/[0.03] p-10 border-b border-white/5 flex items-center justify-between">
+                            <div className="flex items-center gap-5">
+                                <div className="w-12 h-12 rounded-[18px] bg-white/5 border border-white/10 flex items-center justify-center">
+                                    <Type className="w-6 h-6 text-white/60" />
                                 </div>
                                 <div>
-                                    <CardTitle className="text-[16px] font-black uppercase tracking-tight">General Branding</CardTitle>
-                                    <CardDescription className="text-[12px] font-medium">Define your store's public identity.</CardDescription>
+                                    <h2 className="text-[18px] font-black uppercase tracking-tight text-white italic">Identity Matrix</h2>
+                                    <p className="text-[10px] font-bold text-white/20 uppercase tracking-[0.2em] mt-1">Foundational Corporate Branding</p>
                                 </div>
                             </div>
-                        </CardHeader>
-                        <CardContent className="p-6 space-y-6">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div className="space-y-2">
-                                    <Label className="text-[12px] font-black uppercase tracking-widest text-[#616161]">Store Name</Label>
+                        </div>
+                        <div className="p-10 space-y-10">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                                <div className="space-y-4">
+                                    <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-white/70 ml-2">Official Store Designation</Label>
                                     <Input 
                                         value={settings.siteName} 
                                         onChange={(e) => handleChange('siteName', e.target.value)}
-                                        className="h-10 border-[#D2D2D2] rounded-lg focus:ring-black"
+                                        className="h-16 bg-white/[0.03] border-white/5 rounded-2xl px-8 text-[16px] font-black text-white focus:bg-white/[0.05] focus:border-white/20 transition-all outline-none"
+                                        disabled={!canEdit('settings')}
                                     />
                                 </div>
-                                <div className="space-y-2">
-                                    <Label className="text-[12px] font-black uppercase tracking-widest text-[#616161]">Store Handle</Label>
-                                    <div className="relative">
-                                        <span className="absolute left-3 top-2.5 text-[#A1A1A1] text-[13px]">@</span>
+                                <div className="space-y-4">
+                                    <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-white/70 ml-2">Digital Operations Handle</Label>
+                                    <div className="relative group">
                                         <Input 
                                             value={settings.siteName.toLowerCase().replace(/\s+/g, '')}
                                             disabled
-                                            className="h-10 border-[#D2D2D2] rounded-lg pl-8 bg-[#F9F9F9] text-[#A1A1A1]"
+                                            className="h-16 bg-white/[0.01] border-white/5 rounded-2xl pl-12 text-[14px] font-black italic text-white/40"
                                         />
+                                        <div className="absolute left-6 top-1/2 -translate-y-1/2 text-white/20 font-black text-sm">@</div>
                                     </div>
                                 </div>
                             </div>
-                            <div className="space-y-2">
-                                <Label className="text-[12px] font-black uppercase tracking-widest text-[#616161]">Tagline / Description</Label>
+                            <div className="space-y-4">
+                                <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-white/70 ml-2">System Narrative / Executive Summary</Label>
                                 <Textarea 
                                     value={settings.siteDescription}
                                     onChange={(e) => handleChange('siteDescription', e.target.value)}
-                                    className="min-h-[100px] border-[#D2D2D2] rounded-lg focus:ring-black resize-none"
+                                    className="min-h-[140px] bg-white/[0.03] border-white/5 rounded-[28px] p-8 text-[15px] font-medium text-white leading-relaxed focus:bg-white/[0.05] focus:border-white/20 transition-all outline-none resize-none"
+                                    disabled={!canEdit('settings')}
                                 />
                             </div>
-                        </CardContent>
-                    </Card>
+                        </div>
+                    </div>
 
-                    {/* Contact Information */}
-                    <Card className="border-[#E3E3E3] shadow-sm rounded-xl overflow-hidden">
-                        <CardHeader className="bg-[#F9F9F9] border-b border-[#F1F1F1] p-6">
-                            <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-lg bg-white border border-[#E3E3E3] flex items-center justify-center shadow-sm">
-                                    <Phone className="w-5 h-5 text-black" />
+                    {/* Storefront Hero Matrix */}
+                    <div className="glass-card rounded-[48px] border border-white/5 shadow-2xl overflow-hidden bg-[#0A0A0A]/40 backdrop-blur-3xl">
+                        <div className="bg-white/[0.03] p-10 border-b border-white/5 flex items-center justify-between">
+                            <div className="flex items-center gap-5">
+                                <div className="w-12 h-12 rounded-[18px] bg-white/5 border border-white/10 flex items-center justify-center text-white/60">
+                                    <Layout className="w-6 h-6" />
                                 </div>
                                 <div>
-                                    <CardTitle className="text-[16px] font-black uppercase tracking-tight">Store Contact</CardTitle>
-                                    <CardDescription className="text-[12px] font-medium">How customers get in touch with you.</CardDescription>
+                                    <h2 className="text-[18px] font-black uppercase tracking-tight text-white italic">Interface Hero Module</h2>
+                                    <p className="text-[10px] font-bold text-white/20 uppercase tracking-[0.2em] mt-1">Primary Landing Aesthetics</p>
                                 </div>
                             </div>
-                        </CardHeader>
-                        <CardContent className="p-6 space-y-6">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div className="space-y-2">
-                                    <Label className="text-[12px] font-black uppercase tracking-widest text-[#616161]">Customer Email</Label>
-                                    <div className="relative">
-                                        <Mail className="absolute left-3 top-3 w-4 h-4 text-[#A1A1A1]" />
-                                        <Input 
-                                            value={settings.contactEmail}
-                                            onChange={(e) => handleChange('contactEmail', e.target.value)}
-                                            className="pl-10 h-10 border-[#D2D2D2] rounded-lg"
-                                        />
-                                    </div>
-                                </div>
-                                <div className="space-y-2">
-                                    <Label className="text-[12px] font-black uppercase tracking-widest text-[#616161]">Support Phone</Label>
-                                    <div className="relative">
-                                        <Phone className="absolute left-3 top-3 w-4 h-4 text-[#A1A1A1]" />
-                                        <Input 
-                                            value={settings.contactPhone}
-                                            onChange={(e) => handleChange('contactPhone', e.target.value)}
-                                            className="pl-10 h-10 border-[#D2D2D2] rounded-lg"
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="space-y-2">
-                                <Label className="text-[12px] font-black uppercase tracking-widest text-[#616161]">WhatsApp Redirect Number</Label>
-                                <div className="relative">
-                                    <div className="absolute left-3 top-3 w-4 h-4 text-[#25D366]">
-                                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662c1.72.94 3.659 1.437 5.634 1.437h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
-                                    </div>
-                                    <Input 
-                                        value={settings.whatsappNumber}
-                                        onChange={(e) => handleChange('whatsappNumber', e.target.value)}
-                                        placeholder="+974 0000 0000"
-                                        className="pl-10 h-10 border-[#D2D2D2] rounded-lg"
-                                    />
-                                </div>
-                            </div>
-                            <div className="space-y-2">
-                                <Label className="text-[12px] font-black uppercase tracking-widest text-[#616161]">Boutique Address</Label>
-                                <div className="relative">
-                                    <MapPin className="absolute left-3 top-3 w-4 h-4 text-[#A1A1A1]" />
-                                    <Input 
-                                        value={settings.address}
-                                        onChange={(e) => handleChange('address', e.target.value)}
-                                        className="pl-10 h-10 border-[#D2D2D2] rounded-lg"
-                                    />
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
-
-                    {/* SEO & Search */}
-                    <Card className="border-[#E3E3E3] shadow-sm rounded-xl overflow-hidden">
-                        <CardHeader className="bg-[#F9F9F9] border-b border-[#F1F1F1] p-6">
-                            <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-lg bg-white border border-[#E3E3E3] flex items-center justify-center shadow-sm">
-                                    <Search className="w-5 h-5 text-black" />
-                                </div>
-                                <div>
-                                    <CardTitle className="text-[16px] font-black uppercase tracking-tight">Search & SEO</CardTitle>
-                                    <CardDescription className="text-[12px] font-medium">How your store appears in Google and search engines.</CardDescription>
-                                </div>
-                            </div>
-                        </CardHeader>
-                        <CardContent className="p-6 space-y-6">
-                            <div className="space-y-2">
-                                <Label className="text-[12px] font-black uppercase tracking-widest text-[#616161]">Default Meta Title</Label>
-                                <Input 
-                                    value={`${settings.siteName} | ${settings.siteDescription}`}
-                                    disabled
-                                    className="h-10 border-[#D2D2D2] rounded-lg bg-[#F9F9F9] text-[#A1A1A1]"
-                                />
-                            </div>
-                            <div className="flex items-center justify-between p-4 bg-[#F9F9F9] rounded-lg border border-[#F1F1F1]">
-                                <div className="space-y-0.5">
-                                    <p className="text-[13px] font-black text-[#111111] uppercase tracking-tight">Indexable by Google</p>
-                                    <p className="text-[11px] text-[#616161] font-medium">Allow search engines to crawl your boutique.</p>
-                                </div>
-                                <Switch checked={true} disabled />
-                            </div>
-                        </CardContent>
-                    </Card>
-
-                    {/* Homepage Content */}
-                    <Card className="border-[#E3E3E3] shadow-sm rounded-xl overflow-hidden mt-8">
-                        <CardHeader className="bg-[#F9F9F9] border-b border-[#F1F1F1] p-6">
-                            <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-lg bg-white border border-[#E3E3E3] flex items-center justify-center shadow-sm">
-                                    <Type className="w-5 h-5 text-black" />
-                                </div>
-                                <div>
-                                    <CardTitle className="text-[16px] font-black uppercase tracking-tight">Homepage Content</CardTitle>
-                                    <CardDescription className="text-[12px] font-medium">Edit the main text visible on the storefront.</CardDescription>
-                                </div>
-                            </div>
-                        </CardHeader>
-                        <CardContent className="p-6 space-y-6">
-                            <div className="space-y-4">
-                                <div className="space-y-2">
-                                    <Label className="text-[12px] font-black uppercase tracking-widest text-[#616161]">Hero Title</Label>
+                        </div>
+                        <div className="p-10 space-y-10">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                                <div className="space-y-4">
+                                    <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-white/70 ml-2">Executive Title</Label>
                                     <Input 
                                         value={settings.homepageTitle} 
                                         onChange={(e) => handleChange('homepageTitle', e.target.value)}
-                                        className="h-10 border-[#D2D2D2] rounded-lg focus:ring-black"
+                                        className="h-16 bg-white/[0.03] border-white/5 rounded-2xl px-8 text-[16px] font-black text-white focus:bg-white/[0.05] focus:border-white/20 transition-all outline-none"
+                                        disabled={!canEdit('settings')}
                                     />
                                 </div>
-                                <div className="space-y-2">
-                                    <Label className="text-[12px] font-black uppercase tracking-widest text-[#616161]">Hero Subtitle</Label>
+                                <div className="space-y-4">
+                                    <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-white/70 ml-2">Operational Subtitle</Label>
                                     <Input 
                                         value={settings.homepageSubtitle} 
                                         onChange={(e) => handleChange('homepageSubtitle', e.target.value)}
-                                        className="h-10 border-[#D2D2D2] rounded-lg focus:ring-black"
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <Label className="text-[12px] font-black uppercase tracking-widest text-[#616161]">Hero Dynamic Watermark</Label>
-                                    <Input 
-                                        value={settings.heroWatermark} 
-                                        onChange={(e) => handleChange('heroWatermark', e.target.value)}
-                                        placeholder="AUTHENTIC"
-                                        className="h-10 border-[#D2D2D2] rounded-lg focus:ring-black"
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <Label className="text-[12px] font-black uppercase tracking-widest text-[#616161]">About / Description Text</Label>
-                                    <Textarea 
-                                        value={settings.aboutText} 
-                                        onChange={(e) => handleChange('aboutText', e.target.value)}
-                                        className="min-h-[100px] border-[#D2D2D2] rounded-lg focus:ring-black resize-none"
-                                    />
-                                </div>
-                                <div className="space-y-4 pt-4">
-                                    <Label className="text-[12px] font-black uppercase tracking-widest text-[#616161]">Hero Dynamic Backdrop</Label>
-                                    <ImageUpload 
-                                        value={settings.homepageImage ? [settings.homepageImage] : []}
-                                        onChange={(urls) => handleChange('homepageImage', urls[0] || "")}
-                                        onRemove={() => handleChange('homepageImage', "")}
+                                        className="h-16 bg-white/[0.03] border-white/5 rounded-2xl px-8 text-[16px] font-black text-white focus:bg-white/[0.05] focus:border-white/20 transition-all outline-none"
+                                        disabled={!canEdit('settings')}
                                     />
                                 </div>
                             </div>
-                        </CardContent>
-                    </Card>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                                <div className="space-y-4">
+                                     <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-white/70 ml-2">Dynamic Watermark</Label>
+                                     <Input 
+                                         value={settings.heroWatermark} 
+                                         onChange={(e) => handleChange('heroWatermark', e.target.value)}
+                                         className="h-16 bg-white/[0.03] border-white/5 rounded-2xl px-8 text-[14px] font-black tracking-widest text-blue-400 focus:bg-white/[0.05] focus:border-white/20 transition-all outline-none uppercase"
+                                         disabled={!canEdit('settings')}
+                                     />
+                                </div>
+                                 <div className="space-y-4">
+                                     <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-white/70 ml-2">Visual Atmosphere Background</Label>
+                                     <div className="bg-white/[0.02] p-6 rounded-[28px] border border-white/5 group transition-all hover:bg-white/[0.04]">
+                                         <ImageUpload 
+                                             value={settings.homepageImage ? [settings.homepageImage] : []}
+                                             onChange={(urls) => handleChange('homepageImage', urls[0] || "")}
+                                             onRemove={() => handleChange('homepageImage', "")}
+                                             disabled={!canEdit('settings')}
+                                         />
+                                     </div>
+                                 </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Critical Communication Hub */}
+                    <div className="glass-card rounded-[48px] border border-white/5 shadow-2xl overflow-hidden bg-[#0A0A0A]/40 backdrop-blur-3xl">
+                        <div className="bg-white/[0.03] p-10 border-b border-white/5 flex items-center justify-between">
+                            <div className="flex items-center gap-5">
+                                <div className="w-12 h-12 rounded-[18px] bg-white/5 border border-white/10 flex items-center justify-center text-white/60">
+                                    <Phone className="w-6 h-6" />
+                                </div>
+                                <div>
+                                    <h2 className="text-[18px] font-black uppercase tracking-tight text-white italic">Connectivity Protocol</h2>
+                                    <p className="text-[10px] font-bold text-white/20 uppercase tracking-[0.2em] mt-1">Official Response Channels</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="p-10 space-y-10">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                                <div className="space-y-4">
+                                    <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-white/70 ml-2">Primary Email Relay</Label>
+                                    <div className="relative">
+                                         <Mail className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+                                         <Input 
+                                             value={settings.contactEmail} 
+                                             onChange={(e) => handleChange('contactEmail', e.target.value)}
+                                             className="h-16 bg-white/[0.03] border-white/5 rounded-2xl pl-16 pr-8 text-[15px] font-black text-white focus:bg-white/[0.05] focus:border-white/20 transition-all outline-none"
+                                             disabled={!canEdit('settings')}
+                                         />
+                                    </div>
+                                </div>
+                                <div className="space-y-4">
+                                    <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-white/70 ml-2">Secure Voice Line</Label>
+                                    <div className="relative">
+                                         <Phone className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+                                         <Input 
+                                             value={settings.contactPhone} 
+                                             onChange={(e) => handleChange('contactPhone', e.target.value)}
+                                             className="h-16 bg-white/[0.03] border-white/5 rounded-2xl pl-16 pr-8 text-[15px] font-black text-white focus:bg-white/[0.05] focus:border-white/20 transition-all outline-none"
+                                             disabled={!canEdit('settings')}
+                                         />
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                                <div className="space-y-4">
+                                    <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-white/70 ml-2">WhatsApp Direct Vector</Label>
+                                    <div className="relative">
+                                        <Zap className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
+                                        <Input 
+                                            value={settings.whatsappNumber}
+                                            onChange={(e) => handleChange('whatsappNumber', e.target.value)}
+                                            className="h-16 bg-white/[0.03] border-white/5 rounded-2xl pl-16 pr-8 text-[15px] font-black text-white focus:bg-white/[0.05] focus:border-white/20 transition-all outline-none"
+                                            disabled={!canEdit('settings')}
+                                        />
+                                    </div>
+                                </div>
+                                <div className="space-y-4">
+                                    <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-white/70 ml-2">Physical HQ Navigation</Label>
+                                    <div className="relative">
+                                         <MapPin className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+                                         <Input 
+                                             value={settings.address}
+                                             onChange={(e) => handleChange('address', e.target.value)}
+                                             className="h-16 bg-white/[0.03] border-white/5 rounded-2xl pl-16 pr-8 text-[15px] font-black text-white focus:bg-white/[0.05] focus:border-white/20 transition-all outline-none"
+                                             disabled={!canEdit('settings')}
+                                         />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <div className="space-y-8">
-                    {/* Appearance */}
-                    <Card className="border-[#E3E3E3] shadow-sm rounded-xl overflow-hidden">
-                        <CardHeader className="bg-[#F9F9F9] border-b border-[#F1F1F1] p-6">
-                            <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-lg bg-white border border-[#E3E3E3] flex items-center justify-center shadow-sm">
-                                    <Layout className="w-5 h-5 text-black" />
-                                </div>
-                                <CardTitle className="text-[15px] font-black uppercase tracking-tight">Appearance</CardTitle>
+                <div className="lg:col-span-1 space-y-12">
+                    {/* System Logic Control */}
+                    <div className="glass-card rounded-[48px] border border-white/5 shadow-2xl p-10 bg-[#0A0A0A]/40 backdrop-blur-3xl space-y-10 relative overflow-hidden">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 blur-[60px] pointer-events-none" />
+                        <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center border border-white/10 shadow-lg">
+                                <Activity className="w-6 h-6 text-white/60" />
                             </div>
-                        </CardHeader>
-                        <CardContent className="p-6 space-y-4">
-                            <div className="flex items-center justify-between">
-                                <span className="text-[13px] font-bold text-[#333]">Luxury UI Core</span>
-                                <Switch 
-                                    checked={settings.luxuryTheme === 'true'} 
-                                    onCheckedChange={(val) => handleToggle('luxuryTheme', val)}
-                                />
-                            </div>
-                            <div className="flex items-center justify-between">
-                                <span className="text-[13px] font-bold text-[#333]">Maintenance Mode</span>
-                                <Switch 
-                                    checked={settings.maintenanceMode === 'true'} 
-                                    onCheckedChange={(val) => handleToggle('maintenanceMode', val)}
-                                />
-                            </div>
-                        </CardContent>
-                    </Card>
-
-                    {/* Social Connectivity */}
-                    <Card className="border-[#E3E3E3] shadow-sm rounded-xl overflow-hidden">
-                        <CardHeader className="bg-[#F9F9F9] border-b border-[#F1F1F1] p-6">
-                            <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-lg bg-white border border-[#E3E3E3] flex items-center justify-center shadow-sm">
-                                    <Share2 className="w-5 h-5 text-black" />
-                                </div>
-                                <CardTitle className="text-[15px] font-black uppercase tracking-tight">Social Media</CardTitle>
-                            </div>
-                        </CardHeader>
-                        <CardContent className="p-6 space-y-4">
+                            <h3 className="text-[15px] font-black uppercase tracking-widest text-white italic">Operational Logic</h3>
+                        </div>
+                        
+                        <div className="space-y-6">
                             {[
-                                { id: 'instagramUrl', label: 'Instagram', icon: 'https://cdn-icons-png.flaticon.com/512/174/174855.png' },
-                                { id: 'facebookUrl', label: 'Facebook', icon: 'https://cdn-icons-png.flaticon.com/512/124/124010.png' },
-                                { id: 'twitterUrl', label: 'Twitter', icon: 'https://cdn-icons-png.flaticon.com/512/124/124021.png' },
-                            ].map((social) => (
-                                <div key={social.id} className="space-y-2">
-                                    <Label className="text-[10px] font-black uppercase tracking-[0.1em] text-[#8A8A8A]">{social.label}</Label>
-                                    <Input 
-                                        value={settings[social.id]} 
-                                        onChange={(e) => handleChange(social.id, e.target.value)}
-                                        placeholder={`https://...`}
-                                        className="h-9 text-[12px] border-[#D2D2D2] rounded-lg"
+                                { id: 'luxuryTheme', label: 'Ultra Core Engine v4', sub: 'Adaptive high-performance UI', value: settings.luxuryTheme === 'true', icon: Zap },
+                                { id: 'maintenanceMode', label: 'Stasis / Lockdown Mode', sub: 'System offline for deployment', value: settings.maintenanceMode === 'true', icon: Shield },
+                            ].map((opt) => (
+                                <div 
+                                    key={opt.id}
+                                    onClick={() => canEdit('settings') && handleToggle(opt.id, !opt.value)}
+                                    className={cn(
+                                        "flex items-center justify-between p-6 rounded-[28px] border transition-all cursor-pointer group/opt",
+                                        opt.value 
+                                            ? "bg-white/5 border-white/20 shadow-lg shadow-white/5" 
+                                            : "bg-white/[0.01] border-white/5 hover:border-white/10"
+                                    )}
+                                >
+                                    <div className="flex items-center gap-4">
+                                        <div className={cn(
+                                            "w-10 h-10 rounded-xl flex items-center justify-center transition-all",
+                                            opt.value ? "bg-white text-black" : "bg-white/5 text-white/20 group-hover/opt:text-white"
+                                        )}>
+                                            <opt.icon className="w-5 h-5" />
+                                        </div>
+                                        <div className="flex flex-col">
+                                            <span className="text-[13px] font-black text-white uppercase tracking-tight">{opt.label}</span>
+                                            <span className="text-[9px] font-bold text-white/20 uppercase tracking-[0.1em]">{opt.sub}</span>
+                                        </div>
+                                    </div>
+                                    <Switch 
+                                        checked={opt.value} 
+                                        onCheckedChange={(val) => handleToggle(opt.id, val)}
+                                        disabled={!canEdit('settings')}
+                                        className="data-[state=checked]:bg-white data-[state=unchecked]:bg-white/10"
                                     />
                                 </div>
                             ))}
-                        </CardContent>
-                    </Card>
-
-                    {/* System Status */}
-                    <div className="bg-[#111111] rounded-xl p-6 text-white space-y-4">
-                        <div className="flex items-center gap-2">
-                            <CheckCircle2 className="w-4 h-4 text-[#25D366]" />
-                            <span className="text-[11px] font-black uppercase tracking-[0.2em]">All Systems Nominal</span>
                         </div>
-                        <p className="text-[12px] text-white/60 font-medium">
-                            The Local Bazar core is running version <span className="text-white font-black">2.4.0-Platinum</span>.
-                        </p>
-                        <div className="h-1 w-full bg-white/10 rounded-full overflow-hidden">
-                            <div className="h-full bg-[#25D366] w-[100%] shadow-[0_0_8px_#25D366]" />
+                    </div>
+
+                    {/* Social Resonance */}
+                    <div className="glass-card rounded-[48px] border border-white/5 shadow-2xl p-10 bg-[#0A0A0A]/40 backdrop-blur-3xl space-y-10">
+                        <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center border border-white/10 shadow-lg">
+                                <Share2 className="w-6 h-6 text-white/60" />
+                            </div>
+                            <h3 className="text-[15px] font-black uppercase tracking-widest text-white italic">Social Signal Hub</h3>
+                        </div>
+                        
+                        <div className="space-y-6">
+                            {[
+                                { id: 'instagramUrl', label: 'Instagram Vector', icon: Instagram, color: 'text-pink-500' },
+                                { id: 'facebookUrl', label: 'Facebook Matrix', icon: Facebook, color: 'text-blue-500' },
+                                { id: 'twitterUrl', label: 'X (Twitter) Link', icon: Twitter, color: 'text-sky-400' },
+                            ].map((social) => (
+                                <div key={social.id} className="space-y-3">
+                                    <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-white/20 ml-2">{social.label}</Label>
+                                    <div className="relative group/input">
+                                         <social.icon className={cn("absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 transition-all group-focus-within/input:scale-110", social.color)} />
+                                         <Input 
+                                             value={settings[social.id]} 
+                                             onChange={(e) => handleChange(social.id, e.target.value)}
+                                             placeholder="https://identity..."
+                                             className="h-14 bg-white/[0.03] border-white/5 rounded-[22px] pl-16 text-[12px] font-black text-white focus:bg-white/[0.05] focus:border-white/20 transition-all outline-none"
+                                             disabled={!canEdit('settings')}
+                                         />
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Core Integrity Status */}
+                    <div className="bg-white text-black rounded-[40px] p-10 space-y-6 shadow-[0_40px_100px_rgba(255,255,255,0.1)] relative overflow-hidden group">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-black/5 blur-[50px] pointer-events-none group-hover:scale-150 transition-transform duration-1000" />
+                        <div className="flex items-center gap-3">
+                            <div className="relative">
+                                <div className="absolute -inset-2 bg-emerald-500 blur-md opacity-20 rounded-full animate-pulse" />
+                                <CheckCircle2 className="w-5 h-5 text-emerald-600 relative" />
+                            </div>
+                            <span className="text-[11px] font-black uppercase tracking-[0.4em] italic">System Status: NOMINAL</span>
+                        </div>
+                        <div className="space-y-2">
+                             <p className="text-[13px] font-black leading-tight">PLATINUM CORE v2.4.0</p>
+                             <p className="text-[11px] font-medium opacity-40 uppercase tracking-tighter">Architecture by AI Operators Group Elite</p>
+                        </div>
+                        <div className="h-2 w-full bg-black/5 rounded-full overflow-hidden">
+                            <div className="h-full bg-emerald-500 w-[100%] shadow-[0_0_15px_rgba(16,185,129,0.5)]" />
                         </div>
                     </div>
                 </div>

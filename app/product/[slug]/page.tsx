@@ -87,7 +87,7 @@ export default async function ProductPage({
     const allSimilar = await getAllProducts(catToFetch);
 
     // Scramble the identical array so identical products aren't always in identical position
-    const shuffledSimilar = [...allSimilar].sort(() => 0.5 - Math.random());
+    const shuffledSimilar = allSimilar;
 
     // Filter out the current product and take only first 5
     const similarProducts = shuffledSimilar

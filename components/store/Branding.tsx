@@ -3,6 +3,17 @@
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/components/providers/language-provider";
+import { useEffect, useState } from "react";
+import { getAdminSettings } from "@/lib/actions/admin";
+import Image from "next/image";
+
+interface BrandingSize {
+    text: string;
+    luxuryText: string;
+    divider: string;
+    gap: string;
+    imageHeight: number;
+}
 
 interface BrandingProps {
     className?: string;
@@ -12,101 +23,123 @@ interface BrandingProps {
     align?: "left" | "center" | "right";
 }
 
+function LogoContent({ logoUrl, s, align, variant, light }: { logoUrl: string | null, s: BrandingSize, align: string, variant: string, light: boolean }) {
+    if (logoUrl) {
+        return (
+            <div className={cn("relative flex items-center", align === "center" && "justify-center")} style={{ height: `${s.imageHeight}px` }}>
+                <Image 
+                    src={logoUrl} 
+                    alt="Local Bazar" 
+                    fill
+                    className={cn(
+                        "object-contain transition-all duration-700 brightness-0",
+                        light ? "invert grayscale" : "grayscale-0 invert-0"
+                    )}
+                    unoptimized
+                />
+            </div>
+        );
+    }
+
+    if (variant === "luxury") {
+        return (
+            <div className={cn("flex items-center gap-1 group")} dir="ltr">
+                <span className={cn(
+                    "font-serif font-light tracking-[0.2em]",
+                    s.luxuryText,
+                    light ? "text-white" : "text-black"
+                )}>
+                    LOCAL
+                </span>
+                <div className={cn(
+                    "flex flex-col gap-0.5 border-l pl-2 ml-1",
+                    light ? "text-white/80 border-white/20" : "text-black/80 border-black/20"
+                )}>
+                    <span className="text-[13px] font-black tracking-[0.3em] uppercase opacity-40">Bazar</span>
+                </div>
+            </div>
+        );
+    }
+
+    return (
+        <div className={cn("flex items-center", s.gap)} dir="ltr">
+            <span className={cn(
+                "font-serif font-light tracking-[-0.02em]",
+                s.text,
+                light ? "text-white" : "text-black"
+            )}>
+                LOCAL
+            </span>
+            <div className={cn(
+                "w-[1px] rotate-[20deg]",
+                s.divider,
+                light ? "bg-white/20" : "bg-zinc-200"
+            )} />
+            <span className={cn(
+                "font-serif font-bold tracking-[-0.02em] text-brand-burgundy",
+                s.text
+            )}>
+                BAZAR
+            </span>
+        </div>
+    );
+}
+
 export function Branding({ className, size = "md", variant = "default", light = false, align = "center" }: BrandingProps) {
-    const { t, language } = useLanguage();
-    const isAr = language === 'ar';
+    const { language } = useLanguage();
+    // We ignore the actual language for the logo text as per user request
+    const [logoUrl, setLogoUrl] = useState<string | null>(null);
+
+    useEffect(() => {
+        async function loadLogo() {
+            try {
+                const settings = await getAdminSettings();
+                if (settings && settings.website_logo_url) {
+                    setLogoUrl(settings.website_logo_url);
+                }
+            } catch (error) {
+                console.error("Failed to load branding logo:", error);
+            }
+        }
+        loadLogo();
+    }, []);
 
     const sizes = {
         sm: {
-            text: "text-[16px]",
-            luxuryText: "text-[20px]",
-            letterSize: "text-[6px]",
+            text: "text-[18px]",
+            luxuryText: "text-[22px]",
             divider: "h-4",
-            gap: "gap-2"
+            gap: "gap-2",
+            imageHeight: 28
         },
         md: {
-            text: "text-[18px] lg:text-[26px]",
-            luxuryText: "text-[28px] lg:text-[34px]",
-            letterSize: "text-[8px]",
-            divider: "h-5 lg:h-7",
-            gap: "gap-2 lg:gap-4"
+            text: "text-[18px] lg:text-[30px]",
+            luxuryText: "text-[24px] lg:text-[40px]",
+            divider: "h-5 lg:h-8",
+            gap: "gap-1 lg:gap-4",
+            imageHeight: 40
         },
         lg: {
-            text: "text-[24px] lg:text-[36px]",
-            luxuryText: "text-[32px] lg:text-[42px]",
-            letterSize: "text-[10px]",
-            divider: "h-6 lg:h-9",
-            gap: "gap-3 lg:gap-5"
+            text: "text-[24px] lg:text-[42px]",
+            luxuryText: "text-[32px] lg:text-[52px]",
+            divider: "h-6 lg:h-12",
+            gap: "gap-2 lg:gap-6",
+            imageHeight: 60
         }
     };
 
     const s = sizes[size];
 
-    if (variant === "luxury") {
-        return (
-            <div className={cn(
-                "flex flex-col",
-                align === "center" && "items-center text-center",
-                align === "left" && (isAr ? "items-end text-right" : "items-start text-left"),
-                align === "right" && (isAr ? "items-start text-left" : "items-end text-right"),
-                className
-            )}>
-                <Link href="/" className={cn(
-                    "flex flex-col gap-2 group transition-all duration-700",
-                    align === "center" && "items-center",
-                    align === "left" && (isAr ? "items-end" : "items-start"),
-                    align === "right" && (isAr ? "items-start" : "items-end")
-                )}>
-                    <div className={cn("flex items-center gap-2 group", isAr && "flex-row-reverse")}>
-                        <span className={cn(
-                            "font-serif font-light tracking-[0.2em] transition-all duration-700",
-                            s.luxuryText,
-                            light ? "text-white" : "text-black"
-                        )}>
-                            {isAr ? "لوكال" : "LOCAL"}
-                        </span>
-                        <div className={cn(
-                            "flex flex-col gap-0.5 font-bold leading-[1.1] transition-all duration-700",
-                            s.letterSize,
-                            light ? "text-white/80 border-white/20" : "text-black/80 border-black/20",
-                            isAr ? "border-r pr-2 mr-1" : "border-l pl-2 ml-1"
-                        )}>
-                            <span className="tracking-widest">{t('header.logo.letter1')}</span>
-                            <span className="tracking-widest">{t('header.logo.letter2')}</span>
-                            <span className="tracking-widest">{t('header.logo.letter3')}</span>
-                            <span className="tracking-widest">{t('header.logo.letter4')}</span>
-                            <span className="tracking-widest">{t('header.logo.letter5')}</span>
-                        </div>
-                    </div>
-                </Link>
-            </div>
-        )
-    }
-
     return (
-        <div className={cn("flex flex-col items-center flex-shrink-0", className)} dir="ltr">
-            <Link href="/" className="group relative">
-                <div className={cn("flex items-center", s.gap)}>
-                    <span className={cn(
-                        "font-serif font-light tracking-[-0.02em] transition-all group-hover:tracking-[0.15em] duration-700",
-                        s.text,
-                        light ? "text-white" : "text-black"
-                    )}>
-                        LOCAL
-                    </span>
-                    <div className={cn(
-                        "w-[1px] rotate-[20deg] transition-transform duration-700 group-hover:rotate-[45deg]",
-                        s.divider,
-                        light ? "bg-white/20" : "bg-zinc-200"
-                    )} />
-                    <span className={cn(
-                        "font-serif font-bold tracking-[-0.02em] text-brand-burgundy transition-all group-hover:tracking-[0.15em] duration-700",
-                        s.text
-                    )}>
-                        BAZAR
-                    </span>
-                </div>
-                <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-0 h-[1.5px] bg-brand-burgundy group-hover:w-full transition-all duration-700" />
+        <div className={cn(
+            "flex flex-col transition-all duration-700",
+            align === "center" && "items-center text-center",
+            align === "left" && "items-start text-left",
+            align === "right" && "items-end text-right",
+            className
+        )}>
+            <Link href="/" className="group relative block w-full h-full">
+                <LogoContent logoUrl={logoUrl} s={s} align={align} variant={variant} light={light} />
             </Link>
         </div>
     );

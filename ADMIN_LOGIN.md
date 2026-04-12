@@ -6,7 +6,7 @@
 
 **Username:** admin  
 **Email:** admin@localbazar.com  
-**Password:** localbazar_admin_2024!
+**Password:** localbazaraio
 
 ---
 

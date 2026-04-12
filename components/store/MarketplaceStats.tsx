@@ -51,17 +51,17 @@ export function MarketplaceStats() {
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ delay: i * 0.1 }}
-                            className="group relative p-6 rounded-2xl bg-zinc-50/50 dark:bg-white/[0.03] border border-zinc-200 dark:border-white/5 hover:border-brand-burgundy/20 dark:hover:border-white/10 transition-all duration-300 backdrop-blur-sm shadow-sm"
+                            className="group relative p-6 rounded-2xl bg-white/5 border border-white/10 hover:border-white/30 transition-all duration-300 backdrop-blur-sm shadow-sm"
                         >
                             <div className="flex items-center gap-4">
                                 <div className={cn("p-3 rounded-xl", stat.bg, stat.color)}>
                                     <stat.icon className="w-5 h-5" />
                                 </div>
                                 <div>
-                                    <p className="text-[10px] font-bold uppercase tracking-wider text-zinc-500">
+                                    <p className="text-[10px] font-bold uppercase tracking-wider text-white/50">
                                         {stat.label}
                                     </p>
-                                    <h3 className="text-xl md:text-2xl font-black text-zinc-900 dark:text-white italic tracking-tighter">
+                                    <h3 className="text-xl md:text-2xl font-black text-white italic tracking-tighter">
                                         {stat.value}
                                     </h3>
                                 </div>
@@ -72,19 +72,19 @@ export function MarketplaceStats() {
             </div>
 
             {/* Subtle Activity Ticker */}
-            <div className="mt-12 border-t border-zinc-200 dark:border-white/5 py-3 overflow-hidden flex relative">
+            <div className="mt-12 border-t border-white/10 py-3 overflow-hidden flex relative">
                 <div className="flex animate-marquee whitespace-nowrap items-center">
                     {[1, 2, 3].map((_, idx) => (
                         <div key={idx} className="flex gap-12 items-center px-6">
-                            <span className="text-[10px] font-medium text-zinc-500 flex items-center gap-2">
+                            <span className="text-[10px] font-medium text-white/50 flex items-center gap-2">
                                 <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full" />
                                 {t('stats.ticker1')}
                             </span>
-                            <span className="text-[10px] font-medium text-zinc-500 flex items-center gap-2">
+                            <span className="text-[10px] font-medium text-white/50 flex items-center gap-2">
                                 <span className="w-1.5 h-1.5 bg-blue-500 rounded-full" />
                                 {t('stats.ticker2')}
                             </span>
-                            <span className="text-[10px] font-medium text-zinc-500 flex items-center gap-2">
+                            <span className="text-[10px] font-medium text-white/50 flex items-center gap-2">
                                 <span className="w-1.5 h-1.5 bg-indigo-500 rounded-full" />
                                 {t('stats.ticker3')}
                             </span>

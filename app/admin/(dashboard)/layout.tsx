@@ -1,20 +1,33 @@
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
 import { AdminHeader } from "@/components/admin/AdminHeader";
+import { PageTransition } from "@/components/admin/PageTransition";
+import { NotificationManager } from "@/components/admin/NotificationManager";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { redirect } from "next/navigation";
 
-export default function AdminLayout({
+export default async function AdminLayout({
     children,
 }: {
     children: React.ReactNode;
 }) {
+    const session = await getServerSession(authOptions);
+
+    if (!session || !session.user) {
+        redirect("/admin/login");
+    }
+
+
     return (
-        <div className="flex h-screen w-full overflow-hidden" style={{ background: '#F1F1F1', color: '#303030' }}>
+        <div className="flex h-screen w-full overflow-hidden bg-[#050505] text-white relative antialiased selection:bg-white/10 selection:text-white" dir="ltr">
+            <NotificationManager />
             <AdminSidebar />
-            <div className="flex flex-col flex-1 min-w-0 h-full overflow-hidden" style={{ background: '#F1F1F1' }}>
+            <div className="flex flex-col flex-1 min-w-0 h-full overflow-hidden">
                 <AdminHeader />
-                <main className="flex-1 overflow-y-auto" style={{ background: '#F1F1F1' }}>
-                    <div className="max-w-[1200px] mx-auto p-4 md:p-6 lg:p-8 space-y-6 pb-32">
+                <main className="flex-1 overflow-y-auto bg-[#050505]">
+                    <PageTransition>
                         {children}
-                    </div>
+                    </PageTransition>
                 </main>
             </div>
         </div>
