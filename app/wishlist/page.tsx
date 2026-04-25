@@ -62,8 +62,8 @@ export default function WishlistPage() {
                                     name: item.name,
                                     price: item.price,
                                     slug: item.slug,
-                                    category: (item.category || "Fashion") as any,
-                                    images: item.image // Fallback
+                                    category: { name: (item.category as string) || "Fashion", slug: (item.category as string)?.toLowerCase().replace(/\s+/g, '-') || "fashion" },
+                                    images: item.image || ""
                                 } as any}
                             />
                         ))}

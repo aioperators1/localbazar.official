@@ -73,6 +73,18 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
 
 export const useCurrency = () => {
     const context = useContext(CurrencyContext);
-    if (!context) throw new Error("useCurrency must be used within a CurrencyProvider");
+    
+    // Provide a safe fallback during SSR or if context is missing
+    if (!context) {
+        return {
+            currency: "QAR" as Currency,
+            setCurrency: () => {},
+            formatPrice: (price: number | string) => {
+                const num = typeof price === "string" ? parseFloat(price) : price;
+                return `${num?.toLocaleString() || 0} QAR`;
+            },
+            exchangeRate: 1
+        };
+    }
     return context;
 };

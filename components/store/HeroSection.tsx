@@ -33,9 +33,9 @@ export function HeroSection({ banners }: { banners?: Banner[] }) {
     }, [next]);
 
     return (
-        <section className="relative w-full h-[90vh] sm:h-[70vh] lg:h-[100vh] overflow-hidden bg-[#0A0A0A] group">
+        <section className="relative w-full overflow-hidden bg-[#0A0A0A] group">
             {/* ── THE LUXURY IMAGE-ONLY HERO ── */}
-            <div className="absolute inset-0">
+            <div className="relative w-full h-[70vh] sm:h-auto sm:aspect-[4/3] md:aspect-[16/9] lg:aspect-[2/1] xl:aspect-[21/9] max-h-[900px]">
                 {/* Slides Container */}
                 {slides.map((slide, idx) => {
                     const isActive = idx === current;
@@ -54,12 +54,14 @@ export function HeroSection({ banners }: { banners?: Banner[] }) {
                                         src={slide.image} 
                                         alt="Banner" 
                                         fill 
+                                        sizes="100vw"
+                                        quality={100}
+                                        unoptimized
                                         className={cn(
-                                            "object-cover transition-all duration-1000",
+                                            "object-cover object-center transition-all duration-1000",
                                             isActive ? "opacity-100" : "opacity-0"
                                         )}
                                         priority={idx === 0}
-                                        unoptimized
                                     />
                                 </div>
 
@@ -69,12 +71,14 @@ export function HeroSection({ banners }: { banners?: Banner[] }) {
                                         src={slide.mobileImage} 
                                         alt="Mobile Banner" 
                                         fill 
+                                        sizes="100vw"
+                                        quality={100}
+                                        unoptimized
                                         className={cn(
-                                            "object-cover transition-opacity duration-1000",
+                                            "object-cover object-top transition-opacity duration-1000",
                                             isActive ? "opacity-100" : "opacity-0"
                                         )}
                                         priority={idx === 0}
-                                        unoptimized
                                     />
                                 </div>
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Plus, Trash2, Edit2, X, Tag, Shield, Zap, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -44,6 +44,24 @@ export default function BrandsClient({ initialBrands }: { initialBrands: Brand[]
         showInHome: false
     });
 
+    const [nameError, setNameError] = useState<string | null>(null);
+
+    // Real-time duplicate name check
+    useEffect(() => {
+        if (!formData.name.trim()) {
+            setNameError(null);
+            return;
+        }
+        const duplicate = brands.find(
+            b => b.name.toLowerCase() === formData.name.trim().toLowerCase() && b.id !== isEditing
+        );
+        if (duplicate) {
+            setNameError(`This name is already used by another brand. Please choose a different name.`);
+        } else {
+            setNameError(null);
+        }
+    }, [formData.name, brands, isEditing]);
+
     const resetForm = () => {
         setFormData({ name: "", nameAr: "", slug: "", logo: "", description: "", descriptionAr: "", featured: false, showInHome: false });
         setIsEditing(null);
@@ -53,6 +71,7 @@ export default function BrandsClient({ initialBrands }: { initialBrands: Brand[]
     const handleCreate = async () => {
         if (!canEdit('brands')) return toast.error("ACCESS DENIED: EDITOR PERMISSION REQUIRED");
         if (!formData.name) return toast.error("Brand name is required");
+        if (nameError) return toast.error(nameError);
         setLoading(true);
         const res = await createBrand(formData);
         if (res.success) {
@@ -60,13 +79,14 @@ export default function BrandsClient({ initialBrands }: { initialBrands: Brand[]
             resetForm();
             window.location.reload();
         } else {
-            toast.error("INITIALIZATION FAILED");
+            toast.error(res.error || "INITIALIZATION FAILED");
         }
         setLoading(false);
     };
 
     const handleUpdate = async (id: string) => {
         if (!canEdit('brands')) return toast.error("ACCESS DENIED: EDITOR PERMISSION REQUIRED");
+        if (nameError) return toast.error(nameError);
         setLoading(true);
         const res = await updateBrand(id, formData);
         if (res.success) {
@@ -74,7 +94,7 @@ export default function BrandsClient({ initialBrands }: { initialBrands: Brand[]
             resetForm();
             window.location.reload();
         } else {
-            toast.error("SYNCHRONIZATION ERROR");
+            toast.error(res.error || "SYNCHRONIZATION ERROR");
         }
         setLoading(false);
     };
@@ -111,62 +131,43 @@ export default function BrandsClient({ initialBrands }: { initialBrands: Brand[]
     };
 
     return (
-        <div className="space-y-12 pb-20 animate-in fade-in duration-1000">
-            {/* 🌌 ULTRA PRO HEADER */}
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-10">
-                <div className="space-y-4">
-                    <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 bg-white/5 rounded-[20px] flex items-center justify-center border border-white/10 shadow-2xl">
-                            <Shield className="w-6 h-6 text-white/40" />
-                        </div>
-                        <div>
-                            <h1 className="text-4xl font-black text-white tracking-tighter uppercase italic leading-none">Brand Ecosystem</h1>
-                            <p className="text-[12px] font-bold text-white/30 uppercase tracking-[0.4em] mt-2 ml-1">Corporate Identity Registry</p>
-                        </div>
-                    </div>
+        <div className="space-y-8 pb-16">
+            {/* Header */}
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+                <div>
+                    <h1 className="text-3xl font-bold text-black tracking-tight mb-2">Brands</h1>
+                    <p className="text-[13px] text-gray-500">Manage brand identities and information.</p>
                 </div>
                 {!isCreating && canEdit('brands') && (
-                    <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}>
-                        <Button 
-                            onClick={() => setIsCreating(true)} 
-                            className="bg-white text-black hover:bg-white/90 h-14 px-10 rounded-[22px] font-black text-[12px] uppercase tracking-widest transition-all hover:scale-105 active:scale-95 shadow-2xl shadow-white/5"
-                        >
-                            <Plus className="w-5 h-5 mr-3" /> Initialize Brand
-                        </Button>
-                    </motion.div>
+                    <Button 
+                        onClick={() => setIsCreating(true)} 
+                        className="bg-black text-white hover:bg-gray-800 h-10 px-6 rounded-lg text-[12px] font-semibold uppercase tracking-wider shadow-sm transition-all"
+                    >
+                        <Plus className="w-4 h-4 mr-2" /> Add Brand
+                    </Button>
                 )}
             </div>
 
             <AnimatePresence mode="wait">
                 {isCreating && (
-                    <motion.div 
-                        initial={{ opacity: 0, y: -20, scale: 0.98 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: -20, scale: 0.98 }}
-                        className="glass-card p-12 rounded-[48px] border border-white/10 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.8)] space-y-12 relative overflow-hidden bg-[#0A0A0A]/60 backdrop-blur-3xl"
-                    >
-                        <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 blur-[100px] rounded-full -translate-y-1/2 translate-x-1/2" />
-                        
-                        <div className="flex items-center justify-between relative z-10">
-                             <div className="flex items-center gap-5">
-                                 <div className="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center border border-white/10">
-                                     <Tag className="w-6 h-6 text-white/60" />
-                                 </div>
+                    <div className="bg-white border border-gray-200 rounded-xl p-8 shadow-sm space-y-8 animate-in fade-in slide-in-from-top-4">
+                        <div className="flex items-center justify-between">
+                             <div className="flex items-center gap-3">
+                                 <Tag className="w-5 h-5 text-gray-500" />
                                  <div>
-                                     <h2 className="text-2xl font-black text-white uppercase tracking-tight italic">{isEditing ? "Synchronize Entity" : "Entity Specification"}</h2>
-                                     <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.3em]">Configure administrative parameters</p>
+                                     <h2 className="text-[16px] font-bold text-black tracking-tight">{isEditing ? "Edit Brand" : "New Brand"}</h2>
                                  </div>
                              </div>
-                             <Button variant="ghost" onClick={resetForm} className="h-12 w-12 p-0 rounded-2xl hover:bg-white/5 text-white/20 hover:text-white transition-all">
-                                 <X className="w-6 h-6" />
+                             <Button variant="ghost" onClick={resetForm} className="h-8 w-8 p-0 text-gray-400 hover:text-black hover:bg-gray-100 rounded-md">
+                                 <X className="w-5 h-5" />
                              </Button>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-16 relative z-10">
-                            <div className="space-y-10">
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                    <div className="space-y-4">
-                                        <Label className="text-[11px] font-black uppercase tracking-[0.3em] text-white/70 ml-2">Brand Identity (EN)</Label>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                            <div className="space-y-6">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div className="space-y-2">
+                                        <Label className="text-[12px] font-semibold text-gray-700">Brand Name (EN)</Label>
                                         <Input 
                                             value={formData.name}
                                             onChange={(e) => {
@@ -177,74 +178,66 @@ export default function BrandsClient({ initialBrands }: { initialBrands: Brand[]
                                                     slug: isEditing ? formData.slug : val.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '')
                                                 });
                                             }}
-                                            placeholder="e.g. LUXURY_ESTATE"
-                                            className="h-16 bg-white/[0.03] border-white/5 rounded-2xl px-8 text-[16px] font-black text-white placeholder-white/10 focus:bg-white/[0.05] focus:border-white/20 focus:ring-4 focus:ring-white/5 transition-all outline-none"
+                                            placeholder="e.g. Acme Studio"
+                                            className={cn(
+                                                "bg-white border-gray-200 h-10 text-[13px] text-black rounded-lg outline-none",
+                                                nameError && "border-red-400 focus:border-red-500 focus:ring-red-500"
+                                            )}
                                         />
+                                        {nameError && (
+                                            <p className="text-[11px] text-red-500 font-medium mt-1">{nameError}</p>
+                                        )}
                                     </div>
-                                    <div className="space-y-4">
-                                        <Label className="text-[11px] font-black uppercase tracking-[0.3em] text-white/70 mr-2 text-right block">اسم العلامة التجارية (AR)</Label>
+                                    <div className="space-y-2">
+                                        <Label className="text-[12px] font-semibold text-gray-700 block text-right">اسم العلامة التجارية (AR)</Label>
                                         <Input 
                                             value={formData.nameAr}
                                             onChange={(e) => setFormData({ ...formData, nameAr: e.target.value })}
-                                            placeholder="مثال: العقارات الفاخرة"
+                                            placeholder="استوديو اكمي"
                                             dir="rtl"
-                                            className="h-16 bg-white/[0.03] border-white/5 rounded-2xl px-8 text-[20px] font-black text-white placeholder-white/10 focus:bg-white/[0.05] focus:border-white/20 focus:ring-4 focus:ring-white/5 transition-all outline-none text-right font-sans"
+                                            className="bg-white border-gray-200 h-10 text-[14px] text-black rounded-lg text-right outline-none"
                                         />
                                     </div>
                                 </div>
-                                <div className="space-y-4">
-                                    <Label className="text-[11px] font-black uppercase tracking-[0.3em] text-white/70 ml-2">Universal Slug Protocol</Label>
-                                    <div className="relative group">
-                                        <Input 
-                                            value={formData.slug}
-                                            onChange={e => setFormData({...formData, slug: e.target.value})}
-                                            placeholder="luxury-estate"
-                                            className="h-16 bg-white/[0.03] border-white/5 rounded-2xl pl-16 pr-8 text-[14px] font-black tracking-widest text-blue-400 focus:bg-white/[0.05] focus:border-white/20 transition-all outline-none"
-                                        />
-                                        <div className="absolute left-6 top-1/2 -translate-y-1/2 text-white/40 font-black text-[12px]">@</div>
-                                    </div>
+                                <div className="space-y-2">
+                                    <Label className="text-[12px] font-semibold text-gray-700">URL Slug</Label>
+                                    <Input 
+                                        value={formData.slug}
+                                        onChange={e => setFormData({...formData, slug: e.target.value})}
+                                        placeholder="acme-studio"
+                                        className="bg-gray-50 border-gray-200 h-10 text-[13px] text-black rounded-lg outline-none"
+                                    />
                                 </div>
                                 
-                                <div className="grid grid-cols-1 gap-4">
+                                <div className="space-y-3">
                                     {[
-                                        { id: 'featured', label: 'Global Recognition', sub: 'Set as featured premium ecosystem member', value: formData.featured, field: 'featured' },
-                                        { id: 'showInHome', label: 'Home Page Matrix', sub: 'Display under main operations hero section', value: formData.showInHome, field: 'showInHome' }
+                                        { id: 'featured', label: 'Featured Brand', sub: 'Highlight this brand in related lists', value: formData.featured, field: 'featured' },
+                                        { id: 'showInHome', label: 'Show on Homepage', sub: 'Display this brand globally on the front page', value: formData.showInHome, field: 'showInHome' }
                                     ].map((opt) => (
                                         <div 
                                             key={opt.id}
                                             onClick={() => setFormData({...formData, [opt.field]: !opt.value})}
-                                            className={cn(
-                                                "flex items-center gap-6 p-6 rounded-[28px] border transition-all cursor-pointer group/opt",
-                                                opt.value 
-                                                    ? "bg-white/5 border-white/20" 
-                                                    : "bg-white/[0.01] border-white/5 hover:bg-white/[0.03] hover:border-white/10"
-                                            )}
+                                            className="flex items-center gap-4 p-4 rounded-xl border border-gray-200 bg-gray-50 cursor-pointer"
                                         >
-                                            <div className={cn(
-                                                "w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-500",
-                                                opt.value ? "bg-white text-black scale-110" : "bg-white/5 text-white/20 group-hover/opt:scale-110"
-                                            )}>
-                                                {opt.value ? <Zap className="w-5 h-5 fill-current" /> : <Info className="w-5 h-5" />}
-                                            </div>
-                                            <div className="flex flex-col flex-1">
-                                                <Label className="text-white text-[14px] font-black uppercase tracking-widest cursor-pointer leading-none mb-1">{opt.label}</Label>
-                                                <span className="text-white/20 text-[10px] font-bold uppercase tracking-[0.1em]">{opt.sub}</span>
+                                            <div className="flex-1">
+                                                <Label className="text-[13px] font-bold text-black cursor-pointer">{opt.label}</Label>
+                                                <p className="text-[11px] text-gray-500 mt-1">{opt.sub}</p>
                                             </div>
                                             <div className={cn(
-                                                "w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all",
-                                                opt.value ? "bg-white border-white" : "border-white/10"
+                                                "w-5 h-5 rounded-full border flex items-center justify-center transition-colors",
+                                                opt.value ? "bg-black border-black" : "bg-white border-gray-300"
                                             )}>
-                                                {opt.value && <div className="w-2.5 h-2.5 bg-black rounded-full" />}
+                                                {opt.value && <div className="w-2 h-2 bg-white rounded-full" />}
                                             </div>
                                         </div>
                                     ))}
                                 </div>
                             </div>
                             
-                            <div className="space-y-10">
-                                <div className="space-y-4">
-                                    <Label className="text-[11px] font-black uppercase tracking-[0.3em] text-white/70 ml-2">Visual Logotype Asset</Label>
-                                    <div className="bg-white/[0.02] rounded-[32px] p-10 border border-white/10 shadow-inner group/upload transition-all hover:bg-white/[0.04]">
+                            <div className="space-y-6">
+                                <div className="space-y-2">
+                                    <Label className="text-[12px] font-semibold text-gray-700">Brand Logo</Label>
+                                    <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
                                         <ImageUpload 
                                             value={formData.logo ? [formData.logo] : []}
                                             onChange={(urls) => setFormData({...formData, logo: urls[urls.length - 1]})}
@@ -253,136 +246,128 @@ export default function BrandsClient({ initialBrands }: { initialBrands: Brand[]
                                     </div>
                                 </div>
 
-                                <div className="space-y-8">
-                                    <div className="space-y-4">
-                                        <Label className="text-[11px] font-black uppercase tracking-[0.3em] text-white/70 ml-2">Corporate Narrative (EN)</Label>
+                                <div className="space-y-4">
+                                    <div className="space-y-2">
+                                        <Label className="text-[12px] font-semibold text-gray-700">Description (EN)</Label>
                                         <Textarea 
                                             value={formData.description}
                                             onChange={e => setFormData({...formData, description: e.target.value})}
-                                            placeholder="Formal executive brand description..."
-                                            className="min-h-[140px] bg-white/[0.03] border-white/5 rounded-[28px] p-8 text-[15px] font-medium text-white/80 placeholder:text-white/10 focus:bg-white/[0.05] focus:border-white/20 transition-all outline-none resize-none leading-relaxed"
+                                            placeholder="Brand details..."
+                                            className="min-h-[100px] bg-white border-gray-200 rounded-lg p-3 text-[13px] text-black outline-none resize-y"
                                         />
                                     </div>
-                                    <div className="space-y-4">
-                                        <Label className="text-[11px] font-black uppercase tracking-[0.3em] text-white/70 mr-2 text-right block">وصف العلامة التجارية (AR)</Label>
+                                    <div className="space-y-2">
+                                        <Label className="text-[12px] font-semibold text-gray-700 block text-right">الوصف (AR)</Label>
                                         <Textarea 
                                             value={formData.descriptionAr}
                                             onChange={e => setFormData({...formData, descriptionAr: e.target.value})}
-                                            placeholder="وصف رسمي تنفيذي للعلامة التجارية..."
+                                            placeholder="تفاصيل العلامة التجارية..."
                                             dir="rtl"
-                                            className="min-h-[140px] bg-white/[0.03] border-white/5 rounded-[28px] p-8 text-[18px] font-medium text-white/80 placeholder:text-white/10 focus:bg-white/[0.05] focus:border-white/20 transition-all outline-none resize-none leading-relaxed text-right font-sans"
+                                            className="min-h-[100px] bg-white border-gray-200 rounded-lg p-3 text-[14px] text-black outline-none resize-y text-right"
                                         />
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div className="flex justify-end gap-6 pt-12 border-t border-white/5 relative z-10">
+                        <div className="flex justify-end gap-3 pt-6 border-t border-gray-100">
                             <Button 
                                 variant="ghost" 
                                 onClick={resetForm} 
                                 disabled={loading} 
-                                className="h-16 px-12 rounded-2xl text-[12px] font-black uppercase tracking-[0.3em] text-white/20 hover:text-white hover:bg-white/5 transition-all"
+                                className="h-10 px-6 rounded-lg text-[12px] font-semibold text-gray-500 hover:text-black hover:bg-gray-100"
                             >
-                                Abort Mission
+                                Cancel
                             </Button>
                             <Button
                                 onClick={() => isEditing ? handleUpdate(isEditing) : handleCreate()}
                                 disabled={loading}
-                                className="h-16 px-16 bg-white hover:bg-white/90 text-black rounded-[24px] font-black text-[12px] uppercase tracking-widest shadow-2xl shadow-white/5 hover:scale-105 active:scale-95 transition-all"
+                                className="h-10 px-8 bg-black hover:bg-gray-800 text-white rounded-lg font-semibold text-[12px]"
                             >
-                                {loading ? "EXECUTING PROTOCOL..." : (isEditing ? "Synchronize State" : "Initialize Entity")}
+                                {loading ? "Saving..." : (isEditing ? "Save Brand" : "Create Brand")}
                             </Button>
                         </div>
-                    </motion.div>
+                    </div>
                 )}
             </AnimatePresence>
 
-            {/* 💎 ENTITY GRID */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-10">
-                {brands.map((brand, idx) => (
-                    <motion.div 
+            {/* Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {brands.map((brand) => (
+                    <div 
                         key={brand.id}
-                        initial={{ opacity: 0, y: 30 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: idx * 0.08 }}
-                        whileHover={{ y: -10 }}
-                        className="glass-card border border-white/5 rounded-[40px] p-10 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.5)] bg-white/[0.01] backdrop-blur-3xl group relative overflow-hidden flex flex-col h-full"
+                        className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm flex flex-col relative"
                     >
                          {/* Status indicators */}
-                        <div className="absolute top-6 right-6 flex flex-col gap-2 items-end z-10">
+                        <div className="absolute top-4 right-4 flex flex-col gap-1.5 items-end">
                              {brand.featured && (
-                                 <div className="bg-amber-500/10 text-amber-500 border border-amber-500/20 text-[8px] font-black px-3 py-1.5 rounded-full uppercase tracking-widest backdrop-blur-xl">Featured</div>
+                                 <div className="bg-amber-50 text-amber-600 border border-amber-200 text-[10px] font-semibold px-2 py-0.5 rounded-md uppercase tracking-wider">Featured</div>
                              )}
                              {brand.showInHome && (
-                                 <div className="bg-blue-500/10 text-blue-500 border border-blue-500/20 text-[8px] font-black px-3 py-1.5 rounded-full uppercase tracking-widest backdrop-blur-xl">Home Hub</div>
+                                 <div className="bg-blue-50 text-blue-600 border border-blue-200 text-[10px] font-semibold px-2 py-0.5 rounded-md uppercase tracking-wider">Home</div>
                              )}
                         </div>
 
-                        <div className="flex flex-col items-center text-center gap-8 mb-10">
-                            <div className="relative group/logo">
-                                <div className="absolute -inset-4 bg-white/5 rounded-[48px] blur-2xl opacity-0 group-hover/logo:opacity-100 transition-opacity duration-700" />
-                                <div className="relative w-28 h-28 bg-white/[0.03] rounded-[36px] flex items-center justify-center border border-white/10 overflow-hidden shadow-2xl transition-all duration-700 group-hover/logo:scale-110 group-hover/logo:rotate-3">
-                                    {brand.logo ? (
-                                        <Image 
-                                            src={brand.logo} 
-                                            alt={brand.name} 
-                                            width={80} 
-                                            height={80} 
-                                            className="object-contain p-4 opacity-90 group-hover/logo:opacity-100 transition-all duration-700 group-hover/logo:scale-110" 
-                                            unoptimized 
-                                        />
-                                    ) : (
-                                        <Tag className="w-10 h-10 text-white/10" />
-                                    )}
-                                </div>
+                        <div className="flex flex-col items-center text-center gap-4 mb-6">
+                            <div className="w-20 h-20 bg-gray-50 rounded-xl flex items-center justify-center border border-gray-200 overflow-hidden">
+                                {brand.logo ? (
+                                    <Image 
+                                        src={brand.logo} 
+                                        alt={brand.name} 
+                                        width={64} 
+                                        height={64} 
+                                        className="object-contain p-2" 
+                                        unoptimized 
+                                    />
+                                ) : (
+                                    <Tag className="w-8 h-8 text-gray-300" />
+                                )}
                             </div>
                             
-                            <div className="space-y-3">
-                                <h3 className="font-black text-white text-[20px] uppercase tracking-tighter italic leading-none">{brand.name}</h3>
-                                <div className="inline-flex items-center px-4 py-1.5 rounded-full bg-white/5 border border-white/5 text-[10px] font-black text-white/30 uppercase tracking-[0.3em]">
+                            <div className="space-y-1">
+                                <h3 className="font-bold text-black text-[16px]">{brand.name}</h3>
+                                <div className="text-[11px] font-medium text-gray-500">
                                     @{brand.slug}
                                 </div>
                             </div>
                         </div>
 
-                        <div className="mb-12 flex-1 relative">
-                             <div className="absolute -left-4 -top-4 text-4xl text-white/5 font-serif">&quot;</div>
-                             <p className="text-[14px] text-white/40 font-medium leading-[1.8] line-clamp-3 italic tracking-tight px-2">
-                                 {brand.description || "Corporate narrative pending initialization for this operational entity."}
+                        <div className="mb-6 flex-1">
+                             <p className="text-[12px] text-gray-500 line-clamp-3 text-center">
+                                 {brand.description || "No description provided."}
                              </p>
                         </div>
 
                         {canEdit('brands') && (
-                            <div className="flex items-center gap-4 pt-8 border-t border-white/5">
+                            <div className="flex items-center gap-2 pt-4 border-t border-gray-100 mt-auto">
                                 <Button 
-                                    variant="ghost" 
+                                    variant="outline" 
                                     onClick={() => startEditing(brand)} 
-                                    className="flex-1 h-14 bg-white/[0.03] hover:bg-white hover:text-black border border-white/5 rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] transition-all group/modify"
+                                    className="flex-1 h-8 bg-gray-50 hover:bg-gray-100 border-gray-200 text-black text-[11px] font-semibold"
                                 >
-                                    <Edit2 className="w-4 h-4 mr-3 group-hover/modify:scale-110" /> Modify
+                                    <Edit2 className="w-3.5 h-3.5 mr-1.5" /> Edit
                                 </Button>
                                 <Button 
                                     variant="ghost" 
                                     onClick={() => handleDelete(brand.id)} 
-                                    className="w-14 h-14 bg-rose-500/5 text-rose-500 hover:bg-rose-500 hover:text-white border border-rose-500/10 rounded-2xl transition-all"
+                                    className="w-8 h-8 p-0 text-gray-400 hover:bg-red-50 hover:text-red-600 border border-gray-200 rounded-md"
                                 >
-                                    <Trash2 className="w-5 h-5" />
+                                    <Trash2 className="w-4 h-4" />
                                 </Button>
                             </div>
                         )}
-                    </motion.div>
+                    </div>
                 ))}
             </div>
 
             {brands.length === 0 && (
-                <div className="py-40 flex flex-col items-center justify-center gap-8 opacity-20 group">
-                    <div className="w-24 h-24 rounded-[40px] bg-white/5 border border-white/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-1000">
-                        <Tag className="w-10 h-10" />
+                <div className="py-20 flex flex-col items-center justify-center gap-4 bg-gray-50 border border-dashed border-gray-200 rounded-xl">
+                    <div className="w-16 h-16 rounded-full bg-white border border-gray-200 flex items-center justify-center">
+                        <Tag className="w-6 h-6 text-gray-400" />
                     </div>
                     <div className="text-center">
-                        <p className="text-xl font-black text-white uppercase tracking-[0.5em] mb-2 leading-none">Registry Empty</p>
-                        <p className="text-[11px] font-bold text-white/40 uppercase tracking-widest">Awaiting brand ecosystem initialization</p>
+                        <p className="text-[14px] font-bold text-black mb-1">No Brands Found</p>
+                        <p className="text-[12px] text-gray-500">Add a new brand to see it here</p>
                     </div>
                 </div>
             )}

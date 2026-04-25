@@ -1,3 +1,8 @@
+export interface VariantSize {
+    name: string;
+    price: number | null;
+}
+
 export interface Category {
     id: string;
     name: string;
@@ -63,6 +68,7 @@ export interface Product {
     careInstructions: string | null;
     careInstructionsAr?: string | null;
     sku?: string | null;
+    position?: number;
     createdAt: string;
     updatedAt: string;
     reviews?: Review[];
@@ -99,6 +105,7 @@ export interface Order {
     createdAt: string;
     updatedAt: string;
     items?: OrderItem[];
+    orderItems?: OrderItem[];
     user?: {
         name: string | null;
         email: string | null;

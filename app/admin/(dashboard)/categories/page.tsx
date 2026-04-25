@@ -16,14 +16,14 @@ export default async function AdminCategoriesPage() {
 
     return (
         <div className="space-y-10 pb-20">
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
-                <div className="space-y-2">
-                    <h1 className="text-3xl font-black text-white uppercase tracking-tighter italic">Collections</h1>
-                    <p className="text-[13px] text-white/40 font-medium uppercase tracking-[0.2em]">Curate and organize your boutique&apos;s master hierarchy.</p>
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+                <div>
+                    <h1 className="text-3xl font-bold text-black tracking-tight mb-2">Collections</h1>
+                    <p className="text-[13px] text-gray-500">Curate and organize your boutique's master hierarchy.</p>
                 </div>
                 <div className="flex items-center gap-3">
                     {canEdit && (
-                        <Button asChild className="h-10 bg-white text-black hover:bg-white/80 px-6 rounded-full text-[11px] font-black uppercase tracking-[0.2em] transition-all shadow-xl shadow-white/5 active:scale-95">
+                        <Button asChild className="h-10 bg-black text-white hover:bg-[#333] px-6 rounded-lg text-[12px] font-semibold uppercase tracking-wider shadow-sm">
                             <Link href="/admin/categories/new" className="flex items-center gap-2">
                                 <Plus className="w-4 h-4" /> Add collection
                             </Link>
@@ -32,7 +32,7 @@ export default async function AdminCategoriesPage() {
                 </div>
             </div>
 
-            <div className="glass-table rounded-[40px] border-white/5 shadow-2xl overflow-hidden p-6 lg:p-10">
+            <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden p-6 lg:p-8">
                 <CategoryList categories={categories} />
             </div>
         </div>

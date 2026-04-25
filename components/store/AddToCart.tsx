@@ -1,12 +1,13 @@
 "use client";
 
 import { useCart } from "@/hooks/use-cart";
-import { useToast } from "@/components/ui/use-toast";
+import { useRouter } from "next/navigation";
 import { ShoppingCart, Check } from "lucide-react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/components/providers/language-provider";
+import { toast } from "sonner";
 
 interface AddToCartProps {
     product: {
@@ -20,12 +21,13 @@ interface AddToCartProps {
     fullWidth?: boolean;
     className?: string;
     quantity?: number;
+    disabled?: boolean;
 }
 
-export function AddToCart({ product, fullWidth = true, className, quantity = 1 }: AddToCartProps) {
+export function AddToCart({ product, fullWidth = true, className, quantity = 1, disabled }: AddToCartProps) {
+    const router = useRouter();
     const addItem = useCart((state) => state.addItem);
-    const { toast } = useToast();
-    const { t } = useLanguage();
+    const { t, language } = useLanguage();
     const [isAdding, setIsAdding] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
 
@@ -50,11 +52,18 @@ export function AddToCart({ product, fullWidth = true, className, quantity = 1 }
             setIsAdding(false);
             setIsSuccess(true);
 
-            toast({
-                title: t('product.addedToCart'),
-                description: `${product.name} ${t('product.addedSuccess')}`,
-                variant: "default",
-                className: "bg-background/80 backdrop-blur-xl border-primary/20",
+            toast.success(language === 'ar' ? 'تمت الإضافة للسلة' : 'Added to cart', {
+                description: product.name,
+                action: {
+                    label: "CHECKOUT",
+                    onClick: () => router.push("/checkout")
+                },
+                style: {
+                    background: 'rgba(32, 8, 11, 0.95)',
+                    backdropFilter: 'blur(10px)',
+                    color: 'white',
+                    border: '1px solid rgba(255,255,255,0.1)'
+                }
             });
 
             // Reset success state
@@ -67,13 +76,15 @@ export function AddToCart({ product, fullWidth = true, className, quantity = 1 }
     return (
         <button
             onClick={handleAdd}
-            disabled={isAdding || isSuccess}
+            disabled={isAdding || isSuccess || disabled}
             className={cn(
                 "relative font-bold h-12 rounded-[3px] flex items-center justify-center gap-2 transition-colors",
                 fullWidth ? "w-full" : "px-8",
                 isSuccess
                     ? "bg-[#111111] text-white" 
-                    : "bg-[#111111] text-white hover:bg-[#333]",
+                    : isAdding || isSuccess || disabled
+                        ? "bg-black/20 text-white/40 cursor-not-allowed border border-white/5"
+                        : "bg-[#111111] text-white hover:bg-[#333]",
                 className
             )}
         >

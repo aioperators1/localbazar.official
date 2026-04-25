@@ -6,7 +6,7 @@ export const metadata = {
     description: "Discover our exclusive collections of high fashion, abayas, and luxury scents in Qatar.",
 };
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 export default async function ShopPage({
     searchParams,

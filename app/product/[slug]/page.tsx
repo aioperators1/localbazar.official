@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 import ProductPageClient from "./ProductPageClient";
 import JsonLd from "@/components/store/JsonLd";
 
+export const revalidate = 60;
+
 export async function generateMetadata({
     params,
 }: {

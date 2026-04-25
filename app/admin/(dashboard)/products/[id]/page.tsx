@@ -67,7 +67,7 @@ export default async function EditProductPage(props: EditProductPageProps) {
             <ProductForm
                 categories={serializedCategories}
                 brands={brands}
-                initialData={serializedProduct}
+                initialData={serializedProduct as any}
             />
         </div>
     );

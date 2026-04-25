@@ -45,31 +45,31 @@ export function OrderStatusSelect({ orderId, currentStatus }: OrderStatusSelectP
     const statusConfig: Record<string, { label: string, color: string, bg: string, icon: any, border: string }> = {
         PENDING: { 
             label: "Pending Order", 
-            color: "text-amber-400", 
-            bg: "bg-amber-500/10", 
+            color: "text-amber-800", 
+            bg: "bg-amber-50", 
             icon: Clock,
-            border: "border-amber-500/20"
+            border: "border-amber-200"
         },
         SHIPPED: { 
             label: "Shipped Item", 
-            color: "text-blue-400", 
-            bg: "bg-blue-500/10", 
+            color: "text-blue-800", 
+            bg: "bg-blue-50", 
             icon: Truck,
-            border: "border-blue-500/20"
+            border: "border-blue-200"
         },
         DELIVERED: { 
             label: "Delivered Success", 
-            color: "text-emerald-400", 
-            bg: "bg-emerald-500/10", 
+            color: "text-emerald-800", 
+            bg: "bg-emerald-50", 
             icon: CheckCircle2,
-            border: "border-emerald-500/20"
+            border: "border-emerald-200"
         },
         CANCELLED: { 
             label: "Cancelled Void", 
-            color: "text-rose-400", 
-            bg: "bg-rose-500/10", 
+            color: "text-rose-800", 
+            bg: "bg-rose-50", 
             icon: XCircle,
-            border: "border-rose-500/20"
+            border: "border-rose-200"
         },
     };
 

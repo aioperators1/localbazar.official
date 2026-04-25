@@ -1,5 +1,5 @@
 import { getAdminTeamMembers, deleteTeamMember } from "@/lib/actions/admin";
-import { UserCircle, Shield, Mail, Key, Trash2, ShieldCheck, UserCog, Ghost, Activity, Users, Clock } from "lucide-react";
+import { UserCircle, Shield, Mail, Key, Trash2, ShieldCheck, UserCog, Ghost, Activity, Users, Clock, Truck } from "lucide-react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { AddMemberModal } from "@/components/admin/AddMemberModal";
@@ -8,10 +8,11 @@ import { Button } from "@/components/ui/button";
 import { revalidatePath } from "next/cache";
 
 const ROLE_STYLES: Record<string, { label: string, color: string, icon: any, border: string }> = {
-    SUPER_ADMIN: { label: "Supreme Admin", color: "bg-white text-black", border: "border-white/20", icon: ShieldCheck },
-    ADMIN: { label: "Administrator", color: "bg-amber-500/10 text-amber-500", border: "border-amber-500/20", icon: Shield },
-    MANAGER: { label: "Operational Manager", color: "bg-blue-500/10 text-blue-500", border: "border-blue-500/20", icon: UserCog },
-    STAFF: { label: "Field Analyst", color: "bg-white/5 text-white/40", border: "border-white/10", icon: Ghost },
+    SUPER_ADMIN: { label: "Super Admin", color: "bg-black text-white", border: "border-black", icon: ShieldCheck },
+    ADMIN: { label: "Administrator", color: "bg-gray-100 text-gray-800", border: "border-gray-200", icon: Shield },
+    MANAGER: { label: "Manager", color: "bg-blue-50 text-blue-600", border: "border-blue-100", icon: UserCog },
+    DRIVER: { label: "Logistics / Driver", color: "bg-emerald-50 text-emerald-600", border: "border-emerald-100", icon: Truck },
+    STAFF: { label: "Staff", color: "bg-gray-50 text-gray-500", border: "border-gray-200", icon: Ghost },
 };
 
 export default async function AdminTeamPage() {
@@ -19,54 +20,47 @@ export default async function AdminTeamPage() {
 
     return (
         <div className="space-y-12 pb-20 animate-in fade-in duration-1000">
-            {/* 🌌 ULTRA PRO HEADER */}
-            <div className="flex flex-col gap-10 md:flex-row md:items-end md:justify-between group">
-                <div className="space-y-4">
-                    <div className="flex items-center gap-4">
-                        <div className="w-14 h-14 bg-white/5 rounded-[22px] flex items-center justify-center border border-white/10 shadow-2xl group-hover:scale-110 transition-all duration-700">
-                            <Shield className="w-7 h-7 text-white/40" />
-                        </div>
-                        <div>
-                            <h1 className="text-4xl font-black text-white tracking-tighter uppercase italic leading-none">Security Matrix</h1>
-                            <p className="text-[12px] font-bold text-white/30 uppercase tracking-[0.4em] mt-2 ml-1">Universal Personnel Proxy Hub</p>
-                        </div>
-                    </div>
+            {/* Header */}
+            <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+                <div>
+                    <h1 className="text-3xl font-bold text-black tracking-tight mb-2">Team Directory</h1>
+                    <p className="text-[13px] text-gray-500">Manage personnel and access privileges across the workspace.</p>
                 </div>
 
-                <div className="flex items-center gap-6">
-                    <div className="hidden lg:flex items-center gap-4 px-6 py-3 bg-white/5 border border-white/10 rounded-2xl backdrop-blur-3xl">
-                        <Users className="w-5 h-5 text-white/20" />
+                <div className="flex items-center gap-4">
+                    <div className="hidden lg:flex items-center gap-4 px-6 py-2.5 bg-white border border-gray-200 rounded-lg shadow-sm">
+                        <Users className="w-5 h-5 text-gray-400" />
                         <div className="flex flex-col">
-                            <span className="text-[14px] font-black text-white tracking-tighter leading-none">{staff.length} Active</span>
-                            <span className="text-[9px] font-bold text-white/20 uppercase tracking-widest mt-1">Personnel</span>
+                            <span className="text-[14px] font-bold text-black leading-none">{staff.length}</span>
+                            <span className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mt-1">Active Personnel</span>
                         </div>
                     </div>
                     <AddMemberModal />
                 </div>
             </div>
 
-            {/* 💎 TEAM MATRIX TABLE */}
-            <div className="glass-card border border-white/5 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.8)] rounded-[40px] overflow-hidden bg-[#0A0A0A]/40 backdrop-blur-3xl">
+            {/* TEAM MATRIX TABLE */}
+            <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
                 <div className="overflow-x-auto no-scrollbar">
                     <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="bg-white/[0.03] border-b border-white/5">
-                                <th className="p-8 font-black text-[10px] uppercase tracking-[0.25em] text-white/20">Operational Identity</th>
-                                <th className="p-8 font-black text-[10px] uppercase tracking-[0.25em] text-white/20">Access Protocol</th>
-                                <th className="p-8 font-black text-[10px] uppercase tracking-[0.25em] text-white/20">Frequency Channel</th>
-                                <th className="p-8 font-black text-[10px] uppercase tracking-[0.25em] text-white/20">Registry Timestamp</th>
-                                <th className="p-8 text-right font-black text-[10px] uppercase tracking-[0.25em] text-white/20">Directive Actions</th>
+                            <tr className="bg-gray-50 border-b border-gray-200">
+                                <th className="p-4 pl-6 font-semibold text-[11px] uppercase tracking-wider text-gray-500">Personnel Identity</th>
+                                <th className="p-4 font-semibold text-[11px] uppercase tracking-wider text-gray-500">Access Level</th>
+                                <th className="p-4 font-semibold text-[11px] uppercase tracking-wider text-gray-500">Contact Protocol</th>
+                                <th className="p-4 font-semibold text-[11px] uppercase tracking-wider text-gray-500">Registry Date</th>
+                                <th className="p-4 pr-6 text-right font-semibold text-[11px] uppercase tracking-wider text-gray-500">Actions</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-white/5">
+                        <tbody className="divide-y divide-gray-100">
                             {staff.length === 0 ? (
                                 <tr>
-                                    <td colSpan={5} className="p-40 text-center">
-                                        <div className="flex flex-col items-center gap-8 opacity-10">
-                                            <div className="w-24 h-24 rounded-[40px] bg-white/10 flex items-center justify-center animate-pulse">
-                                                <Ghost className="w-12 h-12" />
+                                    <td colSpan={5} className="p-20 text-center">
+                                        <div className="flex flex-col items-center gap-4">
+                                            <div className="w-16 h-16 rounded-full bg-gray-50 border border-gray-100 flex items-center justify-center">
+                                                <Ghost className="w-6 h-6 text-gray-400" />
                                             </div>
-                                            <p className="text-white font-black uppercase text-xs tracking-[0.5em]">No personnel synchronized</p>
+                                            <p className="text-black font-semibold text-[14px] tracking-tight">No personnel registered</p>
                                         </div>
                                     </td>
                                 </tr>
@@ -76,28 +70,25 @@ export default async function AdminTeamPage() {
                                     const RoleIcon = style.icon;
 
                                     return (
-                                        <tr key={member.id} className="group hover:bg-white/[0.02] transition-all duration-500">
-                                            <td className="p-8">
-                                                <div className="flex items-center gap-6">
-                                                    <div className="relative w-14 h-14 rounded-[22px] bg-white/[0.03] border border-white/10 flex items-center justify-center text-white/20 overflow-hidden shrink-0 group-hover:scale-105 transition-all duration-700 shadow-2xl">
+                                        <tr key={member.id} className="hover:bg-gray-50 transition-all duration-300">
+                                            <td className="p-4 pl-6">
+                                                <div className="flex items-center gap-4">
+                                                    <div className="relative w-10 h-10 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center overflow-hidden shrink-0">
                                                         {member.image ? (
-                                                            <Image src={member.image} alt={member.name || 'Member'} fill className="object-cover group-hover:scale-110 transition-transform duration-700" unoptimized />
+                                                            <Image src={member.image} alt={member.name || 'Member'} fill className="object-cover" unoptimized />
                                                         ) : (
-                                                            <UserCircle className="w-8 h-8 opacity-30" />
+                                                            <UserCircle className="w-6 h-6 text-gray-400" />
                                                         )}
-                                                        <div className="absolute inset-x-0 bottom-0 h-1 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity" />
                                                     </div>
                                                     <div className="flex flex-col">
-                                                        <span className="font-black text-white text-[16px] tracking-tight uppercase italic group-hover:translate-x-1 transition-transform">{member.name || 'Undefined Identity'}</span>
-                                                        <div className="flex items-center gap-2 mt-1 px-3 py-1 rounded-full bg-white/5 border border-white/5 w-fit">
-                                                            <span className="text-white/20 text-[10px] font-black uppercase tracking-widest">@{member.username || 'staff'}</span>
-                                                        </div>
+                                                        <span className="font-semibold text-black text-[14px] line-clamp-1">{member.name || 'Undefined Identity'}</span>
+                                                        <span className="text-gray-500 text-[11px] font-medium leading-none mt-1">@{member.username || 'staff'}</span>
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td className="p-8">
+                                            <td className="p-4">
                                                 <div className={cn(
-                                                    "inline-flex items-center gap-3 px-5 py-2 rounded-[14px] text-[10px] font-black uppercase tracking-widest border transition-all duration-500 group-hover:scale-105",
+                                                    "inline-flex items-center gap-2 px-3 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider border",
                                                     style.color,
                                                     style.border
                                                 )}>
@@ -105,26 +96,22 @@ export default async function AdminTeamPage() {
                                                     {style.label}
                                                 </div>
                                             </td>
-                                            <td className="p-8">
-                                                <div className="flex flex-col gap-1.5 font-mono">
-                                                    <div className="flex items-center gap-2 text-white/40 group-hover:text-white transition-colors duration-500">
-                                                        <Mail className="w-3.5 h-3.5" />
-                                                        <span className="text-[14px] font-black tracking-tighter">{member.email}</span>
-                                                    </div>
+                                            <td className="p-4">
+                                                <div className="flex items-center gap-2 text-gray-500 hover:text-black transition-colors duration-300">
+                                                    <Mail className="w-4 h-4" />
+                                                    <span className="text-[13px] font-medium">{member.email}</span>
                                                 </div>
                                             </td>
-                                            <td className="p-8">
+                                            <td className="p-4">
                                                 <div className="flex flex-col gap-1">
-                                                    <div className="flex items-center gap-2 text-white font-black text-[14px] uppercase italic">
-                                                        <Clock className="w-3.5 h-3.5 text-white/20" />
+                                                    <div className="flex items-center gap-2 text-black font-medium text-[13px]">
                                                         {new Date(member.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                                                     </div>
-                                                    <span className="text-white/20 text-[9px] font-black uppercase tracking-widest ml-5">Operational Since</span>
                                                 </div>
                                             </td>
-                                            <td className="p-8 text-right">
+                                            <td className="p-4 pr-6 text-right">
                                                 {member.role !== 'SUPER_ADMIN' ? (
-                                                    <div className="flex items-center justify-end gap-3">
+                                                    <div className="flex items-center justify-end gap-2">
                                                         <EditMemberModal member={member} />
                                                         <form action={async () => {
                                                             "use server"
@@ -134,17 +121,16 @@ export default async function AdminTeamPage() {
                                                             <Button 
                                                                 variant="ghost" 
                                                                 size="icon" 
-                                                                className="h-12 w-12 text-white/20 hover:text-rose-500 hover:bg-rose-500/10 rounded-2xl transition-all border border-transparent hover:border-rose-500/20"
+                                                                className="h-8 w-8 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors"
                                                             >
-                                                                <Trash2 className="w-5 h-5" />
+                                                                <Trash2 className="w-4 h-4" />
                                                             </Button>
                                                         </form>
                                                     </div>
                                                 ) : (
                                                     <div className="flex items-center justify-end">
-                                                        <div className="h-12 w-12 flex items-center justify-center bg-white/5 border border-white/10 rounded-2xl text-white/20 cursor-not-allowed group/key overflow-hidden relative">
-                                                            <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover/key:opacity-100 transition-opacity" />
-                                                            <Key className="w-5 h-5 relative z-10" />
+                                                        <div className="h-8 w-8 flex items-center justify-center bg-gray-50 rounded-md text-gray-400 cursor-not-allowed">
+                                                            <Key className="w-4 h-4" />
                                                         </div>
                                                     </div>
                                                 )}
@@ -158,10 +144,10 @@ export default async function AdminTeamPage() {
                 </div>
 
                 {/* Footer Insight Component */}
-                <div className="p-8 bg-white/[0.01] border-t border-white/5 flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                        <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                        <span className="text-[10px] font-black text-white/30 uppercase tracking-[0.4em]">All operational channels secured</span>
+                <div className="p-4 bg-gray-50 border-t border-gray-200 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full bg-emerald-500" />
+                        <span className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">System operational</span>
                     </div>
                 </div>
             </div>

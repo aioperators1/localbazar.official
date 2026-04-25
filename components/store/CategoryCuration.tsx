@@ -19,11 +19,11 @@ export function CategoryCuration({ categories }: { categories?: Category[] }) {
     })) || [];
 
     return (
-        <section className={`py-16 sm:py-24 bg-transparent overflow-hidden ${language === 'ar' ? 'rtl' : 'ltr'}`}>
+        <section className={`py-8 sm:py-12 bg-transparent overflow-hidden ${language === 'ar' ? 'rtl' : 'ltr'}`}>
             <div className="container mx-auto px-4 lg:px-24">
                 {/* Section Title */}
-                <div className="mb-12 border-b border-white/10 pb-8">
-                    <div className="flex items-center gap-4">
+                <div className="mb-6 border-b border-white/10 pb-4">
+                    <div className="flex items-center gap-2">
                         <div className="w-10 h-px bg-white" />
                         <span className="text-[10px] font-black tracking-[0.5em] text-white/50 uppercase">
                             {language === 'ar' ? "التصنيفات" : "Categories"}
@@ -51,7 +51,7 @@ export function CategoryCuration({ categories }: { categories?: Category[] }) {
                                     <span className="text-[8px] font-black tracking-[0.4em] uppercase mb-2 opacity-60">
                                         {item.subtitle}
                                     </span>
-                                    <h2 className="font-serif text-[24px] lg:text-[28px] leading-tight font-medium tracking-tight mb-4">
+                                    <h2 className="font-serif text-[24px] lg:text-[28px] leading-tight font-medium tracking-tight mb-2">
                                         {item.title}
                                     </h2>
                                     <div className="flex items-center gap-3">

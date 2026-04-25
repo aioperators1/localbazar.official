@@ -21,9 +21,9 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-import { AdminSetting, AppSession } from "@/lib/types";
+import { AdminSetting, AppSession, Category } from "@/lib/types";
 
-export function Header({ settings }: { settings?: AdminSetting }) {
+export function Header({ settings, categories = [] }: { settings?: AdminSetting, categories?: Category[] }) {
     const pathname = usePathname();
     const isHome = pathname === "/";
     const { data: sessionData } = useSession();
@@ -71,6 +71,9 @@ export function Header({ settings }: { settings?: AdminSetting }) {
 
     if (pathname.startsWith("/admin")) return null;
 
+    // Show all categories from database
+    const displayCategories = categories;
+
     return (
         <header
             className={cn(
@@ -98,8 +101,8 @@ export function Header({ settings }: { settings?: AdminSetting }) {
                         {/* Heritage Selectors with Refined Dropdowns */}
                         <div className="flex items-center gap-6 lg:gap-10 w-full sm:w-auto justify-center sm:justify-end">
                             {[
-                                { id: 'lang', label: language === 'en' ? 'EN' : language === 'fr' ? 'FR' : 'AR', icon: ChevronDown },
-                                { id: 'curr', label: currency, icon: ChevronDown }
+                                { id: 'lang', label: mounted ? (language === 'en' ? 'EN' : language === 'fr' ? 'FR' : 'AR') : '...', icon: ChevronDown },
+                                { id: 'curr', label: mounted ? currency : '...', icon: ChevronDown }
                             ].map((item) => (
                                 <DropdownMenu key={item.id}>
                                     <DropdownMenuTrigger className="text-[11px] font-black tracking-[0.3em] text-white/40 hover:text-white uppercase flex items-center gap-2 outline-none group">
@@ -141,7 +144,7 @@ export function Header({ settings }: { settings?: AdminSetting }) {
                 <div className="container mx-auto px-4 lg:px-12 flex items-center justify-between relative min-h-[50px]">
 
                     {/* Left: Discovery & Archives */}
-                    <div className="flex items-center gap-6 lg:gap-12 flex-1">
+                    <div className="flex items-center gap-6 xl:gap-12 flex-1">
                         <button
                             className="group flex flex-col gap-2 focus:outline-none relative h-10 justify-center"
                             onClick={() => setIsMenuOpen(true)}
@@ -152,7 +155,7 @@ export function Header({ settings }: { settings?: AdminSetting }) {
                                     <div className="w-4 h-[1px] lg:w-4 lg:h-[1.5px] rounded-full transition-colors bg-white" />
                                 </div>
                                 <span className={cn(
-                                    "text-[11px] font-black uppercase tracking-[0.3em] hidden lg:block overflow-hidden whitespace-nowrap transition-colors text-white",
+                                    "text-[11px] font-black uppercase tracking-[0.3em] hidden xl:block overflow-hidden whitespace-nowrap transition-colors text-white",
                                     isAr ? "mr-4" : "ml-4"
                                 )}>
                                     {t('nav.boutique')}
@@ -160,7 +163,7 @@ export function Header({ settings }: { settings?: AdminSetting }) {
                             </div>
                         </button>
 
-                        <nav className="hidden lg:flex items-center gap-10">
+                        <nav className="hidden xl:flex items-center gap-10">
                             {[
                                 { name: t('nav.archive'), href: '/shop' },
                                 { name: t('nav.editions'), href: '/shop?category=new-arrivals' }
@@ -185,13 +188,13 @@ export function Header({ settings }: { settings?: AdminSetting }) {
                     </div>
 
                     {/* Right: Actions & Vault */}
-                    <div className="flex items-center justify-end gap-3 lg:gap-10 flex-1">
-                        <div className="hidden lg:flex items-center gap-10">
+                    <div className="flex items-center justify-end gap-3 lg:gap-8 flex-1">
+                        <div className="hidden md:flex items-center gap-6 xl:gap-10">
                             <button
                                 onClick={() => setIsSearchOpen(true)}
                                 className="group flex items-center gap-4"
                             >
-                                <span className="text-[9px] font-black tracking-[0.4em] uppercase transition-colors text-white/40 group-hover:text-white">PRODUCT REGISTRY</span>
+                                <span className="text-[9px] font-black tracking-[0.4em] uppercase transition-colors text-white/40 group-hover:text-white hidden xl:block">PRODUCT REGISTRY</span>
                                 <Search className="w-[18px] h-[18px] stroke-[1.2] transition-colors text-white/40 group-hover:text-white" />
                             </button>
 
@@ -208,13 +211,13 @@ export function Header({ settings }: { settings?: AdminSetting }) {
                             </button>
                         </div>
 
-                        <div className="h-6 w-px bg-white/10 hidden lg:block mx-2" />
+                        <div className="h-6 w-px bg-white/10 hidden md:block mx-1 xl:mx-2" />
 
                         <button
                             onClick={() => setIsCartOpen(true)}
                             className="relative group flex items-center gap-5 focus:outline-none py-2"
                         >
-                            <div className="flex flex-col items-end hidden sm:flex pointer-events-none">
+                            <div className="flex flex-col items-end hidden lg:flex pointer-events-none">
                                 <span className="text-[10px] font-black tracking-[0.25em] uppercase leading-none mb-1 text-white/40">{t('nav.cart')}</span>
                                 <span className="text-[13px] font-black tracking-tighter leading-tight text-white">{mounted ? formatCurrency(totalPrice()) : '—'}</span>
                             </div>
@@ -288,16 +291,10 @@ export function Header({ settings }: { settings?: AdminSetting }) {
                                 {t('nav.collections')}
                             </span>
                             <div className="flex flex-col gap-6">
-                                {[
-                                    { name: t('cat.abayas'), href: '/shop?category=abayas' },
-                                    { name: t('cat.dresses'), href: '/shop?category=dresses-jalabiyas' },
-                                    { name: t('cat.men'), href: '/shop?category=men' },
-                                    { name: t('cat.perfumes'), href: '/shop?category=perfumes-oud' },
-                                    { name: t('nav.newArrivals'), href: '/shop?category=new-arrivals', highlight: true }
-                                ].map((link, idx) => (
+                                {displayCategories.map((cat, idx) => (
                                     <Link 
-                                        key={idx} 
-                                        href={link.href} 
+                                        key={cat.id} 
+                                        href={`/shop?category=${cat.slug}`} 
                                         onClick={() => setIsMenuOpen(false)}
                                         className={cn(
                                             "group flex items-center gap-4",
@@ -305,16 +302,29 @@ export function Header({ settings }: { settings?: AdminSetting }) {
                                         )}
                                     >
                                         <span className={cn(
-                                            "text-[28px] lg:text-[34px] font-serif font-light text-white/80 group-hover:text-white tracking-tight uppercase",
-                                            isAr ? "text-right" : "text-left"
+                                            "text-[28px] lg:text-[34px] font-serif font-light text-white/80 group-hover:text-white tracking-tight uppercase transition-all duration-500",
+                                            isAr ? "text-right font-sans font-black" : "text-left"
                                         )}>
-                                            {link.name}
+                                            {isAr && cat.nameAr ? cat.nameAr : cat.name}
                                         </span>
-                                        {link.highlight && (
-                                            <div className="w-2 h-2 rounded-full bg-brand-burgundy" />
-                                        )}
                                     </Link>
                                 ))}
+                                <Link 
+                                    href="/shop?category=new-arrivals" 
+                                    onClick={() => setIsMenuOpen(false)}
+                                    className={cn(
+                                        "group flex items-center gap-4",
+                                        isAr && "flex-row-reverse"
+                                    )}
+                                >
+                                    <span className={cn(
+                                        "text-[28px] lg:text-[34px] font-serif font-light text-white/80 group-hover:text-white tracking-tight uppercase",
+                                        isAr ? "text-right font-sans font-black" : "text-left"
+                                    )}>
+                                        {t('nav.newArrivals')}
+                                    </span>
+                                    <div className="w-2 h-2 rounded-full bg-brand-burgundy" />
+                                </Link>
                             </div>
                         </div>
 

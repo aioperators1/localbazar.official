@@ -54,6 +54,12 @@ proxy.ts
 path_machine.txt
 path_user.txt
 
+# IDE
+.vscode/
+
+# scratch files
+/scratch/
+
 # prisma and uploads
 /prisma/generated/
 /public/uploads/

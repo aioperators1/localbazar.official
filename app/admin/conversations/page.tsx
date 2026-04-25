@@ -11,8 +11,8 @@ import Image from "next/image";
 export default async function AdminConversationsPage() {
     const session = await getServerSession(authOptions);
 
-    if (!session || !["ADMIN", "SUPER_ADMIN"].includes(session.user.role)) {
-        redirect("/");
+    if (!session) {
+        redirect("/admin/login");
     }
 
     const conversations = await prisma.conversation.findMany({

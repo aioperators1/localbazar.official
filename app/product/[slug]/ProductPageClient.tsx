@@ -13,7 +13,8 @@ import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { useCurrency } from "@/components/providers/currency-provider";
 import { useLanguage } from "@/components/providers/language-provider";
-import { useToast } from "@/components/ui/use-toast";
+import { useWishlist } from "@/hooks/use-wishlist";
+import { toast } from "sonner";
 
 import { Product, Category } from "@/lib/types";
 
@@ -28,7 +29,6 @@ export default function ProductPageClient({ product, images, similarProducts }: 
     const addItem = useCart(state => state.addItem);
     const { formatPrice: formatCurrency } = useCurrency();
     const { t, language } = useLanguage();
-    const { toast } = useToast();
     const [quantity, setQuantity] = useState(1);
     const [selectedSize, setSelectedSize] = useState<string | null>(null);
     const [selectedColor, setSelectedColor] = useState<{ name: string, hex: string } | null>(null);
@@ -37,16 +37,47 @@ export default function ProductPageClient({ product, images, similarProducts }: 
     const displayTitle = language === 'ar' && product.nameAr ? product.nameAr : product.name;
     const displayDescription = language === 'ar' && product.descriptionAr ? product.descriptionAr : product.description;
     const displayMaterials = language === 'ar' && product.materialsAr ? product.materialsAr : product.materials;
-    const displayCare = language === 'ar' && product.careInstructionsAr ? product.careInstructionsAr : product.careInstructions;
+
     
     const categoryObject = product.category;
     const displayCategory = language === 'ar' && categoryObject?.nameAr 
         ? categoryObject.nameAr 
         : (categoryObject?.name || "Fashion");
 
-    // Parse sizes and colors
-    const sizes = product.sizes ? JSON.parse(product.sizes) : [];
-    const colors = product.colors ? JSON.parse(product.colors) : [];
+    // Parse sizes and colors with backward compatibility and safety
+    const safeParse = (data: any) => {
+        if (!data) return [];
+        if (Array.isArray(data)) return data;
+        if (typeof data === 'object') return [data];
+        try {
+            const parsed = JSON.parse(data);
+            return Array.isArray(parsed) ? parsed : [];
+        } catch (e) {
+            return [];
+        }
+    };
+
+    const rawSizes = safeParse(product.sizes);
+    const sizes = rawSizes.map((s: any) => 
+        typeof s === 'string' ? { name: s, price: null } : s
+    );
+    const rawColors = safeParse(product.colors);
+    const colors = rawColors;
+
+    const [currentPrice, setCurrentPrice] = useState<number>(Number(product.price));
+
+    useEffect(() => {
+        if (selectedSize) {
+            const sizeObj = sizes.find((s: any) => s.name === selectedSize);
+            if (sizeObj && sizeObj.price) {
+                setCurrentPrice(sizeObj.price);
+            } else {
+                setCurrentPrice(Number(product.price));
+            }
+        } else {
+            setCurrentPrice(Number(product.price));
+        }
+    }, [selectedSize, sizes, product.price]);
 
     useEffect(() => {
         if (colors.length > 0 && !selectedColor) {
@@ -57,18 +88,18 @@ export default function ProductPageClient({ product, images, similarProducts }: 
         }
     }, [colors]);
 
+    const isOutOfStock = product.stock <= 0;
+
     const handleBuyNow = () => {
+        if (isOutOfStock) return;
         if (sizes.length > 0 && !selectedSize) {
-            toast({
-                title: t('product.selectSize'),
-                variant: "destructive",
-            });
+            toast.error(t('product.selectSize'));
             return;
         }
         addItem({
             id: product.id,
             name: displayTitle,
-            price: Number(product.price),
+            price: currentPrice,
             image: images[0],
             category: displayCategory,
             quantity: quantity,
@@ -78,18 +109,63 @@ export default function ProductPageClient({ product, images, similarProducts }: 
         router.push("/checkout");
     };
 
+    const { toggleItem, isInWishlist } = useWishlist();
+
+    const handleShare = async () => {
+        try {
+            if (navigator.share) {
+                await navigator.share({
+                    title: displayTitle,
+                    text: displayDescription?.replace(/<[^>]*>?/gm, '').slice(0, 100),
+                    url: window.location.href,
+                });
+            } else {
+                await navigator.clipboard.writeText(window.location.href);
+                toast.success(t('common.copiedToClipboard') || "Link copied to clipboard!");
+            }
+        } catch (error) {
+            console.error("Error sharing:", error);
+        }
+    };
+
+    const handleToggleWishlist = () => {
+        const isCurrentlyInWishlist = isInWishlist(product.id);
+        
+        toggleItem({
+            id: product.id,
+            name: displayTitle,
+            price: Number(product.price),
+            image: images[0],
+            slug: product.slug,
+            category: displayCategory
+        });
+        
+        if (isCurrentlyInWishlist) {
+            toast.success(t('product.removedFromWishlist') || "Removed from wishlist");
+        } else {
+            toast.success(t('product.addedToWishlist') || "Added to wishlist");
+        }
+    };
+
     const increaseQty = () => setQuantity(prev => prev + 1);
     const decreaseQty = () => setQuantity(prev => (prev > 1 ? prev - 1 : 1));
+
+    const [mounted, setMounted] = useState(false);
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    if (!mounted) return null;
 
     return (
         <div className="bg-transparent min-h-screen pb-32 pt-6 text-white">
             <div className="container mx-auto px-4 lg:px-20 max-w-[1500px]">
                 {/* Breadcrumbs - Minimalist */}
-                <div className="flex items-center gap-2 mb-12 text-[11px] font-bold uppercase tracking-[0.3em] text-white/50">
-                    <Link href="/" className="hover:text-white transition-all duration-500">{t('shop.breadcrumb.home')}</Link>
-                    <ChevronRight className={cn("w-3 h-3 text-white/40", language === 'ar' && "rotate-180")} />
-                    <Link href="/shop" className="hover:text-white transition-all duration-500">{t('shop.breadcrumb.shop')}</Link>
-                    <ChevronRight className={cn("w-3 h-3 text-white/40", language === 'ar' && "rotate-180")} />
+                <div className="flex flex-wrap items-center justify-center gap-y-3 gap-x-3 mb-8 lg:mb-12 text-[10px] lg:text-[11px] font-bold uppercase tracking-[0.2em] lg:tracking-[0.3em] text-white/50">
+                    <Link href="/" className="hover:text-white transition-all duration-500 whitespace-nowrap">{t('shop.breadcrumb.home')}</Link>
+                    <ChevronRight className={cn("w-3 h-3 text-white/40 flex-shrink-0", language === 'ar' && "rotate-180")} />
+                    <Link href="/shop" className="hover:text-white transition-all duration-500 whitespace-nowrap">{t('shop.breadcrumb.shop')}</Link>
+                    <ChevronRight className={cn("w-3 h-3 text-white/40 flex-shrink-0", language === 'ar' && "rotate-180")} />
                     <span className="text-white font-black">{displayCategory}</span>
                 </div>
 
@@ -103,131 +179,171 @@ export default function ProductPageClient({ product, images, similarProducts }: 
 
                     {/* RIGHT COLUMN: Product Info */}
                     <div className="lg:col-span-5 flex flex-col">
-                        {/* Brand & Title */}
-                        <div className="mb-10 text-center lg:text-left">
-                            <span className="text-[13px] font-bold uppercase tracking-[0.4em] text-white/50 mb-4 block">
-                                {product.brand || "LOCAL BAZAR COUTURE"}
-                            </span>
-                            <h1 className={cn(
-                                "text-[32px] lg:text-[42px] font-black text-white leading-[1.1] tracking-tight mb-6",
-                                language === 'ar' ? "font-sans text-right" : "font-serif"
-                            )}>
-                                {displayTitle}
-                            </h1>
-                            <div className="flex items-center justify-center lg:justify-start gap-4">
-                                <span className="text-[22px] lg:text-[26px] font-medium text-white">
-                                    {formatCurrency(product.price)}
-                                </span>
+                        {/* Brand, Title & Price Block */}
+                        <div className="bg-white/5 border border-white/10 rounded-3xl p-6 lg:p-8 mb-6 shadow-2xl backdrop-blur-xl">
+                            <div className="text-center">
+
+                                <h1 className="text-[28px] lg:text-[38px] font-black text-white leading-[1.2] tracking-tight mb-6">
+                                    {displayTitle}
+                                </h1>
+                                <div className="flex flex-col items-center justify-center gap-1">
+                                    {product.salePrice && product.salePrice > 0 && (
+                                        <span className="text-[16px] lg:text-[18px] text-white/40 line-through font-medium tracking-tight">
+                                            {formatCurrency(product.salePrice)}
+                                        </span>
+                                    )}
+                                    <span className="text-[26px] lg:text-[32px] !font-sans font-medium text-white tracking-tight">
+                                        {formatCurrency(currentPrice)}
+                                    </span>
+                                </div>
                             </div>
+                            {isOutOfStock && (
+                                <div className="mt-6 flex justify-center border-t border-white/5 pt-6">
+                                    <div className="relative group">
+                                        <span className="relative z-10 bg-black/60 backdrop-blur-xl text-red-500 text-[10px] font-black tracking-[0.4em] uppercase px-5 py-2 border border-red-500/20 flex items-center gap-2 rounded-full shadow-xl">
+                                            <div className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+                                            {language === 'ar' ? "نفذت الكمية" : "OUT OF STOCK"}
+                                        </span>
+                                    </div>
+                                </div>
+                            )}
                         </div>
 
-                        {/* Color Selection */}
-                        {colors.length > 0 && (
-                            <div className="mb-10">
-                                <span className="text-[12px] font-bold uppercase tracking-[0.2em] mb-4 block text-white/50">
-                                    {t('product.color')}: <span className="text-white">{selectedColor?.name}</span>
-                                </span>
-                                <div className="flex gap-4">
-                                    {colors.map((color: { name: string, hex: string }, idx: number) => (
-                                        <button
-                                            key={idx}
-                                            onClick={() => setSelectedColor(color)}
-                                            className={cn(
-                                                "w-8 h-8 rounded-full border border-white/20 p-0.5 transition-all duration-300",
-                                                selectedColor?.name === color.name ? "ring-1 ring-white scale-110" : "hover:scale-105"
-                                            )}
-                                        >
-                                            <div 
-                                                className="w-full h-full rounded-full" 
-                                                style={{ backgroundColor: color.hex }}
-                                            />
-                                        </button>
-                                    ))}
-                                </div>
+                        {/* Selectors Block (Colors & Sizes) */}
+                        {(colors.length > 0 || sizes.length > 0) && (
+                            <div className="bg-white/5 border border-white/10 rounded-3xl p-6 lg:p-8 mb-6 shadow-2xl backdrop-blur-xl">
+                                {/* Color Selection */}
+                                {colors.length > 0 && (
+                                    <div className={cn(sizes.length > 0 ? "border-b border-white/10 pb-6 mb-6" : "")}>
+                                        <span className="text-[12px] font-bold uppercase tracking-[0.2em] mb-4 block text-white/50">
+                                            {t('product.color')}: <span className="text-white">{selectedColor?.name}</span>
+                                        </span>
+                                        <div className="flex gap-4">
+                                            {colors.map((color: { name: string, hex: string }, idx: number) => (
+                                                <button
+                                                    key={idx}
+                                                    onClick={() => setSelectedColor(color)}
+                                                    className={cn(
+                                                        "w-10 h-10 rounded-full border border-white/20 p-0.5 transition-all duration-300",
+                                                        selectedColor?.name === color.name ? "ring-2 ring-white scale-110" : "hover:scale-105"
+                                                    )}
+                                                >
+                                                    <div className="w-full h-full rounded-full" style={{ backgroundColor: color.hex }} />
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Size Selection */}
+                                {sizes.length > 0 && (
+                                    <div>
+                                        <div className="flex justify-between items-center mb-4">
+                                            <span className="text-[12px] font-bold uppercase tracking-[0.2em] text-white/50">{t('product.selectSize')}</span>
+                                            <button className="flex items-center gap-2 text-[12px] font-bold uppercase tracking-[0.1em] text-white/50 hover:text-white transition-colors">
+                                                <Ruler className="w-3.5 h-3.5" />
+                                                {t('product.sizeGuide')}
+                                            </button>
+                                        </div>
+                                        <div className="flex flex-wrap gap-2.5">
+                                            {sizes.map((size: { name: string, price: number | null }) => (
+                                                <button
+                                                    key={size.name}
+                                                    onClick={() => setSelectedSize(size.name)}
+                                                    className={cn(
+                                                        "min-w-14 h-12 rounded-xl border text-[12px] font-bold tracking-widest transition-all duration-300 flex flex-col items-center justify-center px-4",
+                                                        selectedSize === size.name 
+                                                            ? "bg-white border-white text-black shadow-lg scale-105" 
+                                                            : "bg-transparent border-white/20 text-white hover:border-white/50"
+                                                    )}
+                                                >
+                                                    <span>{size.name}</span>
+                                                    {size.price && size.price > 0 && (
+                                                        <span className={cn(
+                                                            "text-[9px] font-bold opacity-60",
+                                                            selectedSize === size.name ? "text-black" : "text-emerald-400"
+                                                        )}>
+                                                            {formatCurrency(size.price)}
+                                                        </span>
+                                                    )}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         )}
 
-                        {/* Size Selection */}
-                        {sizes.length > 0 && (
-                            <div className="mb-12">
-                                <div className="flex justify-between items-center mb-4">
-                                    <span className="text-[12px] font-bold uppercase tracking-[0.2em] text-white/50">{t('product.selectSize')}</span>
-                                    <button className="flex items-center gap-2 text-[12px] font-bold uppercase tracking-[0.1em] text-white/50 hover:text-white transition-colors">
-                                        <Ruler className="w-3.5 h-3.5" />
-                                        {t('product.sizeGuide')}
-                                    </button>
-                                </div>
-                                <div className="flex flex-wrap gap-2">
-                                    {sizes.map((size: string) => (
-                                        <button
-                                            key={size}
-                                            onClick={() => setSelectedSize(size)}
-                                            className={cn(
-                                                "min-w-12 h-12 border text-[11px] font-bold tracking-widest transition-all duration-300 flex items-center justify-center px-4",
-                                                selectedSize === size 
-                                                    ? "bg-white border-white text-[#592C2F]" 
-                                                    : "bg-transparent border-white/20 text-white hover:border-white"
-                                            )}
-                                        >
-                                            {size}
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Action Buttons */}
-                        <div className="space-y-6 mb-12">
-                            <div className="flex items-center gap-6">
-                                <div className="flex items-center border border-white/20 h-16 w-32 px-4 shadow-sm">
-                                    <button 
-                                        onClick={decreaseQty}
-                                        className="flex-1 flex items-center justify-center text-white/50 hover:text-white transition-colors"
-                                    >
+                        {/* Actions Block */}
+                        <div className="bg-white/5 border border-white/10 rounded-3xl p-6 lg:p-8 mb-6 shadow-2xl backdrop-blur-xl space-y-4">
+                            <div className="flex items-center gap-4">
+                                <div className={cn(
+                                    "flex items-center border border-white/10 bg-black/20 rounded-2xl h-14 w-32 px-2 shadow-inner transition-opacity",
+                                    isOutOfStock && "opacity-20 pointer-events-none"
+                                )}>
+                                    <button onClick={decreaseQty} className="flex-1 flex items-center justify-center text-white/50 hover:text-white transition-colors">
                                         <Minus className="w-4 h-4" />
                                     </button>
-                                    <span className="flex-1 text-center font-black text-[14px]">{quantity}</span>
-                                    <button 
-                                        onClick={increaseQty}
-                                        className="flex-1 flex items-center justify-center text-white/50 hover:text-white transition-colors"
-                                    >
+                                    <span className="flex-1 text-center font-black text-[15px]">{quantity}</span>
+                                    <button onClick={increaseQty} className="flex-1 flex items-center justify-center text-white/50 hover:text-white transition-colors">
                                         <Plus className="w-4 h-4" />
                                     </button>
                                 </div>
                                 <AddToCart
+                                    disabled={isOutOfStock}
                                     product={{
                                         id: product.id,
                                         name: product.name,
-                                        price: Number(product.price),
+                                        price: currentPrice,
                                         image: images[0],
                                         size: selectedSize,
                                         color: selectedColor?.name
                                     }}
                                     quantity={quantity}
-                                    className="h-16 flex-1 bg-white text-[#592C2F] font-bold text-[12px] uppercase tracking-[0.4em] hover:bg-white/80 transition-all rounded-[1px] shadow-lg"
+                                    className={cn(
+                                        "h-14 flex-1 font-bold text-[12px] uppercase tracking-[0.2em] rounded-2xl shadow-xl transition-all duration-300",
+                                        isOutOfStock 
+                                            ? "bg-red-950/20 text-red-500 border border-red-500/30 cursor-not-allowed"
+                                            : "bg-white text-black hover:scale-[1.02] active:scale-95"
+                                    )}
                                 />
                             </div>
                             <button
                                 onClick={handleBuyNow}
-                                className="h-16 w-full bg-transparent border border-white/20 text-white font-bold text-[12px] uppercase tracking-[0.4em] hover:bg-white hover:text-[#592C2F] hover:border-white transition-all duration-500 rounded-[1px]"
+                                disabled={isOutOfStock}
+                                className={cn(
+                                    "h-14 w-full font-bold text-[12px] uppercase tracking-[0.3em] rounded-2xl transition-all duration-300 shadow-lg",
+                                    isOutOfStock
+                                        ? "bg-red-950/10 text-red-800 border border-red-900/20 cursor-not-allowed"
+                                        : "bg-white/5 border border-white/10 text-white hover:bg-white hover:text-black"
+                                )}
                             >
-                                {t('product.buyNow')}
+                                {isOutOfStock ? (language === 'ar' ? "نفذت الكمية" : "OUT OF STOCK") : t('product.buyNow')}
                             </button>
                         </div>
 
                         <div className="flex items-center justify-center lg:justify-start gap-8 border-b border-white/10 pb-10 mb-10">
-                            <button className="flex items-center gap-2 text-[12px] font-bold uppercase tracking-[0.15em] text-white/50 hover:text-white transition-colors">
-                                <Heart className="w-4 h-4" />
+                            <button 
+                                onClick={handleToggleWishlist}
+                                className={cn(
+                                    "flex items-center gap-2 text-[12px] font-bold uppercase tracking-[0.15em] transition-all duration-300",
+                                    isInWishlist(product.id) ? "text-brand-burgundy" : "text-white/50 hover:text-white"
+                                )}
+                            >
+                                <Heart className={cn("w-4 h-4", isInWishlist(product.id) && "fill-brand-burgundy")} />
                                 {t('product.wishlist')}
                             </button>
-                            <button className="flex items-center gap-2 text-[12px] font-bold uppercase tracking-[0.15em] text-white/50 hover:text-white transition-colors">
+                            <button 
+                                onClick={handleShare}
+                                className="flex items-center gap-2 text-[12px] font-bold uppercase tracking-[0.15em] text-white/50 hover:text-white transition-colors"
+                            >
                                 <Share2 className="w-4 h-4" />
                                 {t('product.share')}
                             </button>
                         </div>
 
-                        {/* Accordion Details */}
-                        <div className="space-y-6">
+                        {/* Accordion Details Block */}
+                        <div className="bg-white/5 border border-white/10 rounded-3xl p-6 lg:p-8 shadow-2xl backdrop-blur-xl space-y-6">
                             <AccordionItem 
                                 title={t('product.description')} 
                                 isOpen={activeSection === "details"}
@@ -246,18 +362,7 @@ export default function ProductPageClient({ product, images, similarProducts }: 
                                 </div>
                             </AccordionItem>
 
-                            <AccordionItem 
-                                title={t('product.care')} 
-                                isOpen={activeSection === "care"}
-                                onClick={() => setActiveSection(activeSection === "care" ? "" : "care")}
-                            >
-                                <p className={cn(
-                                    "text-[13px] text-white/70 leading-relaxed font-medium capitalize first-letter:uppercase",
-                                    language === 'ar' && "text-right font-sans text-[15px]"
-                                )}>
-                                    {displayCare || (language === 'ar' ? "يوصى بالتنظيف الجاف للمحافظة على جودة المنتج." : "Professional cleaning recommended to preserve fabric quality.")}
-                                </p>
-                            </AccordionItem>
+
 
                             <AccordionItem 
                                 title={t('product.shipping')} 

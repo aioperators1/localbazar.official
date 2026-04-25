@@ -37,10 +37,13 @@ const FALLBACK_PRODUCTS: Product[] = [
 export async function getFeaturedProducts(): Promise<Product[]> {
   try {
     const products = await prisma.product.findMany({
-      where: { featured: true },
+      where: { featured: true, status: 'APPROVED' },
       include: { category: true },
       take: 8,
-      orderBy: { createdAt: 'desc' }
+      orderBy: [
+        { position: 'asc' },
+        { createdAt: 'desc' }
+      ]
     });
     if (products.length > 0) {
       return products.map(p => ({
@@ -50,8 +53,8 @@ export async function getFeaturedProducts(): Promise<Product[]> {
         createdAt: p.createdAt.toISOString(),
         updatedAt: p.updatedAt.toISOString(),
         category: p.category ? {
-            ...p.category,
-            createdAt: p.category.createdAt.toISOString()
+          ...p.category,
+          createdAt: p.category.createdAt.toISOString()
         } : null
       })) as unknown as Product[];
     }
@@ -72,7 +75,9 @@ export async function getAllProducts(
   brandSlug?: string
 ): Promise<Product[]> {
   try {
-    const where: Prisma.ProductWhereInput = {};
+    const where: Prisma.ProductWhereInput = {
+      status: 'APPROVED'
+    };
 
     if (categorySlug) {
       where.OR = [
@@ -82,7 +87,19 @@ export async function getAllProducts(
     }
 
     if (brandSlug) {
-      where.brand = { slug: brandSlug };
+      // Find the brand first to get its proper name
+      const brand = await prisma.brand.findUnique({ where: { slug: brandSlug } });
+      
+      if (brand) {
+        where.OR = [
+          ...(where.OR || []),
+          { brandId: brand.id },
+          { brandName: { contains: brand.name, mode: 'insensitive' } }
+        ];
+      } else {
+        // Fallback for non-existent brands in model or custom slugs
+        where.brandName = { contains: brandSlug.replace(/-/g, ' '), mode: 'insensitive' };
+      }
     }
 
     if (search) {
@@ -92,7 +109,7 @@ export async function getAllProducts(
           { description: { contains: search } }
         ]
       };
-      
+
       if (where.AND) {
         where.AND = Array.isArray(where.AND) ? [...where.AND, searchCondition] : [where.AND, searchCondition];
       } else {
@@ -111,10 +128,18 @@ export async function getAllProducts(
       if (maxPrice !== undefined) where.price.lte = maxPrice;
     }
 
-    let orderBy: Prisma.ProductOrderByWithRelationInput = { createdAt: 'desc' };
-    if (sort === 'price_asc') orderBy = { price: 'asc' };
-    else if (sort === 'price_desc') orderBy = { price: 'desc' };
-    else if (sort === 'newest') orderBy = { createdAt: 'desc' };
+    let orderBy: Prisma.ProductOrderByWithRelationInput[] = [
+      { position: 'asc' },
+      { createdAt: 'desc' }
+    ];
+
+    if (sort === 'price_asc') {
+      orderBy = [{ price: 'asc' }];
+    } else if (sort === 'price_desc') {
+      orderBy = [{ price: 'desc' }];
+    } else if (sort === 'newest') {
+      orderBy = [{ createdAt: 'desc' }];
+    }
 
     const products = await prisma.product.findMany({
       where,
@@ -147,26 +172,16 @@ export async function getAllProducts(
 export async function getCategories(): Promise<Category[]> {
   try {
     const categories = await prisma.category.findMany({
-      orderBy: { name: 'asc' }
+      orderBy: { createdAt: 'desc' }
     });
-    if (categories.length > 0) {
-       return categories.map(c => ({
-         ...c,
-         createdAt: c.createdAt.toISOString()
-       })) as unknown as Category[];
-    }
+    return categories.map(c => ({
+      ...c,
+      createdAt: c.createdAt.toISOString()
+    })) as unknown as Category[];
   } catch (error) {
     console.error("Failed to fetch categories:", error);
+    return [];
   }
-  
-  return [
-    { id: 'abayas', name: 'Abayas', slug: 'abayas', image: 'https://images.unsplash.com/photo-1566174053879-31528523f8ae?q=80&w=1200', parentId: null, createdAt: new Date().toISOString() },
-    { id: 'dresses-jalabiyas', name: 'Dresses & Jalabiyas', slug: 'dresses-jalabiyas', image: 'https://images.unsplash.com/photo-1566174053879-31528523f8ae?q=80&w=1200', parentId: null, createdAt: new Date().toISOString() },
-    { id: 'men', name: 'Men', slug: 'men', image: 'https://images.unsplash.com/photo-1594932224036-9c205771abb6?q=80&w=1200', parentId: null, createdAt: new Date().toISOString() },
-    { id: 'perfumes-oud', name: 'Perfumes & Oud', slug: 'perfumes-oud', image: 'https://images.unsplash.com/photo-1547887538-e3a2f32cb1cc?q=80&w=1200', parentId: null, createdAt: new Date().toISOString() },
-    { id: 'jewelry', name: 'Jewelry', slug: 'jewelry', image: 'https://images.unsplash.com/photo-1610812383719-38379010461f?q=80&w=1200', parentId: null, createdAt: new Date().toISOString() },
-    { id: 'accessories', name: 'Accessories', slug: 'accessories', image: 'https://images.unsplash.com/photo-1520903920243-00d872a2d1c9?q=80&w=1200', parentId: null, createdAt: new Date().toISOString() }
-  ];
 }
 
 export async function getProductById(id: string): Promise<Product | null> {
@@ -196,27 +211,37 @@ export async function getProductById(id: string): Promise<Product | null> {
 
 export async function getProductBySlug(slug: string): Promise<Product | null> {
   try {
-    const p = await prisma.product.findUnique({
+    // 1. Try Slug
+    let p = await prisma.product.findUnique({
       where: { slug },
       include: { category: true }
     });
+
+    // 2. Fallback to ID if not found by slug
+    if (!p) {
+      p = await prisma.product.findUnique({
+        where: { id: slug },
+        include: { category: true }
+      });
+    }
+
     if (p) {
-       return {
-         ...p,
-         price: Number(p.price),
-         salePrice: p.salePrice ? Number(p.salePrice) : null,
-         createdAt: p.createdAt.toISOString(),
-         updatedAt: p.updatedAt.toISOString(),
-         category: p.category ? {
-           ...p.category,
-           createdAt: p.category.createdAt.toISOString()
-         } : null
-       } as unknown as Product;
+      return {
+        ...p,
+        price: Number(p.price),
+        salePrice: p.salePrice ? Number(p.salePrice) : null,
+        createdAt: p.createdAt.toISOString(),
+        updatedAt: p.updatedAt.toISOString(),
+        category: p.category ? {
+          ...p.category,
+          createdAt: p.category.createdAt.toISOString()
+        } : null
+      } as unknown as Product;
     }
   } catch (error) {
-    console.error("Failed to fetch product by slug:", error);
+    console.error("Failed to fetch product by slug/id:", error);
   }
-  return FALLBACK_PRODUCTS.find(p => p.slug === slug) || null;
+  return FALLBACK_PRODUCTS.find(p => p.slug === slug || p.id === slug) || null;
 }
 
 export async function getMarketplaceProducts(): Promise<Product[]> {

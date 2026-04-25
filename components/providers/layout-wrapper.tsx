@@ -9,13 +9,16 @@ import { ScrollProgress } from "@/components/ui/scroll-progress";
 import { Maintenance } from "@/components/store/Maintenance";
 
 import { WelcomePage } from "@/components/store/WelcomePage";
+import { AnnouncementBar } from "@/components/store/AnnouncementBar";
 
 export function LayoutWrapper({ 
   children, 
-  settings 
+  settings,
+  categories 
 }: { 
   children: React.ReactNode;
   settings: any;
+  categories: any[];
 }) {
   const pathname = usePathname();
   const isAdmin = pathname?.startsWith("/admin");
@@ -33,7 +36,7 @@ export function LayoutWrapper({
     return (
       <>
         {children}
-        <Toaster />
+        <Toaster position="top-center" />
       </>
     );
   }
@@ -43,7 +46,7 @@ export function LayoutWrapper({
     return (
       <div className="bg-transparent min-h-screen">
         <main>{children}</main>
-        <Toaster />
+        <Toaster position="top-center" />
       </div>
     );
   }
@@ -54,13 +57,19 @@ export function LayoutWrapper({
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-transparent text-white">
+    <div className="flex flex-col min-h-screen bg-transparent text-white overflow-x-hidden max-w-[100vw]">
+      <AnnouncementBar 
+        text={settings?.notice_bar_text || ""} 
+        active={settings?.notice_bar_active === "true"} 
+        bgColor={settings?.notice_bar_bg_color}
+        textColor={settings?.notice_bar_text_color}
+      />
       <WelcomePage />
       <ScrollProgress />
-      <Header settings={settings} />
+      <Header settings={settings} categories={categories} />
       <main className="flex-grow">{children}</main>
-      <Footer settings={settings} />
-      <Toaster />
+      <Footer settings={settings} categories={categories} />
+      <Toaster position="top-center" />
     </div>
   );
 }

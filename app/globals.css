@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@100;200;300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&family=Changa:wght@400;500;600;700;800&display=swap');
 @import "tailwindcss";
 
 @theme {
@@ -123,10 +123,19 @@ body {
   @apply bg-background text-foreground antialiased selection:bg-brand-burgundy selection:text-white;
   font-family: 'Inter', sans-serif;
   min-height: 100vh;
+  overflow-x: hidden;
+  width: 100%;
+  position: relative;
 }
 
-[dir="rtl"] body {
-  font-family: 'IBM Plex Sans Arabic', sans-serif;
+[dir="rtl"] body,
+[dir="rtl"] button,
+[dir="rtl"] input,
+[dir="rtl"] optgroup,
+[dir="rtl"] select,
+[dir="rtl"] textarea {
+  font-family: 'Changa', sans-serif;
+  font-size: 1.05em; /* slightly larger for clarity */
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -136,7 +145,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 [dir="rtl"] h1, [dir="rtl"] h2, [dir="rtl"] h3, [dir="rtl"] h4, [dir="rtl"] h5, [dir="rtl"] h6 {
-  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-family: 'Changa', sans-serif;
   letter-spacing: normal;
 }
 
@@ -144,6 +153,12 @@ html {
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+  width: 100%;
+}
+
+* {
+  box-sizing: border-box;
 }
 
 /* Utilities */
@@ -219,6 +234,18 @@ html {
   }
 }
 
+@keyframes shimmer {
+  0% { transform: translateY(-100%); opacity: 0; }
+  50% { opacity: 1; }
+  100% { transform: translateY(100%); opacity: 0; }
+}
+
+@keyframes scroll-down {
+  0% { transform: translateY(-100%); opacity: 0; }
+  50% { opacity: 1; }
+  100% { transform: translateY(100%); opacity: 0; }
+}
+
 .animate-marquee {
   animation: marquee 40s linear infinite;
 }
@@ -237,4 +264,34 @@ html {
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+@keyframes loading-bar {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(200%); }
+}
+
+.animate-loading-bar {
+  animation: loading-bar 2s infinite ease-in-out;
+  width: 50%;
+}
+
+@keyframes loading-bar-fast {
+  0% { transform: translateX(-100%); }
+  50% { transform: translateX(0%); }
+  100% { transform: translateX(100%); }
+}
+
+.animate-loading-bar-fast {
+  animation: loading-bar-fast 1s infinite linear;
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  animation: marquee 30s linear infinite;
+  will-change: transform;
 }

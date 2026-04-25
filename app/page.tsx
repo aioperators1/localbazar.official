@@ -7,10 +7,11 @@ import { HomeBrands } from "@/components/store/HomeBrands";
 import { getAllProducts } from "@/lib/actions/product";
 import { ScrollReveal } from "@/components/store/ScrollReveal";
 import { getAdminBanners } from "@/lib/actions/admin";
+import { DynamicSectionsBuilder } from "@/components/store/DynamicSectionsBuilder";
 
-import { Category, Banner, Brand, Product } from "@/lib/types";
+import { Category, Banner, Brand, Product, AdminSetting } from "@/lib/types";
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 60;
 
 export default async function Home() {
   const [allProducts, rawBanners, dbSettings, allCategories, allBrands] = await Promise.all([
@@ -23,6 +24,14 @@ export default async function Home() {
 
   const activeBanners = rawBanners.filter((b: Banner) => b.active).sort((a: Banner, b: Banner) => a.order - b.order);
 
+  const rawSections = dbSettings?.home_sections;
+  let parsedDynamicSections = [];
+  if (rawSections) {
+    try {
+      parsedDynamicSections = JSON.parse(rawSections);
+    } catch(e) {}
+  }
+
   const fallbackSettings = {
     homepageTitle: "Doha Signature",
     homepageSubtitle: "LUXURY COLLECTION",
@@ -31,7 +40,7 @@ export default async function Home() {
     whatsappNumber: "97450558884"
   };
 
-  const settings = { ...fallbackSettings, ...(dbSettings || {}) };
+  const settings: AdminSetting = { ...fallbackSettings, ...(dbSettings || {}) };
 
   const homeBrands = allBrands.filter((b: Brand) => b.showInHome);
 
@@ -50,27 +59,40 @@ export default async function Home() {
 
   return (
     <div className="relative min-h-screen pb-20 overflow-x-hidden">
-      {/* Hero - Full width experience */}
-      <HeroSection banners={activeBanners as any} />
+      {/* Dynamic Builder Sections */}
+      {parsedDynamicSections.length > 0 ? (
+          <DynamicSectionsBuilder 
+              sections={parsedDynamicSections} 
+              products={allProducts} 
+              categories={allCategories}
+              brands={homeBrands}
+              activeBanners={activeBanners as any}
+          />
+      ) : (
+        <>
+          {/* Hero - Full width experience */}
+          <HeroSection banners={activeBanners as any} />
 
-      {homeBrands.length > 0 && (
-          <HomeBrands brands={homeBrands} />
-      )}
+          {homeBrands.length > 0 && (
+              <HomeBrands brands={homeBrands} />
+          )}
 
-      {homeTabsCategories.length > 0 && (
-        <ScrollReveal delay={0.2}>
-          <NewArrivalsTabs products={allProducts} categories={homeTabsCategories} />
-        </ScrollReveal>
-      )}
+          {homeTabsCategories.length > 0 && (
+            <ScrollReveal delay={0.2}>
+              <NewArrivalsTabs products={allProducts} categories={homeTabsCategories} />
+            </ScrollReveal>
+          )}
 
-      {homeCuratedCategories.length > 0 && (
-        <ScrollReveal delay={0.3}>
-          <CategoryCuration categories={homeCuratedCategories} />
-        </ScrollReveal>
-      )}
+          {homeCuratedCategories.length > 0 && (
+            <ScrollReveal delay={0.3}>
+              <CategoryCuration categories={homeCuratedCategories} />
+            </ScrollReveal>
+          )}
 
-      {selectionCategory && (
-        <HomeContent selectionProducts={selectionProducts} selectionCategory={selectionCategory} />
+          {selectionCategory && (
+            <HomeContent selectionProducts={selectionProducts} selectionCategory={selectionCategory} />
+          )}
+        </>
       )}
 
       <WhatsAppButton settings={settings} />

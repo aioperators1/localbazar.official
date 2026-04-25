@@ -32,25 +32,31 @@ import {
     Lock,
     Unlock,
     Eye,
-    EyeOff
+    EyeOff,
+    Truck,
+    Store,
+    Terminal
 } from "lucide-react";
 import { createTeamMember } from "@/lib/actions/admin";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
 const PAGES = [
-    { id: "all", name: "Supreme Authority", desc: "Full System Access Protocol", icon: CheckCircle2 },
-    { id: "dashboard", name: "Dashboard", desc: "Command & Operations Analytics", icon: LayoutDashboard },
-    { id: "orders", name: "Orders", desc: "Transaction & Fulfillment Matrix", icon: ShoppingCart },
-    { id: "products", name: "Products", desc: "Inventory Assets Registry", icon: Tag },
-    { id: "categories", name: "Categories", desc: "Structural Taxonomy", icon: Layers },
-    { id: "customers", name: "Customers", desc: "Client Relationship Management", icon: Users },
-    { id: "banners", name: "Banners", desc: "Visual Interface Marketing", icon: Megaphone },
-    { id: "vouchers", name: "Vouchers", desc: "Strategic Discount Vectors", icon: Ticket },
-    { id: "brands", name: "Brands", desc: "Vendor Ecosystem Directory", icon: Gem },
-    { id: "logo", name: "Logo", desc: "Brand Identity Assets", icon: ImageIcon },
-    { id: "settings", name: "Settings", desc: "Core System Configuration", icon: SettingsIcon },
-    { id: "team", name: "Team", desc: "Security & Access Hub", icon: Shield },
+    { id: "all", name: "Full Admin Pass", desc: "Global system access", icon: CheckCircle2 },
+    { id: "dashboard", name: "Dashboard", desc: "Analytics and overview", icon: LayoutDashboard },
+    { id: "orders", name: "Orders", desc: "Purchase management", icon: ShoppingCart },
+    { id: "products", name: "Products", desc: "Inventory assets", icon: Tag },
+    { id: "categories", name: "Categories", desc: "Store organization", icon: Layers },
+    { id: "customers", name: "Customers", desc: "Guest relationship", icon: Users },
+    { id: "drivers", name: "Drivers", desc: "Logistics fleet", icon: Truck },
+    { id: "store", name: "Store", desc: "Front-end builder", icon: Store },
+    { id: "banners", name: "Banners", desc: "Homepage visuals", icon: Megaphone },
+    { id: "notice", name: "Notice Bar", desc: "System announcements", icon: Terminal },
+    { id: "vouchers", name: "Vouchers", desc: "Discount strategies", icon: Ticket },
+    { id: "brands", name: "Brands", desc: "Vendor directory", icon: Gem },
+    { id: "logo", name: "Logo", desc: "Brand identity", icon: ImageIcon },
+    { id: "settings", name: "Settings", desc: "General config", icon: SettingsIcon },
+    { id: "team", name: "Team", desc: "Staff management", icon: Shield },
 ];
 
 export function AddMemberModal() {
@@ -64,6 +70,13 @@ export function AddMemberModal() {
         role: "ADMIN",
         permissions: [] as { id: string, access: "visitor" | "editor" }[]
     });
+
+    const ROLE_OPTIONS = [
+        { value: "ADMIN", label: "Administrator" },
+        { value: "MANAGER", label: "Manager" },
+        { value: "DRIVER", label: "Driver / Logistics" },
+        { value: "STAFF", label: "Staff" },
+    ];
     
     const togglePermission = (id: string, access: "visitor" | "editor" = "editor") => {
         if (id === "all") {
@@ -73,7 +86,7 @@ export function AddMemberModal() {
             setFormData(prev => ({
                 ...prev,
                 permissions: isAllSelected ? [] : allIds,
-                role: isAllSelected ? "ADMIN" : "SUPER_ADMIN"
+                role: isAllSelected ? prev.role : "SUPER_ADMIN"
             }));
             return;
         }
@@ -96,7 +109,7 @@ export function AddMemberModal() {
             return {
                 ...prev,
                 permissions: newPermissions,
-                role: isAllSelected ? "SUPER_ADMIN" : "ADMIN"
+                role: isAllSelected ? "SUPER_ADMIN" : prev.role
             };
         });
     };
@@ -104,7 +117,7 @@ export function AddMemberModal() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (formData.permissions.length === 0) {
-            toast.error("Initialize at least one frequency protocol");
+            toast.error("Please select at least one permission");
             return;
         }
         setLoading(true);
@@ -115,15 +128,15 @@ export function AddMemberModal() {
             } as any);
             
             if (res.success) {
-                toast.success("MEMBER ENTITY INITIALIZED");
+                toast.success("TEAM MEMBER ADDED");
                 setOpen(false);
                 setFormData({ name: "", email: "", password: "", role: "ADMIN", permissions: [] });
                 window.location.reload();
             } else {
-                toast.error(res.error || "Initialization failed");
+                toast.error(res.error || "Failed to add member");
             }
         } catch (error) {
-            toast.error("Critical operational failure");
+            toast.error("Operation failed");
         } finally {
             setLoading(false);
         }
@@ -132,216 +145,199 @@ export function AddMemberModal() {
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button className="h-14 px-10 bg-white text-black hover:bg-white/90 rounded-[22px] font-black text-[12px] uppercase tracking-[0.2em] shadow-2xl transition-all hover:scale-[1.02] active:scale-95 flex items-center gap-4">
-                    <UserPlus className="w-5 h-5" />
-                    Initialize Personnel
+                <Button className="h-12 px-8 bg-black text-white hover:bg-black/90 rounded-xl font-black text-[11px] uppercase tracking-wider shadow-lg transition-all active:scale-95 flex items-center gap-3">
+                    <UserPlus className="w-4 h-4" />
+                    Add Team Member
                 </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[850px] bg-[#0A0A0A] border-white/5 shadow-[0_40px_150px_rgba(0,0,0,1)] rounded-[48px] p-0 overflow-hidden max-h-[92vh] flex flex-col outline-none">
-                <div className="absolute top-0 right-0 w-96 h-96 bg-blue-600/5 blur-[120px] pointer-events-none -translate-y-1/2 translate-x-1/2" />
-                <div className="absolute bottom-0 left-0 w-80 h-80 bg-white/5 blur-[120px] pointer-events-none translate-y-1/2 -translate-x-1/2" />
-                
-                <div className="relative p-12 pb-6 flex items-center justify-between z-10">
-                    <div className="flex items-center gap-6">
-                        <div className="w-16 h-16 bg-white/5 border border-white/10 rounded-[28px] flex items-center justify-center backdrop-blur-3xl shadow-2xl transition-transform hover:scale-110 duration-700">
-                            <Shield className="w-8 h-8 text-white/40" />
-                        </div>
-                        <div>
-                            <DialogTitle className="text-3xl font-black text-white uppercase tracking-tighter italic leading-none">Initialize Protocol</DialogTitle>
-                            <p className="text-white/20 text-[10px] font-black uppercase tracking-[0.4em] mt-3">Identity Synthesis & Access Matrix Allocation</p>
-                        </div>
+            <DialogContent className="sm:max-w-xl bg-white border-gray-100 shadow-2xl rounded-3xl p-0 overflow-hidden flex flex-col outline-none max-h-[92vh]">
+                <DialogHeader className="p-6 border-b border-gray-50 flex flex-row items-center justify-between shrink-0">
+                    <div>
+                        <DialogTitle className="text-xl font-black text-black uppercase tracking-tight">Access Management</DialogTitle>
+                        <p className="text-gray-400 text-[10px] font-black uppercase tracking-widest mt-1">Configure new personnel profile</p>
                     </div>
-                    <Button variant="ghost" onClick={() => setOpen(false)} className="h-14 w-14 rounded-full hover:bg-white/5 text-white/20 hover:text-white transition-all">
-                        <X className="w-7 h-7" />
+                    <Button variant="ghost" onClick={() => setOpen(false)} className="h-8 w-8 rounded-full hover:bg-gray-100 text-gray-400">
+                        <X className="w-4 h-4" />
                     </Button>
-                </div>
+                </DialogHeader>
 
-                <div className="overflow-y-auto no-scrollbar px-12 py-10 space-y-12 flex-1 relative z-10">
-                    <form id="member-form" onSubmit={handleSubmit} className="space-y-16">
-                        {/* Section 1: Profile Matrix */}
-                        <div className="space-y-8">
-                            <div className="flex items-center gap-4">
-                                <span className="text-[11px] font-black uppercase tracking-[0.5em] text-white/10">01</span>
-                                <div className="h-px flex-1 bg-white/5" />
-                                <h3 className="text-[11px] font-black uppercase tracking-[0.3em] text-white/40">Profile Genesis</h3>
+                <div className="overflow-y-auto no-scrollbar px-8 py-6 space-y-8 flex-1">
+                    <form id="member-form" onSubmit={handleSubmit} className="space-y-8">
+                        {/* Section 1: Basic Info */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                            <div className="space-y-2">
+                                <Label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Full Name</Label>
+                                <Input 
+                                    required
+                                    value={formData.name}
+                                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                    placeholder="e.g. John Doe"
+                                    className="h-12 bg-gray-50 border-gray-100 rounded-xl focus:bg-white focus:border-black font-bold text-[13px] px-5 transition-all outline-none"
+                                />
                             </div>
-                            
-                            <div className="grid grid-cols-2 gap-10">
-                                <div className="space-y-4">
-                                    <Label className="text-[10px] font-black text-white/30 uppercase tracking-widest ml-2">Legal Identity Designation</Label>
-                                    <Input 
-                                        required
-                                        value={formData.name}
-                                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                        placeholder="EXECUTIVE_ID_NAME"
-                                        className="h-16 bg-white/[0.03] border-white/5 rounded-[22px] focus:bg-white/[0.05] focus:border-white/20 focus:ring-4 focus:ring-white/5 font-black text-[15px] px-8 text-white placeholder-white/10 transition-all"
-                                    />
-                                </div>
-                                <div className="space-y-4">
-                                    <Label className="text-[10px] font-black text-white/30 uppercase tracking-widest ml-2">Communication Terminal</Label>
-                                    <Input 
-                                        type="email"
-                                        required
-                                        value={formData.email}
-                                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                        placeholder="frequency@localbazar.com"
-                                        className="h-16 bg-white/[0.03] border-white/5 rounded-[22px] focus:bg-white/[0.05] focus:border-white/20 focus:ring-4 focus:ring-white/5 font-black text-[15px] px-8 text-white placeholder-white/10 transition-all"
-                                    />
-                                </div>
+                            <div className="space-y-2">
+                                <Label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Email Address</Label>
+                                <Input 
+                                    type="email"
+                                    required
+                                    value={formData.email}
+                                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                    placeholder="name@localbazar.com"
+                                    className="h-12 bg-gray-50 border-gray-100 rounded-xl focus:bg-white focus:border-black font-bold text-[13px] px-5 transition-all outline-none"
+                                />
                             </div>
-
-                            <div className="space-y-4 max-w-md">
-                                <Label className="text-[10px] font-black text-white/30 uppercase tracking-widest ml-2">Secured Logical Passphrase</Label>
-                                <div className="relative group/key">
+                            <div className="space-y-2 sm:col-span-2">
+                                <Label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Access Password</Label>
+                                <div className="relative">
                                     <Input 
                                         type={showPassword ? "text" : "password"}
                                         required
                                         value={formData.password}
                                         onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                                        placeholder="Min. 12 Symbols Required"
-                                        className="h-16 bg-white/[0.03] border-white/5 rounded-[22px] focus:bg-white/[0.05] focus:border-white/20 focus:ring-4 focus:ring-white/5 font-black text-[15px] px-8 text-white placeholder-white/10 transition-all pr-16"
+                                        placeholder="Enter password..."
+                                        className="h-12 bg-gray-50 border-gray-100 rounded-xl focus:bg-white focus:border-black font-bold text-[13px] px-5 transition-all outline-none pr-12"
                                     />
                                     <button 
                                         type="button"
                                         onClick={() => setShowPassword(!showPassword)}
-                                        className="absolute right-6 top-1/2 -translate-y-1/2 p-2 rounded-xl bg-white/5 text-white/20 hover:text-white hover:bg-white/10 transition-all"
+                                        className="absolute right-4 top-1/2 -translate-y-1/2 p-1.5 rounded-lg text-gray-400 hover:text-black hover:bg-gray-100 transition-all"
                                     >
-                                        {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                                     </button>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Section 2: Access Protocols Matrix */}
-                        <div className="space-y-8 pb-10">
-                            <div className="flex items-center justify-between">
+                        {/* Section 1.5: Role Selector */}
+                        <div className="space-y-2">
+                            <Label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Access Role</Label>
+                            <select
+                                value={formData.role === "SUPER_ADMIN" ? "ADMIN" : formData.role}
+                                onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                                className="w-full h-12 bg-gray-50 border border-gray-100 rounded-xl focus:bg-white focus:border-black font-bold text-[13px] px-5 transition-all outline-none appearance-none cursor-pointer"
+                            >
+                                {ROLE_OPTIONS.map(opt => (
+                                    <option key={opt.value} value={opt.value}>{opt.label}</option>
+                                ))}
+                            </select>
+                        </div>
+
+                        {/* Section 2: Permissions Grid */}
+                        <div className="space-y-6">
+                            <div className="flex items-center justify-between border-b border-gray-50 pb-4">
+                                <h3 className="text-[10px] font-black uppercase tracking-widest text-gray-400">Permissions Matrix</h3>
                                 <div className="flex items-center gap-4">
-                                    <span className="text-[11px] font-black uppercase tracking-[0.5em] text-white/10">02</span>
-                                    <div className="h-px w-20 bg-white/5" />
-                                    <h3 className="text-[11px] font-black uppercase tracking-[0.3em] text-white/40">Operational Matrix</h3>
-                                </div>
-                                <div className="flex items-center gap-8">
-                                     <div className="flex items-center gap-3">
-                                         <div className="w-2.5 h-2.5 rounded-full border border-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.5)]" />
-                                         <span className="text-[9px] font-black text-white/20 tracking-[0.3em] uppercase italic">Quantum Visitor</span>
+                                     <div className="flex items-center gap-2">
+                                         <div className="w-2 h-2 rounded-full bg-black/10" />
+                                         <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Viewer</span>
                                      </div>
-                                     <div className="flex items-center gap-3">
-                                         <div className="w-2.5 h-2.5 rounded-full bg-white shadow-[0_0_10px_rgba(255,255,255,0.5)]" />
-                                         <span className="text-[9px] font-black text-white/20 tracking-[0.3em] uppercase italic">System Editor</span>
+                                     <div className="flex items-center gap-2">
+                                         <div className="w-2 h-2 rounded-full bg-black" />
+                                         <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Editor</span>
                                      </div>
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                                {PAGES.map((page) => {
-                                    const Icon = page.icon;
-                                    const isActive = formData.permissions.find((p: any) => p.id === page.id);
-                                    const access = (isActive as any)?.access;
-                                    const isSuper = page.id === "all";
-                                    
-                                    if (isSuper) {
-                                        const allIds = PAGES.filter(p => p.id !== "all").map(p => p.id);
-                                        const isAllSelected = allIds.every(pid => formData.permissions.some((p: any) => p.id === pid && p.access === "editor"));
-
-                                        return (
-                                            <div key={page.id} className="lg:col-span-2 group/super">
-                                                <div 
-                                                    onClick={() => togglePermission("all")}
-                                                    className={cn(
-                                                        "flex items-center gap-8 p-10 rounded-[36px] border-[2px] transition-all duration-700 cursor-pointer overflow-hidden relative",
-                                                        isAllSelected 
-                                                            ? "bg-white border-white shadow-[0_40px_80px_-20px_rgba(255,255,255,0.2)]" 
-                                                            : "bg-white/[0.01] border-white/5 hover:border-white/10 hover:bg-white/[0.03]"
-                                                    )}
-                                                >
-                                                    {isAllSelected && (
-                                                         <div className="absolute inset-x-0 bottom-0 h-1 bg-black/10 animate-pulse" />
-                                                    )}
-                                                    <div className={cn(
-                                                        "w-16 h-16 rounded-[22px] flex items-center justify-center transition-all duration-700",
-                                                        isAllSelected ? "bg-black text-white scale-110" : "bg-white/5 text-white/20"
-                                                    )}>
-                                                        <Icon className="w-8 h-8" />
-                                                    </div>
-                                                    <div className="flex-1 flex flex-col">
-                                                        <span className={cn("text-xl font-black uppercase tracking-tighter italic", isAllSelected ? "text-black" : "text-white")}>Supreme Executioner Protocol</span>
-                                                        <span className={cn("text-[10px] font-bold uppercase tracking-[0.4em] mt-1", isAllSelected ? "text-black/40" : "text-white/20")}>Universal Administrative Overlook</span>
-                                                    </div>
-                                                    <div className={cn(
-                                                        "w-10 h-10 rounded-full border-4 flex items-center justify-center transition-all duration-700",
-                                                        isAllSelected ? "border-black/5 bg-black" : "border-white/5"
-                                                    )}>
-                                                        {isAllSelected && <Lock className="w-4 h-4 text-white" />}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        )
-                                    }
-
+                            <div className="grid grid-cols-1 gap-4">
+                                {/* All Access Option */}
+                                {(() => {
+                                    const allIds = PAGES.filter(p => p.id !== "all").map(p => p.id);
+                                    const isAllSelected = allIds.every(pid => formData.permissions.some((p: any) => p.id === pid && p.access === "editor"));
                                     return (
-                                        <div key={page.id} className={cn(
-                                            "flex items-center gap-4 group/entry transition-opacity",
-                                            isActive ? "opacity-100" : "opacity-30 hover:opacity-100"
-                                        )}>
-                                            <div className="flex-1 flex items-center gap-5 p-6 bg-white/[0.02] border border-white/5 rounded-[28px] transition-all group-hover/entry:bg-white/[0.04] group-hover/entry:border-white/10 group-hover/entry:shadow-2xl">
+                                        <div 
+                                            onClick={() => togglePermission("all")}
+                                            className={cn(
+                                                "flex items-center justify-between p-4 rounded-2xl border-2 transition-all cursor-pointer",
+                                                isAllSelected 
+                                                    ? "bg-black border-black shadow-xl" 
+                                                    : "bg-gray-50 border-gray-50 hover:border-gray-100"
+                                            )}
+                                        >
+                                            <div className="flex items-center gap-4">
                                                 <div className={cn(
-                                                    "w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-500",
-                                                    access === "editor" ? "bg-white text-black" : access === "visitor" ? "bg-blue-500/20 text-blue-400" : "bg-white/5 text-white/20"
+                                                    "w-10 h-10 rounded-xl flex items-center justify-center transition-all",
+                                                    isAllSelected ? "bg-white/10 text-white" : "bg-white text-gray-400"
                                                 )}>
-                                                    <Icon className="w-6 h-6" />
+                                                    <CheckCircle2 className="w-5 h-5" />
                                                 </div>
                                                 <div className="flex flex-col">
-                                                    <span className="font-black text-[13px] uppercase tracking-widest text-white leading-none mb-1.5 italic">{page.name}</span>
-                                                    <span className="text-[10px] font-bold text-white/20 uppercase tracking-[0.1em]">{page.desc}</span>
+                                                    <span className={cn("text-[13px] font-black uppercase tracking-tight", isAllSelected ? "text-white" : "text-black")}>Supreme Admin Access</span>
+                                                    <span className={cn("text-[9px] font-bold uppercase tracking-widest", isAllSelected ? "text-white/40" : "text-gray-400")}>Full Global Permissions</span>
                                                 </div>
                                             </div>
-                                            
-                                            <div className="flex flex-col gap-2">
-                                                <button
-                                                    type="button"
-                                                    onClick={() => togglePermission(page.id, "visitor")}
-                                                    className={cn(
-                                                        "w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-500 border",
-                                                        access === "visitor" ? "bg-blue-600 border-blue-500 text-white shadow-[0_0_20px_rgba(59,130,246,0.3)]" : "bg-white/5 border-white/5 text-white/10 hover:text-white hover:bg-white/10"
-                                                    )}
-                                                >
-                                                    <Unlock className="w-5 h-5" />
-                                                </button>
-                                                <button
-                                                    type="button"
-                                                    onClick={() => togglePermission(page.id, "editor")}
-                                                    className={cn(
-                                                        "w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-500 border",
-                                                        access === "editor" ? "bg-white border-white text-black shadow-[0_0_20px_rgba(255,255,255,0.3)]" : "bg-white/5 border-white/5 text-white/10 hover:text-white hover:bg-white/10"
-                                                    )}
-                                                >
-                                                    <Lock className="w-5 h-5" />
-                                                </button>
-                                            </div>
+                                            {isAllSelected && <Lock className="w-4 h-4 text-white" />}
                                         </div>
                                     );
-                                })}
+                                })()}
+
+                                {/* Individual Permissions */}
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pb-8">
+                                    {PAGES.filter(p => p.id !== "all").map((page) => {
+                                        const Icon = page.icon;
+                                        const activePermission = formData.permissions.find((p: any) => p.id === page.id);
+                                        const access = (activePermission as any)?.access;
+
+                                        return (
+                                            <div key={page.id} className="flex flex-col gap-2 p-3 bg-white border border-gray-100 rounded-xl hover:shadow-md transition-all">
+                                                <div className="flex items-center gap-3 mb-2">
+                                                    <div className={cn(
+                                                        "w-8 h-8 rounded-lg flex items-center justify-center",
+                                                        access ? "bg-black text-white" : "bg-gray-50 text-gray-300"
+                                                    )}>
+                                                        <Icon className="w-4 h-4" />
+                                                    </div>
+                                                    <div className="flex flex-col">
+                                                        <span className="text-[11px] font-black text-black uppercase">{page.name}</span>
+                                                        <span className="text-[8px] font-bold text-gray-400 uppercase tracking-tighter">{page.desc}</span>
+                                                    </div>
+                                                </div>
+                                                <div className="flex gap-2">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => togglePermission(page.id, "visitor")}
+                                                        className={cn(
+                                                            "flex-1 py-1.5 rounded-lg text-[8px] font-black uppercase tracking-widest border transition-all",
+                                                            access === "visitor" ? "bg-black/5 border-black/10 text-black" : "bg-transparent border-gray-100 text-gray-300 hover:text-gray-400"
+                                                        )}
+                                                    >
+                                                        Viewer
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => togglePermission(page.id, "editor")}
+                                                        className={cn(
+                                                            "flex-1 py-1.5 rounded-lg text-[8px] font-black uppercase tracking-widest border transition-all",
+                                                            access === "editor" ? "bg-black border-black text-white" : "bg-transparent border-gray-100 text-gray-300 hover:text-gray-400"
+                                                        )}
+                                                    >
+                                                        Editor
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
                             </div>
                         </div>
                     </form>
                 </div>
 
-                <div className="p-12 border-t border-white/5 flex gap-6 bg-[#050505]/80 backdrop-blur-3xl shrink-0 z-20">
+                <div className="p-8 border-t border-gray-50 flex gap-4 bg-white shrink-0">
                     <Button
                         type="button"
                         variant="ghost"
                         onClick={() => setOpen(false)}
-                        className="flex-1 h-16 rounded-[24px] font-black text-white/20 uppercase text-[12px] tracking-[0.4em] hover:text-white hover:bg-white/5 transition-all"
+                        className="flex-1 h-12 rounded-xl font-black text-gray-400 uppercase text-[10px] tracking-widest hover:text-black"
                     >
-                        Abort Protocol
+                        Cancel
                     </Button>
                     <Button
                         type="submit"
                         form="member-form"
                         disabled={loading}
-                        className="flex-[2] h-16 rounded-[24px] bg-white text-black hover:bg-white/90 font-black uppercase text-[12px] tracking-[0.4em] shadow-2xl shadow-white/5 transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-50"
+                        className="flex-[2] h-12 rounded-xl bg-black text-white hover:bg-black/90 font-black uppercase text-[11px] tracking-widest shadow-lg active:scale-95 disabled:opacity-50"
                     >
-                        {loading ? "Synthesizing..." : "Synchronize Personnel"}
+                        {loading ? "Adding..." : "Add Personnel"}
                     </Button>
                 </div>
             </DialogContent>

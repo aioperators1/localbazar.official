@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { CheckCircle2, ShoppingBag } from "lucide-react";
+import { useCart } from "@/hooks/use-cart";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useSearchParams } from "next/navigation";
@@ -26,6 +27,8 @@ interface OrderInfo {
     zip: string;
     paymentMethod: string;
     total: number;
+    shippingCost?: number;
+    shippingMethodName?: string;
     items: { id: string; name: string; price: number; quantity: number; image?: string; category?: string; size?: string | null; color?: string | null }[];
 }
 
@@ -36,6 +39,12 @@ function SuccessContent() {
     const [mounted, setMounted] = useState(false);
     const { formatPrice: formatCurrency } = useCurrency();
     const { t, language } = useLanguage();
+    const { clearCart } = useCart();
+
+    const orderId = orderData?.orderId || orderIdParam || "N/A";
+    const shipping = orderData?.shippingCost !== undefined ? Number(orderData.shippingCost) : 35;
+    const itemsSubtotal = orderData?.items.reduce((acc, item) => acc + (item.price * item.quantity), 0) || 0;
+    const isOnlinePayment = orderData?.paymentMethod === "CARD";
 
     const handleDownload = () => {
         if (!orderData) return;
@@ -56,7 +65,8 @@ function SuccessContent() {
                 }]
             },
             paymentMethod: orderData.paymentMethod,
-            total: orderData.total,
+            total: (orderData.total || itemsSubtotal) + shipping,
+            shippingMethod: orderData.shippingMethodName,
             items: orderData.items.map(item => ({
                 id: item.id,
                 price: item.price,
@@ -78,6 +88,7 @@ function SuccessContent() {
             if (saved) {
                 try {
                     setOrderData(JSON.parse(saved));
+                    clearCart();
                 } catch (e) {
                     console.error("Failed to parse order data");
                 }
@@ -89,19 +100,15 @@ function SuccessContent() {
     // If still mounting, show skeleton or blank
     if (!mounted) return <div className="min-h-screen bg-transparent" />
 
-    const orderId = orderData?.orderId || orderIdParam || "N/A";
-    const subtotal = orderData ? orderData.items.reduce((acc, item) => acc + (item.price * item.quantity), 0) : 0;
-    const shipping = 35;
-    const isOnlinePayment = orderData?.paymentMethod === "CARD";
 
     if (!orderData) {
         return (
             <div className="flex flex-col items-center justify-center min-h-screen px-4 bg-transparent" dir={language === 'ar' ? 'rtl' : 'ltr'}>
                 <div className="relative w-full max-w-md mx-auto text-center">
                     <div className="w-24 h-24 mx-auto mb-8 relative flex items-center justify-center">
-                        <div className="absolute inset-0 rounded-full border-4 border-brand-burgundy opacity-20 animate-[ping_2s_cubic-bezier(0,0,0.2,1)_infinite]"></div>
-                        <div className="relative bg-white rounded-full w-16 h-16 flex items-center justify-center shadow-2xl border-2 border-brand-burgundy">
-                            <CheckCircle2 className="w-8 h-8 text-brand-burgundy animate-pulse" />
+                        <div className="absolute inset-0 rounded-full border-4 border-emerald-500 opacity-20 animate-[ping_2s_cubic-bezier(0,0,0.2,1)_infinite]"></div>
+                        <div className="relative bg-white rounded-full w-16 h-16 flex items-center justify-center shadow-2xl border-2 border-emerald-500">
+                            <CheckCircle2 className="w-8 h-8 text-emerald-500 animate-pulse" />
                         </div>
                     </div>
 
@@ -138,8 +145,8 @@ function SuccessContent() {
 
                         {/* Checkmark & Title */}
                         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-8">
-                            <div className="w-[50px] h-[50px] shrink-0 rounded-full border border-brand-burgundy flex items-center justify-center bg-black/20 shadow-sm">
-                                <CheckCircle2 className="w-6 h-6 text-brand-burgundy" strokeWidth={2} />
+                            <div className="w-[50px] h-[50px] shrink-0 rounded-full border border-emerald-500/50 flex items-center justify-center bg-emerald-500/10 shadow-[0_0_20px_rgba(16,185,129,0.1)]">
+                                <CheckCircle2 className="w-6 h-6 text-emerald-500" strokeWidth={2.5} />
                             </div>
                             <div className="flex flex-col">
                                 <span className="text-[11px] text-white/60 font-bold uppercase tracking-widest">
@@ -197,7 +204,7 @@ function SuccessContent() {
                                     {/* Shipping Method */}
                                     <div>
                                         <h4 className="text-[12px] font-bold text-white/50 uppercase tracking-widest mb-3">{t('success.shippingMethod')}</h4>
-                                        <p className="text-[13px] text-white font-medium leading-relaxed uppercase tracking-tight">{t('checkout.express')}</p>
+                                        <p className="text-[13px] text-white font-medium leading-relaxed uppercase tracking-tight">{orderData.shippingMethodName || t('checkout.express')}</p>
                                     </div>
                                 </div>
                             </div>
@@ -270,7 +277,7 @@ function SuccessContent() {
                                 <div className="space-y-4 pt-6 border-t border-white/10">
                                     <div className="flex justify-between items-center text-[11px] font-bold text-white/50 uppercase tracking-widest">
                                         <span>{t('cart.subtotal')}</span>
-                                        <span className="text-white">{formatCurrency(subtotal)}</span>
+                                        <span className="text-white">{formatCurrency(itemsSubtotal)}</span>
                                     </div>
                                     <div className="flex justify-between items-center text-[11px] font-bold text-white/50 uppercase tracking-widest">
                                         <span>{t('cart.shipping')}</span>
@@ -280,7 +287,7 @@ function SuccessContent() {
                                         <span>{t('cart.total')}</span>
                                         <span className="flex items-baseline gap-2">
                                             <span className="text-[12px] text-white/50 font-medium">QAR</span>
-                                            {formatCurrency(subtotal + shipping).replace(/[A-Z]+/, '').trim()}
+                                            {formatCurrency(itemsSubtotal + shipping).replace(/[A-Z]+/, '').trim()}
                                         </span>
                                     </div>
                                 </div>

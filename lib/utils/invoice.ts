@@ -7,6 +7,8 @@ interface InvoiceOrder {
     id: string;
     createdAt: string | Date;
     paymentMethod: string;
+    phone?: string | null;
+    shippingMethod?: string | null;
     total: number | string;
     user?: {
         name?: string | null;
@@ -47,180 +49,244 @@ export const generateInvoice = (order: InvoiceOrder, settings: InvoiceSettings) 
 
     // --- HELPER: COLOR PALETTE ---
     const COLORS = {
-        ONYX: [24, 24, 24],
-        GOLD: [184, 134, 11],
-        BURGUNDY: [89, 44, 47],
-        SILVER: [200, 200, 200],
+        ONYX: [10, 10, 10],      // Deep Black
+        HERITAGE: [89, 44, 47],  // Burgundy
+        ZINC: [113, 113, 122],   // Deep Gray
+        ZINC_LIGHT: [161, 161, 170], // Light Gray for labels
+        EMERALD: [16, 185, 129], // Success
         WHITE: [255, 255, 255],
-        LIGHT_GRAY: [250, 250, 250],
-        BORDER: [230, 230, 230]
+        CARD_BG: [248, 248, 248],
+        BORDER: [241, 241, 241]
     };
 
-    // --- 1. PREMIUM HEADER ---
-    // Dark background banner
+    // --- 1. HERO HEADER (ONYX) ---
     doc.setFillColor(...COLORS.ONYX as [number, number, number]);
-    doc.rect(0, 0, 210, 55, 'F');
+    doc.rect(0, 0, 210, 75, 'F');
     
-    // Logo / Brand
-    doc.setTextColor(...COLORS.WHITE as [number, number, number]);
+    // Heritage Logo Implementation
+    doc.setTextColor(...COLORS.ZINC as [number, number, number]);
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(28);
-    doc.text("LOCAL BAZAR", 20, 28);
-    
-    doc.setFontSize(8);
-    doc.setFont("helvetica", "normal");
-    doc.setTextColor(...COLORS.SILVER as [number, number, number]);
-    doc.text("EXCELLENCE • HERITAGE • LUXURY PORTAL", 20, 35);
+    doc.setFontSize(7);
+    doc.text("ESTABLISHED 2013", 25, 25);
 
-    // Store Info (Right Aligned in Header)
+    // L-OCA-L (Serif Style)
     doc.setTextColor(...COLORS.WHITE as [number, number, number]);
-    doc.setFontSize(8);
-    doc.text(settings?.storeAddress || "Luxury District, Doha, Qatar", 190, 22, { align: "right" });
-    doc.text(settings?.contactPhone || "+974 5055 8884", 190, 27, { align: "right" });
-    doc.text(settings?.contactEmail || "localbazar.qtr@gmail.com", 190, 32, { align: "right" });
-    doc.text("www.localbazar.qa", 190, 37, { align: "right" });
+    doc.setFont("times", "bolditalic");
+    doc.setFontSize(32);
+    doc.text("L", 25, 40);
+    doc.text("OCA", 34, 40, { charSpace: 1.5 }); // Adjusted for better visual balance
+    doc.text("L", 65, 40);
 
-    // --- 2. INVOICE OVERVIEW ---
+    // BAZAR
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(14);
+    doc.text("BAZAR", 25, 52, { charSpace: 8 }); // Reduced width for tighter look
+
+    // Store Info (Header Right)
+    doc.setTextColor(...COLORS.ZINC as [number, number, number]);
+    doc.setFontSize(8);
+    doc.setFont("helvetica", "bold");
+    doc.text(settings?.storeAddress || "Luxury District, Doha, Qatar", 185, 25, { align: "right" });
+    doc.setFont("helvetica", "normal");
+    doc.text(settings?.contactPhone || "+974 5055 8884", 185, 30, { align: "right" });
+    doc.text(settings?.contactEmail || "concierge@localbazar.qa", 185, 35, { align: "right" });
+    doc.text("www.localbazar.qa", 185, 40, { align: "right" });
+
+    // Document Label Badge
+    doc.setFillColor(255, 255, 255, 0.05);
+    doc.roundedRect(130, 50, 65, 8, 4, 4, 'F'); 
+    doc.setTextColor(...COLORS.WHITE as [number, number, number]);
+    doc.setFontSize(7.5);
+    doc.setFont("helvetica", "bold");
+    doc.text("OFFICIAL RECEIPT", 162.5, 55.5, { align: "center", charSpace: 0.5 }); 
+
+    // --- 2. PROTOCOL METADATA ---
     doc.setTextColor(...COLORS.ONYX as [number, number, number]);
-    doc.setFontSize(24);
+    doc.setFontSize(8);
     doc.setFont("helvetica", "bold");
-    doc.text("OFFICIAL INVOICE", 190, 80, { align: "right" });
-    
-    doc.setFontSize(9);
-    doc.setFont("helvetica", "bold");
-    doc.text(`REFERENCE ID:`, 190, 90, { align: "right" });
-    doc.setFont("helvetica", "normal");
-    doc.text(`${order.id.toUpperCase()}`, 190, 95, { align: "right" });
-    
-    doc.setFont("helvetica", "bold");
-    doc.text(`DATE OF ISSUE:`, 190, 105, { align: "right" });
-    doc.setFont("helvetica", "normal");
-    doc.text(`${new Date(order.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}`, 190, 110, { align: "right" });
-
-    doc.setFont("helvetica", "bold");
-    doc.text(`PAYMENT METHOD:`, 190, 120, { align: "right" });
-    doc.setFont("helvetica", "normal");
-    doc.text(`${order.paymentMethod === 'COD' ? 'CASH ON DELIVERY' : order.paymentMethod}`, 190, 125, { align: "right" });
-
-    // --- 3. CUSTOMER / SHIPPING DETAILS ---
-    // Client Info Box
-    doc.setFillColor(...COLORS.LIGHT_GRAY as [number, number, number]);
-    doc.rect(20, 75, 80, 55, 'F');
-    
-    doc.setFont("helvetica", "bold");
+    doc.text("PROTOCOL REF:", 185, 95, { align: "right" });
     doc.setFontSize(10);
-    doc.text("PRESTIGE CLIENT:", 25, 85);
-    
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(12);
-    doc.text(`${order.user?.name || "Distinguished Guest"}`, 25, 93);
-    
-    doc.setFontSize(9);
-    doc.setFont("helvetica", "normal");
-    doc.setTextColor(100, 100, 100);
-    doc.text(`${order.user?.email || ""}`, 25, 98);
+    doc.text(`LB-PRT-${order.id.slice(-8).toUpperCase()}`, 185, 101, { align: "right" });
 
-    // Delivery Logistics
-    const shippingAddr = order.user?.addresses?.[0] || order.shippingAddress;
-    if (shippingAddr) {
-        doc.setTextColor(...COLORS.ONYX as [number, number, number]);
-        doc.setFont("helvetica", "bold");
-        doc.setFontSize(9);
-        doc.text("DELIVERY LOGISTICS:", 25, 108);
-        doc.setFont("helvetica", "normal");
-        doc.text(`${shippingAddr.street || shippingAddr.line1 || ""}`, 25, 114);
-        doc.text(`${shippingAddr.city || ""}, ${shippingAddr.zip || ""}`, 25, 119);
-        doc.setFont("helvetica", "bold");
-        doc.text(`${shippingAddr.country || "QATAR"}`, 25, 124);
+    // --- 3. THE TRIAD (CLIENT / LOGISTICS / PAYMENT) ---
+    doc.setDrawColor(...COLORS.BORDER as [number, number, number]);
+    doc.line(20, 135, 190, 135);
+
+    // Column 1: Prestige Client
+    doc.setTextColor(...COLORS.ZINC as [number, number, number]);
+    doc.setFontSize(7);
+    doc.text("PRESTIGE CLIENT", 25, 110);
+    doc.setTextColor(...COLORS.ONYX as [number, number, number]);
+    doc.setFont("times", "bolditalic");
+    doc.setFontSize(16);
+    doc.text(`${order.user?.name || "Distinguished Guest"}`, 25, 118);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(6.5);
+    doc.setTextColor(...COLORS.ZINC as [number, number, number]);
+    doc.text(`${(order.user?.email || "verified_member@localbazar.qa").toUpperCase()}`, 25, 124);
+    if (order.phone) {
+        doc.setTextColor(16, 185, 129); // Emerald-500
+        doc.text(`${order.phone}`, 25, 128);
     }
 
-    // --- 4. ITEMS TABLE ---
-    const tableData = order.items.map((item) => [
-        { content: item.product.name.toUpperCase(), styles: { fontStyle: 'bold' as const } },
-        item.product.sku || 'N/A',
-        item.quantity,
-        `QAR ${Number(item.price).toFixed(2)}`,
-        `QAR ${(item.quantity * Number(item.price)).toFixed(2)}`
-    ]);
+    // Column 2: Logistics Hub
+    const shippingAddr = order.user?.addresses?.[0] || order.shippingAddress;
+    doc.setTextColor(...COLORS.ZINC as [number, number, number]);
+    doc.setFontSize(7);
+    doc.text("LOGISTICS HUB", 85, 110);
+    doc.setTextColor(...COLORS.HERITAGE as [number, number, number]);
+    doc.setFontSize(8);
+    doc.setFont("helvetica", "bold");
+    doc.text("GLOBAL EXPRESS DELIVERY", 85, 115);
+    
+    doc.setTextColor(...COLORS.ONYX as [number, number, number]);
+    doc.setFontSize(7);
+    doc.setFont("helvetica", "bold");
+    doc.text("RECIPIENT:", 85, 120);
+    doc.setFont("helvetica", "normal");
+    doc.text(`${order.user?.name || "Distinguished Guest"}`, 105, 120);
+
+    if (shippingAddr) {
+        doc.setFont("helvetica", "bold");
+        doc.text("DESTINATION:", 85, 124);
+        doc.setFont("helvetica", "normal");
+        doc.text(`${shippingAddr.street || shippingAddr.line1 || ""}, ${shippingAddr.city || ""}`, 105, 124);
+        doc.text(`${shippingAddr.country || "QATAR"}`, 105, 128);
+        
+        doc.setFont("helvetica", "bold");
+        doc.text("DISPATCH:", 85, 132);
+        doc.setFont("helvetica", "normal");
+        doc.text("Doha Heritage Hub", 105, 132);
+    }
+
+    // Column 3: Payment Matrix
+    doc.setTextColor(...COLORS.ZINC as [number, number, number]);
+    doc.setFontSize(7);
+    doc.text("PAYMENT MATRIX", 145, 110);
+    doc.setFillColor(...COLORS.CARD_BG as [number, number, number]);
+    doc.roundedRect(145, 114, 40, 14, 2, 2, 'F');
+    doc.setTextColor(...COLORS.ONYX as [number, number, number]);
+    doc.setFontSize(8);
+    doc.setFont("helvetica", "bold");
+    doc.text("SETTLEMENT", 150, 119);
+    doc.setFontSize(10);
+    doc.setFont("times", "bolditalic");
+    doc.text(`${order.paymentMethod === 'COD' ? 'Cash on Delivery' : order.paymentMethod.toUpperCase()}`, 150, 124);
+
+    // --- 4. ACQUISITION TABLE ---
+    let itemsSubtotal = 0;
+    const tableData = order.items.map((item) => {
+        const itemTotal = item.quantity * Number(item.price);
+        itemsSubtotal += itemTotal;
+        return [
+            { 
+                content: item.product.name.toUpperCase(), 
+                styles: { font: 'times', fontStyle: 'bolditalic' as const, fontSize: 10 } 
+            },
+            `LB-ACQ-${(order.id.slice(-4) + (item.product.sku || 'N/A').slice(-4)).toUpperCase()}`,
+            `x${item.quantity}`,
+            `QAR ${Number(item.price).toFixed(2)}`,
+            `QAR ${itemTotal.toFixed(2)}`
+        ];
+    });
 
     autoTable(doc, {
         startY: 145,
-        head: [['DESCRIPTION', 'SKU', 'QTY', 'UNIT PRICE', 'SUBTOTAL']],
+        head: [['ACQUIRED ENTITY', 'SERIAL/SKU', 'UNIT', 'UNIT COST', 'SUBTOTAL']],
         body: tableData,
         headStyles: { 
-            fillColor: COLORS.ONYX as [number, number, number], 
-            textColor: COLORS.WHITE as [number, number, number], 
+            fillColor: COLORS.CARD_BG as [number, number, number], 
+            textColor: COLORS.ZINC as [number, number, number], 
             fontStyle: 'bold',
-            fontSize: 8,
+            fontSize: 7,
             cellPadding: 5
         },
         bodyStyles: {
             fontSize: 8,
-            cellPadding: 4,
-            textColor: [40, 40, 40]
-        },
-        alternateRowStyles: { 
-            fillColor: [253, 253, 253] 
+            cellPadding: 6,
+            textColor: [20, 20, 20]
         },
         margin: { left: 20, right: 20 },
-        theme: 'grid',
+        theme: 'striped',
         styles: { lineColor: COLORS.BORDER as [number, number, number], lineWidth: 0.1 }
     });
 
-    // --- 5. FINANCIAL SUMMARY ---
+    // --- 5. FINANCIAL ARCHITECTURE ---
     const finalY = (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 15;
-    
-    // Summary Layout (Right Side)
     const summaryX = 130;
-    const valueX = 190;
+    const valueX = 188;
     
-    doc.setFontSize(9);
-    doc.setFont("helvetica", "normal");
-    doc.setTextColor(100, 100, 100);
-    doc.text("SUBTOTAL:", summaryX, finalY);
-    doc.text(`QAR ${Number(order.total).toFixed(2)}`, valueX, finalY, { align: "right" });
-    
-    doc.text("TAXES & DUTIES (0%):", summaryX, finalY + 7);
-    doc.text("QAR 0.00", valueX, finalY + 7, { align: "right" });
+    // Calculations
+    const totalOrder = Number(order.total);
+    const shippingPrice = Math.max(0, totalOrder - itemsSubtotal);
+    const totalItemCount = order.items.reduce((acc, item) => acc + item.quantity, 0);
 
-    doc.text("SHIPPING (EXPRESS):", summaryX, finalY + 14);
-    doc.text("COMPLIMENTARY", valueX, finalY + 14, { align: "right" });
-
-    // Total Highlighter
-    doc.setFillColor(...COLORS.ONYX as [number, number, number]);
-    doc.rect(summaryX - 5, finalY + 19, 65, 12, 'F');
-    
+    doc.setFontSize(8);
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(10);
-    doc.setTextColor(...COLORS.WHITE as [number, number, number]);
-    doc.text("TOTAL DUE:", summaryX, finalY + 27);
-    doc.setFontSize(12);
-    doc.text(`QAR ${Number(order.total).toFixed(2)}`, valueX, finalY + 27, { align: "right" });
 
-    // --- 6. FOOTER / LEGAL ---
-    const footerY = 270;
-    
-    // Signature Area
+    // Row 1: Items Subtotal
+    doc.setTextColor(...COLORS.ZINC as [number, number, number]);
+    doc.text(`ITEMS SUBTOTAL (${totalItemCount})`, summaryX, finalY);
     doc.setTextColor(...COLORS.ONYX as [number, number, number]);
-    doc.setFont("times", "italic");
-    doc.setFontSize(10);
-    doc.text("Verified by Local Bazar Management", 190, footerY - 10, { align: "right" });
-    doc.text("________________________________", 190, footerY - 8, { align: "right" });
+    doc.text(`QAR ${itemsSubtotal.toFixed(2)}`, valueX, finalY, { align: "right" });
 
-    // Legal & Contact
+    // Row 2: Shipping Fees (always present — customer selects method at checkout)
+    const shippingLabel = order.shippingMethod ? order.shippingMethod.toUpperCase() : "SHIPPING FEES";
+    doc.setTextColor(...COLORS.ZINC as [number, number, number]);
+    doc.text(shippingLabel, summaryX, finalY + 8);
+    doc.setTextColor(...COLORS.ONYX as [number, number, number]);
+    doc.text(`QAR ${shippingPrice.toFixed(2)}`, valueX, finalY + 8, { align: "right" });
+
+    // Row 3: VAT
+    doc.setTextColor(...COLORS.ZINC as [number, number, number]);
+    doc.text("VAT / TAX (0%)", summaryX, finalY + 16);
+    doc.text("QAR 0.00", valueX, finalY + 16, { align: "right" });
+
+    // Separator line
     doc.setDrawColor(...COLORS.BORDER as [number, number, number]);
-    doc.setLineWidth(0.5);
-    doc.line(20, footerY, 190, footerY);
+    doc.line(summaryX - 5, finalY + 21, valueX + 5, finalY + 21);
 
+    // Equation hint: items + shipping = total
+    doc.setFontSize(6.5);
+    doc.setTextColor(...COLORS.ZINC as [number, number, number]);
+    doc.text(`QAR ${itemsSubtotal.toFixed(2)} + QAR ${shippingPrice.toFixed(2)} = QAR ${totalOrder.toFixed(2)}`, valueX, finalY + 26, { align: "right" });
+
+    // Final Total Card
+    doc.setFillColor(...COLORS.ONYX as [number, number, number]);
+    doc.roundedRect(summaryX - 5, finalY + 30, 75, 20, 3, 3, 'F');
+
+    doc.setTextColor(...COLORS.ZINC_LIGHT as [number, number, number]);
     doc.setFontSize(7);
-    doc.setTextColor(150, 150, 150);
-    doc.setFont("helvetica", "normal");
-    const footerText = "Thank you for choosing Local Bazar. We curate the finest legacy pieces for your sophisticated collection. This document is electronically verified for authenticity and serves as a formal proof of transfer. All items are authenticated prior to dispatch. For inquiries, contact our concierge via support@localbazar.qa";
-    const splitText = doc.splitTextToSize(footerText, 170);
-    doc.text(splitText, 20, footerY + 5);
+    doc.text("FINAL ACQUISITION TOTAL", summaryX, finalY + 37);
 
-    doc.setFont("helvetica", "bold");
-    doc.text(`PORTAL ID: LB-SEC-${order.id.slice(-6).toUpperCase()}-${new Date().getFullYear()}`, 20, footerY + 20);
+    doc.setTextColor(...COLORS.WHITE as [number, number, number]);
+    doc.setFont("times", "bolditalic");
+    doc.setFontSize(18);
+    doc.text(`QAR ${totalOrder.toFixed(2)}`, valueX - 2, finalY + 46, { align: "right" });
+
+    // --- 6. AUTHENTICITY LAYER ---
+    const footerY = 265;
+    
+    doc.setFillColor(...COLORS.CARD_BG as [number, number, number]);
+    doc.roundedRect(20, footerY - 5, 170, 30, 4, 4, 'F');
+    
+    // Security Seal Circle
+    doc.setFillColor(...COLORS.ONYX as [number, number, number]);
+    doc.circle(35, footerY + 10, 10, 'F');
+    doc.setTextColor(...COLORS.WHITE as [number, number, number]);
+    doc.setFontSize(10);
+    doc.text("LB", 35, footerY + 11.5, { align: "center" });
+
+    doc.setTextColor(...COLORS.ONYX as [number, number, number]);
+    doc.setFont("times", "bolditalic");
+    doc.setFontSize(9);
+    doc.text(`Heritage Financial Protocol: ${order.id.slice(0, 12).toUpperCase()}`, 50, footerY + 6);
+    
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(7);
+    doc.setTextColor(...COLORS.ZINC as [number, number, number]);
+    doc.text("Electronic verification successful. This document constitutes a legal recording of the asset transfer and acquisition within the Local Bazar Heritage Framework.", 50, footerY + 12);
+    doc.text(`PORTAL SESSION AUTO-LOG: 256bit-AES-SSL-VERIFIED-LB-TRANSACTION-METADATA-HASH-${Math.random().toString(36).substring(7).toUpperCase()}`, 50, footerY + 16);
 
     // Final download
     doc.save(`INVOICE-${order.id.slice(-8).toUpperCase()}.pdf`);

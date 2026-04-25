@@ -32,7 +32,7 @@ export default async function AdminPage() {
     // to their first available department.
     if (!hasDashboard) {
         // Fallback array for redirection map matching AddMemberModal PAGES IDs
-        const possiblePages = ["orders", "products", "categories", "customers", "banners", "vouchers", "brands", "logo", "team", "settings"];
+        const possiblePages = ["orders", "products", "categories", "customers", "drivers", "store", "banners", "notice", "vouchers", "brands", "logo", "team", "settings"];
         
         let target = "/admin"; // Default fallback (which would just be an empty sidebar here naturally)
         for (const p of possiblePages) {

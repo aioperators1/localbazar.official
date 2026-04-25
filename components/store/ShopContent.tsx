@@ -5,8 +5,10 @@ import { ShopSidebar } from "@/components/store/ShopSidebar";
 import { ShopToolbar } from "@/components/store/ShopToolbar";
 import { ProductsGrid } from "@/components/store/ProductsGrid";
 import { EmptyState } from "@/components/store/EmptyState";
+import { MobileFilterDrawer } from "@/components/store/MobileFilterDrawer";
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
+import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 
 import { Product, Category, Brand } from "@/lib/types";
@@ -40,6 +42,14 @@ export function ShopContent({ products, categories, brands, params, currentCateg
 
     const categorySl = params.category?.toLowerCase() || '';
     const descText = catDescriptions[categorySl] || t('footer.about');
+
+    const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
+
+    useEffect(() => {
+        const handleOpen = () => setIsMobileFiltersOpen(true);
+        window.addEventListener('open-mobile-filters', handleOpen);
+        return () => window.removeEventListener('open-mobile-filters', handleOpen);
+    }, []);
 
     return (
         <div className="bg-transparent min-h-screen pb-32 pt-12" dir={language === 'ar' ? 'rtl' : 'ltr'}>
@@ -90,6 +100,13 @@ export function ShopContent({ products, categories, brands, params, currentCateg
                     </div>
                 </div>
             </main>
+
+            <MobileFilterDrawer 
+                isOpen={isMobileFiltersOpen} 
+                onClose={() => setIsMobileFiltersOpen(false)} 
+                categories={categories}
+                brands={brands}
+            />
         </div>
     );
 }

@@ -24,9 +24,12 @@ interface CheckoutData {
     items: CheckoutItem[];
     total: number; // Provided total (requested)
     voucherId?: string;
+    shippingMethodId?: string;
+    shippingCost?: number;
 }
 
-const SHIPPING_COST = 35; // Standard Qatar Shipping
+// Default fallback if no shipping settings set
+const DEFAULT_SHIPPING_COST = 35;
 
 export async function placeOrder(data: CheckoutData) {
     try {
@@ -40,6 +43,24 @@ export async function placeOrder(data: CheckoutData) {
 
         // RUN EVERYTHING IN A TRANSACTION FOR ATOMICITY
         const result = await prisma.$transaction(async (tx) => {
+            // Fetch Shipping Settings securely on server
+            const settings = await tx.setting.findUnique({ where: { key: 'shippingMethods' } });
+            let currentShippingCost = Object.prototype.hasOwnProperty.call(data, 'shippingCost') ? Number(data.shippingCost) : DEFAULT_SHIPPING_COST;
+            
+            if (settings && settings.value) {
+                try {
+                    const methods = JSON.parse(settings.value);
+                    if (Array.isArray(methods) && methods.length > 0) {
+                        const method = data.shippingMethodId ? methods.find(m => m.id === data.shippingMethodId) : methods[0];
+                        if (method) {
+                            currentShippingCost = Number(method.price);
+                        }
+                    }
+                } catch (e) {
+                    // fallback to provided or default
+                }
+            }
+
             // 1. Server-Side Total Verification (Security)
             const productIds = items.map(i => i.id);
             const products = await tx.product.findMany({
@@ -97,7 +118,7 @@ export async function placeOrder(data: CheckoutData) {
                 }
             }
 
-            const finalTotal = Math.max(0, calculatedSubtotal - discount + SHIPPING_COST);
+            const finalTotal = Math.max(0, calculatedSubtotal - discount + currentShippingCost);
 
             // 2. Find or Create User
             let user = await tx.user.findUnique({
@@ -119,8 +140,15 @@ export async function placeOrder(data: CheckoutData) {
                         name,
                         username,
                         password,
+                        phone: data.phone,
                         role: "USER",
                     }
+                });
+            } else if (!user.phone && data.phone) {
+                // Update existing user with phone if missing
+                await tx.user.update({
+                    where: { id: user.id },
+                    data: { phone: data.phone }
                 });
             }
 
@@ -135,14 +163,26 @@ export async function placeOrder(data: CheckoutData) {
                 }
             });
 
+            // Handle Shipping Method Name for Record
+            let selectedMethodName = "Standard Delivery";
+            if (settings && settings.value) {
+                try {
+                    const methods = JSON.parse(settings.value);
+                    const method = data.shippingMethodId ? methods.find((m: any) => m.id === data.shippingMethodId) : methods[0];
+                    if (method) selectedMethodName = method.name;
+                } catch (e) {}
+            }
+
             // 4. Create Order
             const order = await tx.order.create({
                 data: {
                     userId: user.id,
                     total: finalTotal,
-                    status: "PENDING",
+                    status: (paymentMethod === "COD" || !paymentMethod) ? "PENDING" : "DRAFT",
                     paymentMethod: paymentMethod || "COD",
                     voucherId: voucherId || null,
+                    phone: data.phone || null,
+                    shippingMethod: selectedMethodName,
                     items: {
                         create: validItems.map(item => ({
                             productId: item.id,
@@ -165,7 +205,7 @@ export async function placeOrder(data: CheckoutData) {
         });
 
         // 5. Post-transaction: External Payment Initiation
-        if (result.success && paymentMethod && (paymentMethod === "MYFATOORAH" || paymentMethod === "CARD")) {
+        if (result.success && paymentMethod && (paymentMethod === "MYFATOORAH" || paymentMethod === "CARD" || paymentMethod === "APPLE_PAY" || paymentMethod === "GOOGLE_PAY")) {
             try {
                 const { initiatePayment } = await import("@/lib/utils/myfatoorah");
                 const paymentInfo = await initiatePayment(

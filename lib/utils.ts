@@ -8,7 +8,8 @@ export function formatPrice(price: number | string) {
     return new Intl.NumberFormat('en-QA', {
         style: 'currency',
         currency: 'QAR',
-        minimumFractionDigits: 2
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2
     }).format(Number(price));
 }
 

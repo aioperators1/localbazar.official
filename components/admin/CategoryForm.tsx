@@ -7,17 +7,9 @@ import { createCategory, updateCategory } from "@/lib/actions/admin";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { 
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
-import { ImageIcon, MoreHorizontal, Star } from "lucide-react";
+import { ImageIcon, Save, ArrowLeft } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-
 import Link from "next/link";
 import { ImageUpload } from "@/components/admin/ImageUpload";
 
@@ -30,8 +22,6 @@ interface CategoryFormProps {
     initialData?: any | null;
     categories: Category[];
 }
-
-import { motion } from "framer-motion";
 
 export default function CategoryForm({ initialData, categories }: CategoryFormProps) {
     const router = useRouter();
@@ -68,214 +58,136 @@ export default function CategoryForm({ initialData, categories }: CategoryFormPr
         }
 
         if (res.success) {
-            toast.success("ENTITY SYNCHRONIZED");
+            toast.success("Category saved successfully");
             router.push("/admin/categories");
             router.refresh();
         } else {
-            toast.error(res.error || "SYNCHRONIZATION ERROR");
+            toast.error(res.error || "Failed to save category");
         }
         setLoading(false);
     }
 
     return (
-        <form onSubmit={onSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-7xl mx-auto pb-32">
-            {/* Main Column */}
-            <div className="lg:col-span-2 space-y-8">
-                <motion.div 
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="bg-white/40 backdrop-blur-xl rounded-[40px] border border-white/60 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.05)] p-10 space-y-8"
-                >
-                    <div className="flex items-center gap-3 border-b border-[#0F1113]/5 pb-6">
-                        <div className="w-10 h-10 rounded-2xl bg-[#0F1113] flex items-center justify-center">
-                            <Star className="w-5 h-5 text-white" />
-                        </div>
-                        <h2 className="text-xl font-black text-[#0F1113] uppercase tracking-tight">Core Configuration</h2>
+        <form onSubmit={onSubmit} className="space-y-8 max-w-5xl mx-auto pb-20">
+            {/* Header Sticky */}
+            <div className="flex items-center justify-between bg-white p-4 border border-gray-200 rounded-lg shadow-sm sticky top-0 z-50">
+                <div className="flex items-center gap-4">
+                    <Button variant="outline" size="icon" asChild className="h-9 w-9">
+                        <Link href="/admin/categories">
+                            <ArrowLeft className="w-4 h-4" />
+                        </Link>
+                    </Button>
+                    <div>
+                        <h2 className="text-sm font-bold text-black uppercase">{initialData ? "Edit Category" : "New Category"}</h2>
+                        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{initialData?.name || "Initializing..."}</p>
                     </div>
+                </div>
+                <div className="flex items-center gap-3">
+                    <Button variant="ghost" asChild className="text-xs font-bold uppercase text-gray-500">
+                        <Link href="/admin/categories">Cancel</Link>
+                    </Button>
+                    <Button type="submit" disabled={loading} className="bg-black text-white hover:bg-gray-800 text-xs font-bold uppercase px-6 h-9">
+                        <Save className="w-4 h-4 mr-2" />
+                        {loading ? "Saving..." : "Save Category"}
+                    </Button>
+                </div>
+            </div>
 
-                    <div className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div className="lg:col-span-2 space-y-6">
+                    <div className="bg-white border border-gray-200 rounded-xl p-6 space-y-6">
+                        <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest border-b border-gray-100 pb-3">Basic Information</h3>
+                        
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div className="space-y-2.5">
-                                <Label htmlFor="name" className="text-[11px] font-black uppercase tracking-[0.2em] text-[#A1A1A1] ml-1">Collection Title (English)</Label>
-                                <Input
-                                    id="name"
-                                    name="name"
-                                    required
-                                    defaultValue={initialData?.name}
-                                    placeholder="e.g. SUMMER_COLLECTION"
-                                    className="h-16 bg-white/60 border-none rounded-2xl px-6 text-[16px] font-bold focus:ring-[10px] focus:ring-black/5 transition-all outline-none shadow-inner"
-                                />
+                            <div className="space-y-2">
+                                <Label htmlFor="name" className="text-[11px] font-bold text-gray-500 uppercase">Category Name (EN)</Label>
+                                <Input id="name" name="name" required defaultValue={initialData?.name} className="h-10 text-sm" />
                             </div>
-                            <div className="space-y-2.5">
-                                <Label htmlFor="nameAr" className="text-[11px] font-black uppercase tracking-[0.2em] text-[#A1A1A1] mr-1 text-right block">اسم المجموعة (العربية)</Label>
-                                <Input
-                                    id="nameAr"
-                                    name="nameAr"
-                                    defaultValue={initialData?.nameAr}
-                                    placeholder="مثال: مجموعة الصيف"
-                                    dir="rtl"
-                                    className="h-16 bg-white/60 border-none rounded-2xl px-6 text-[18px] font-bold focus:ring-[10px] focus:ring-black/5 transition-all outline-none shadow-inner text-right"
-                                />
+                            <div className="space-y-2">
+                                <Label htmlFor="nameAr" className="text-[11px] font-bold text-gray-500 uppercase block text-right">اسم الفئة (AR)</Label>
+                                <Input id="nameAr" name="nameAr" defaultValue={initialData?.nameAr} dir="rtl" className="h-10 text-sm text-right" />
                             </div>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div className="space-y-2.5">
-                                <Label htmlFor="description" className="text-[11px] font-black uppercase tracking-[0.2em] text-[#A1A1A1] ml-1">Global Narrative (English)</Label>
-                                <Textarea
-                                    id="description"
-                                    name="description"
-                                    defaultValue={initialData?.description || ""}
-                                    placeholder="Formal collection description..."
-                                    className="bg-white/60 border-none rounded-[32px] p-6 text-[14px] font-medium focus:ring-[10px] focus:ring-black/5 transition-all outline-none shadow-inner resize-none min-h-[160px]"
-                                />
+                            <div className="space-y-2">
+                                <Label htmlFor="description" className="text-[11px] font-bold text-gray-500 uppercase">Description (EN)</Label>
+                                <Textarea id="description" name="description" defaultValue={initialData?.description || ""} className="min-h-[100px] text-sm" />
                             </div>
-                            <div className="space-y-2.5">
-                                <Label htmlFor="descriptionAr" className="text-[11px] font-black uppercase tracking-[0.2em] text-[#A1A1A1] mr-1 text-right block">الوصف (العربية)</Label>
-                                <Textarea
-                                    id="descriptionAr"
-                                    name="descriptionAr"
-                                    defaultValue={initialData?.descriptionAr || ""}
-                                    placeholder="وصف رسمي للمجموعة..."
-                                    dir="rtl"
-                                    className="bg-white/60 border-none rounded-[32px] p-6 text-[16px] font-medium focus:ring-[10px] focus:ring-black/5 transition-all outline-none shadow-inner resize-none min-h-[160px] text-right"
-                                />
+                            <div className="space-y-2">
+                                <Label htmlFor="descriptionAr" className="text-[11px] font-bold text-gray-500 uppercase block text-right">الوصف (AR)</Label>
+                                <Textarea id="descriptionAr" name="descriptionAr" defaultValue={initialData?.descriptionAr || ""} dir="rtl" className="min-h-[100px] text-sm text-right" />
                             </div>
                         </div>
                     </div>
-                </motion.div>
 
-                <motion.div 
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.1 }}
-                    className="bg-white/40 backdrop-blur-xl rounded-[40px] border border-white/60 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.05)] p-10 space-y-8"
-                >
-                    <div className="flex items-center gap-3 border-b border-[#0F1113]/5 pb-6">
-                        <div className="w-10 h-10 rounded-2xl bg-[#0F1113] flex items-center justify-center">
-                            <ImageIcon className="w-5 h-5 text-white" />
-                        </div>
-                        <h2 className="text-xl font-black text-[#0F1113] uppercase tracking-tight">Visual Asset</h2>
-                    </div>
-                    
-                    <div className="bg-white/40 rounded-[32px] p-8 border border-white/40 shadow-inner">
+                    <div className="bg-white border border-gray-200 rounded-xl p-6 space-y-6">
+                        <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest border-b border-gray-100 pb-3">Category Image</h3>
                         <ImageUpload 
                             value={image ? [image] : []}
                             onChange={(urls) => setImage(urls[0] || "")}
                             onRemove={() => setImage("")}
                         />
                     </div>
-                </motion.div>
-            </div>
+                </div>
 
-            {/* Sidebar */}
-            <div className="space-y-8">
-                <motion.div 
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.2 }}
-                    className="bg-white/40 backdrop-blur-xl rounded-[40px] border border-white/60 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.05)] p-8 space-y-8"
-                >
-                    <Label className="text-[14px] font-black text-[#0F1113] uppercase tracking-[0.1em] border-b border-[#0F1113]/5 pb-4 block">Organization</Label>
-                    
-                    <div className="space-y-2.5">
-                        <Label htmlFor="parentId" className="text-[10px] font-black uppercase tracking-[0.2em] text-[#A1A1A1] ml-1">Parent Node</Label>
-                        <select
-                            id="parentId"
-                            name="parentId"
-                            defaultValue={initialData?.parentId || ""}
-                            className="w-full h-14 bg-white/60 border-none rounded-2xl px-5 text-[13px] font-black uppercase tracking-widest focus:ring-[10px] focus:ring-black/5 transition-all outline-none appearance-none shadow-inner"
-                        >
-                            <option value="">MASTER_NODE (ROOT)</option>
-                            {categories.filter(c => c.id !== initialData?.id).map((cat) => (
-                                <option key={cat.id} value={cat.id}>{cat.name.toUpperCase()}</option>
-                            ))}
-                        </select>
-                    </div>
-
-                    <div className="flex items-center justify-between bg-[#F6F8F9] p-4 rounded-2xl border border-[#E3E3E3]">
-                        <div className="flex flex-col">
-                            <Label className="text-[11px] font-black uppercase tracking-widest text-[#0F1113]">Featured State</Label>
-                            <span className="text-[9px] text-[#A1A1A1] font-bold uppercase tracking-wider">Priority Visibility</span>
+                <div className="space-y-6">
+                    <div className="bg-white border border-gray-200 rounded-xl p-6 space-y-6">
+                        <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest border-b border-gray-100 pb-3">Organization</h3>
+                        
+                        <div className="space-y-2">
+                            <Label htmlFor="parentId" className="text-[11px] font-bold text-gray-500 uppercase">Parent Category</Label>
+                            <select
+                                id="parentId"
+                                name="parentId"
+                                defaultValue={initialData?.parentId || ""}
+                                className="w-full h-10 bg-white border border-gray-200 rounded-lg px-3 text-sm focus:outline-none focus:border-black"
+                            >
+                                <option value="">None (Master Category)</option>
+                                {categories.filter(c => c.id !== initialData?.id).map((cat) => (
+                                    <option key={cat.id} value={cat.id}>{cat.name}</option>
+                                ))}
+                            </select>
                         </div>
-                        <Switch name="featured" defaultChecked={initialData?.featured} />
-                    </div>
-                </motion.div>
 
-                <motion.div 
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.3 }}
-                    className="bg-white/40 backdrop-blur-xl rounded-[40px] border border-white/60 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.05)] p-8 space-y-8"
-                >
-                    <Label className="text-[14px] font-black text-[#0F1113] uppercase tracking-[0.1em] border-b border-[#0F1113]/5 pb-4 block">Deployment Logic</Label>
-                    
-                    <div className="space-y-6">
-                        <div className="space-y-4 p-5 bg-[#F6F8F9] rounded-[24px] border border-[#E3E3E3] transition-all hover:bg-white">
-                            <div className="flex items-center justify-between">
-                                <div className="flex flex-col">
-                                    <Label className="text-[11px] font-black uppercase tracking-widest text-[#0F1113]">NEW_ARRIVALS_TAB</Label>
-                                    <span className="text-[9px] text-emerald-600 font-bold uppercase tracking-wider mt-1">Live Home Feed</span>
+                        <div className="flex items-center justify-between py-2">
+                            <Label className="text-[11px] font-bold text-gray-500 uppercase">Featured Category</Label>
+                            <Switch name="featured" defaultChecked={initialData?.featured} />
+                        </div>
+                    </div>
+
+                    <div className="bg-white border border-gray-200 rounded-xl p-6 space-y-6">
+                        <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest border-b border-gray-100 pb-3">Home Page Visibility</h3>
+                        
+                        <div className="space-y-4">
+                            <div className="space-y-3">
+                                <div className="flex items-center justify-between">
+                                    <Label className="text-[11px] font-bold text-gray-700">Show in Tabs</Label>
+                                    <Switch name="showInHomeTabs" defaultChecked={initialData?.showInHomeTabs} />
                                 </div>
-                                <Switch name="showInHomeTabs" defaultChecked={initialData?.showInHomeTabs} />
-                            </div>
-                            <div className="flex items-center justify-between gap-4 pt-4 border-t border-[#0F1113]/5">
-                                <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-[#A1A1A1]">Sync Order</Label>
-                                <Input 
-                                    name="orderInHomeTabs" 
-                                    type="number" 
-                                    defaultValue={initialData?.orderInHomeTabs || 0}
-                                    className="h-10 w-20 text-[13px] font-black px-4 rounded-xl border-[#E3E3E3] shadow-inner"
-                                />
-                            </div>
-                        </div>
-
-                        <div className="space-y-4 p-5 bg-[#F6F8F9] rounded-[24px] border border-[#E3E3E3] transition-all hover:bg-white">
-                            <div className="flex items-center justify-between">
-                                <div className="flex flex-col">
-                                    <Label className="text-[11px] font-black uppercase tracking-widest text-[#0F1113]">COLLECTIONS_GRID</Label>
-                                    <span className="text-[9px] text-[#0F1113] font-bold uppercase tracking-wider mt-1">Curated Interface</span>
+                                <div className="flex items-center gap-3">
+                                    <span className="text-[10px] font-bold text-gray-400 uppercase">Order</span>
+                                    <Input name="orderInHomeTabs" type="number" defaultValue={initialData?.orderInHomeTabs || 0} className="h-8 w-20 text-xs" />
                                 </div>
-                                <Switch name="showInHomeCurated" defaultChecked={initialData?.showInHomeCurated} />
                             </div>
-                            <div className="flex items-center justify-between gap-4 pt-4 border-t border-[#0F1113]/5">
-                                <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-[#A1A1A1]">Sync Order</Label>
-                                <Input 
-                                    name="orderInHomeCurated" 
-                                    type="number" 
-                                    defaultValue={initialData?.orderInHomeCurated || 0}
-                                    className="h-10 w-20 text-[13px] font-black px-4 rounded-xl border-[#E3E3E3] shadow-inner"
-                                />
+
+                            <div className="h-px bg-gray-50" />
+
+                            <div className="space-y-3">
+                                <div className="flex items-center justify-between">
+                                    <Label className="text-[11px] font-bold text-gray-700">Show in Curated Grid</Label>
+                                    <Switch name="showInHomeCurated" defaultChecked={initialData?.showInHomeCurated} />
+                                </div>
+                                <div className="flex items-center gap-3">
+                                    <span className="text-[10px] font-bold text-gray-400 uppercase">Order</span>
+                                    <Input name="orderInHomeCurated" type="number" defaultValue={initialData?.orderInHomeCurated || 0} className="h-8 w-20 text-xs" />
+                                </div>
                             </div>
                         </div>
                     </div>
-                </motion.div>
-
-                <motion.div 
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.4 }}
-                    className="pt-4"
-                >
-                    <Button
-                        type="submit"
-                        disabled={loading}
-                        className="w-full h-20 bg-[#0F1113] hover:bg-[#2A2A2A] text-white rounded-[32px] font-black text-[12px] uppercase tracking-[0.3em] transition-all hover:scale-[1.02] active:scale-95 shadow-2xl shadow-black/20"
-                    >
-                        {loading ? (
-                            <div className="flex items-center gap-3">
-                                <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
-                                <span>SYNCHRONIZING...</span>
-                            </div>
-                        ) : (initialData ? "COMMIT UPDATES" : "INITIALIZE COLLECTION")}
-                    </Button>
-                    <div className="mt-8 flex justify-center">
-                       <Link href="/admin/categories" className="text-[11px] text-[#A1A1A1] font-black uppercase tracking-[0.3em] hover:text-rose-600 transition-colors">
-                          Terminate Session
-                       </Link>
-                    </div>
-                </motion.div>
+                </div>
             </div>
         </form>
     );
 }
+

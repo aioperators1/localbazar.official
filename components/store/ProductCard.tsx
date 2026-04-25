@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { ShoppingBag, Heart } from "lucide-react";
@@ -20,6 +21,7 @@ interface ProductProps {
 }
 
 export function ProductCard({ product, className }: ProductProps) {
+    const router = useRouter();
     const { addItem } = useCart();
     const { toggleItem, isInWishlist } = useWishlist();
     const { formatPrice: formatCurrency } = useCurrency();
@@ -77,6 +79,9 @@ export function ProductCard({ product, className }: ProductProps) {
     const handleAddToCart = (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
+        
+        if (product.stock <= 0) return;
+
         addItem({
             id: product.id,
             name: displayTitle,
@@ -88,8 +93,25 @@ export function ProductCard({ product, className }: ProductProps) {
             color: null
         });
         setIsAdded(true);
+        
+        toast.success(language === 'ar' ? 'تمت الإضافة للسلة' : 'Added to cart', {
+            description: displayTitle,
+            action: {
+                label: "CHECKOUT",
+                onClick: () => router.push("/checkout")
+            },
+            style: {
+                background: 'rgba(32, 8, 11, 0.95)',
+                backdropFilter: 'blur(10px)',
+                color: 'white',
+                border: '1px solid rgba(255,255,255,0.1)'
+            }
+        });
+
         setTimeout(() => setIsAdded(false), 2000);
     };
+
+    const isOutOfStock = product.stock <= 0;
 
     return (
         <motion.div
@@ -101,7 +123,7 @@ export function ProductCard({ product, className }: ProductProps) {
         >
             {/* Image Container */}
             <div className="relative aspect-[4/5] w-full overflow-hidden bg-black/20">
-                <Link href={`/product/${product.slug}`} className="block h-full w-full relative group/image">
+                <Link href={`/product/${product.slug || product.id}`} className="block h-full w-full relative group/image">
                     {/* Primary Image with Ken Burns Hover */}
                     <div className={cn(
                         "absolute inset-0 transition-transform duration-[3s] ease-out z-10",
@@ -138,19 +160,23 @@ export function ProductCard({ product, className }: ProductProps) {
                 <button 
                     onClick={toggleWishlist}
                     className={cn(
-                        "absolute top-6 z-30 w-12 h-12 glass rounded-full flex items-center justify-center transition-all duration-1000 lg:opacity-0 lg:group-hover:opacity-100",
+                        "absolute top-6 z-30 w-9 h-9 glass rounded-full flex items-center justify-center transition-all duration-1000 lg:opacity-0 lg:group-hover:opacity-100",
                         isWishlisted ? "bg-white text-rose-500 scale-110 opacity-100" : "text-white/40 hover:bg-white hover:text-[#0A0A0A] hover:scale-110",
                         language === 'ar' ? "left-6" : "right-6"
                     )}
                 >
-                    <Heart className={cn("w-5 h-5 stroke-[1.5]", isWishlisted && "fill-current")} />
+                    <Heart className={cn("w-[18px] h-[18px] stroke-[1.5]", isWishlisted && "fill-current")} />
                 </button>
 
-                {/* Status Badge */}
-                <div className={cn("absolute top-4 z-30", language === 'ar' ? "right-4" : "left-4")}>
-                    <span className="bg-[#111] text-white text-[11px] font-black tracking-[0.4em] uppercase px-4 py-1.5 pb-2 lg:opacity-0 lg:group-hover:opacity-100 transition-all duration-700">
-                        {t('product.signature')}
-                    </span>
+                <div className={cn("absolute top-4 z-30 flex flex-col gap-2", language === 'ar' ? "right-4 items-end" : "left-4 items-start")}>
+                    {isOutOfStock && (
+                        <div className="relative">
+                            <span className="relative z-10 bg-black/60 backdrop-blur-md text-red-500 text-[9px] font-black tracking-[0.3em] uppercase px-3 py-1.5 border border-red-500/20 flex items-center gap-2 rounded-full">
+                                <div className="w-1 h-1 rounded-full bg-red-500 animate-pulse" />
+                                {language === 'ar' ? "نفذت الكمية" : "OUT OF STOCK"}
+                            </span>
+                        </div>
+                    )}
                 </div>
             </div>
 
@@ -186,7 +212,7 @@ export function ProductCard({ product, className }: ProductProps) {
                 </div>
 
                 {/* Title */}
-                <Link href={`/product/${product.slug}`} className="block">
+                <Link href={`/product/${product.slug || product.id}`} className="block">
                     <h3 className={cn(
                         "text-[18px] sm:text-[20px] text-white tracking-tight group-hover:text-white/70 transition-colors line-clamp-2 min-h-[44px] leading-snug",
                         language === 'ar' ? "font-sans font-black" : "font-serif"
@@ -198,20 +224,26 @@ export function ProductCard({ product, className }: ProductProps) {
                 {/* Footer Section */}
                 <div className="pt-1 flex flex-col gap-4">
                     <div className="flex items-baseline justify-between gap-4">
-                        <span className="text-white font-serif italic text-[26px] sm:text-[32px] tracking-tighter leading-none">
-                            {formatCurrency(product.price)}
-                        </span>
-                        <span className="text-[11px] text-white/30 font-bold uppercase tracking-[0.2em]">
-                            {t('product.exclVat')}
-                        </span>
+                        <div className="flex flex-col">
+                            {product.salePrice && product.salePrice > 0 && (
+                                <span className="text-[14px] sm:text-[16px] text-white/30 line-through font-medium tracking-tight mb-0.5">
+                                    {formatCurrency(product.salePrice)}
+                                </span>
+                            )}
+                            <span className="text-white font-serif italic text-[26px] sm:text-[32px] tracking-tighter leading-none">
+                                {formatCurrency(product.price)}
+                            </span>
+                        </div>
                     </div>
 
                     <button
                         onClick={handleAddToCart}
-                        disabled={isAdded}
+                        disabled={isAdded || isOutOfStock}
                         className={cn(
-                            "w-full h-[60px] flex items-center justify-center gap-4 font-black text-[13px] tracking-[0.5em] uppercase transition-all duration-1000 relative overflow-hidden border border-white/10 hover:border-white/40 group/btn rounded-[2px]",
-                            isAdded ? "bg-white text-[#0A0A0A]" : "bg-[#111]/40 text-white"
+                            "w-full h-[60px] flex items-center justify-center gap-4 font-black text-[13px] tracking-[0.5em] uppercase transition-all duration-1000 relative overflow-hidden border rounded-[2px]",
+                            isAdded ? "bg-white text-[#0A0A0A] border-white" : 
+                            isOutOfStock ? "bg-red-950/20 text-red-500 border-red-500/30 cursor-not-allowed" :
+                            "bg-[#111]/40 text-white border-white/10 hover:border-white/40 group/btn"
                         )}
                     >
                         <span className="relative z-10 flex items-center gap-4 transition-colors duration-1000 group-hover/btn:text-[#0A0A0A]">
@@ -220,6 +252,10 @@ export function ProductCard({ product, className }: ProductProps) {
                                     <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                                     {t('product.addedShort')}
                                 </motion.div>
+                            ) : isOutOfStock ? (
+                                <>
+                                    {language === 'ar' ? "غير متوفر" : "OUT OF STOCK"}
+                                </>
                             ) : (
                                 <>
                                     <ShoppingBag className="w-5 h-5 stroke-[1.2]" />
@@ -228,7 +264,7 @@ export function ProductCard({ product, className }: ProductProps) {
                             )}
                         </span>
 
-                        {!isAdded && (
+                        {!isAdded && !isOutOfStock && (
                             <div className="absolute inset-0 bg-white translate-y-full group-hover/btn:translate-y-0 transition-transform duration-1000 ease-[0.19,1,0.22,1]" />
                         )}
                     </button>

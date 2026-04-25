@@ -27,50 +27,80 @@ export function NotificationManager() {
             });
         }
 
-        // 3. Ultra Pro On-Site Toast
+        // 3. Ultra Pro Luxury On-Site Toast
         toast.custom((t) => (
-            <div className="w-[400px] glass-card rounded-2xl border border-white/10 bg-[#0A0A0A]/90 backdrop-blur-3xl p-6 shadow-4xl flex items-start gap-5 relative overflow-hidden group">
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent pointer-events-none" />
-                <div className="w-14 h-14 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-blue-400 shadow-inner group-hover:border-blue-500/20 transition-all duration-700">
-                    <ShoppingBag className="w-8 h-8 animate-pulse" />
-                </div>
-                <div className="flex-1 flex flex-col gap-1.5">
-                    <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-black text-white/30 uppercase tracking-[0.4em]">Transaction Alert</span>
-                        <div className="flex items-center gap-2">
-                             <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                             <span className="text-[8px] font-black text-emerald-400 uppercase tracking-widest">Live Flow</span>
+            <div className="w-[450px] relative group animate-in slide-in-from-right duration-500">
+                {/* Glowing Outer Frame */}
+                <div className="absolute -inset-[1px] bg-gradient-to-r from-emerald-500 via-blue-600 to-indigo-600 rounded-3xl blur-[2px] opacity-30 group-hover:opacity-100 transition-opacity duration-1000 animate-pulse" />
+                
+                <div className="relative glass-card rounded-2xl border border-white/10 bg-[#050505]/95 backdrop-blur-2xl p-7 shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex flex-col gap-6 overflow-hidden">
+                    {/* Interior Design Elements */}
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 blur-[60px] rounded-full -mr-10 -mt-10" />
+                    
+                    <div className="flex items-start justify-between relative z-10">
+                        <div className="flex items-center gap-4">
+                            <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center relative overflow-hidden group/icon">
+                                <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/20 to-transparent opacity-0 group-hover/icon:opacity-100 transition-opacity duration-700" />
+                                <ShoppingBag className="w-9 h-9 text-emerald-400 drop-shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
+                            </div>
+                            <div className="flex flex-col gap-1">
+                                <div className="flex items-center gap-2">
+                                    <span className="text-[10px] font-black text-emerald-500 uppercase tracking-[0.4em] animate-pulse">Live Transmission</span>
+                                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981]" />
+                                </div>
+                                <h4 className="text-[22px] font-black text-white tracking-tighter uppercase leading-none italic">New Acquisition</h4>
+                            </div>
+                        </div>
+                        <button onClick={() => toast.dismiss(t)} className="text-white/20 hover:text-white transition-colors p-1">
+                            <X className="w-5 h-5" />
+                        </button>
+                    </div>
+
+                    <div className="space-y-4 relative z-10">
+                        <div className="bg-white/5 border border-white/5 rounded-2xl p-5 flex flex-col gap-3">
+                            <div className="flex justify-between items-end">
+                                <div className="flex flex-col">
+                                    <span className="text-[9px] font-black text-white/30 uppercase tracking-widest">Client Name</span>
+                                    <span className="text-lg font-bold text-white tracking-tight">{order.user?.name || "Premium Client"}</span>
+                                </div>
+                                <div className="flex flex-col text-right">
+                                    <span className="text-[9px] font-black text-white/30 uppercase tracking-widest text-right">Transaction Value</span>
+                                    <span className="text-2xl font-black text-emerald-400 font-serif italic tracking-tighter leading-none">
+                                        QAR {order.total.toLocaleString()}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="flex items-center gap-3">
+                             <Button 
+                                onClick={() => {
+                                    window.location.href = `/admin/orders/${order.id}`;
+                                    toast.dismiss(t);
+                                }}
+                                className="flex-1 bg-white text-black hover:bg-emerald-500 hover:text-white rounded-xl h-12 font-black uppercase text-[10px] tracking-[0.2em] transition-all duration-500 border-none shadow-xl"
+                             >
+                                Inspect Portfolio
+                             </Button>
+                             <Button 
+                                 variant="ghost" 
+                                 onClick={() => toast.dismiss(t)}
+                                 className="px-6 rounded-xl h-12 border border-white/5 text-white/30 hover:text-white uppercase text-[10px] font-black tracking-widest"
+                             >
+                                 Settle
+                             </Button>
                         </div>
                     </div>
-                    <h4 className="text-lg font-black text-white tracking-tighter uppercase leading-none">New Incoming Order</h4>
-                    <p className="text-[12px] font-bold text-white/60 leading-tight">
-                        <span className="text-white">{order.user?.name || "External Entity"}</span> allocated <span className="text-blue-400">QAR {order.total.toLocaleString()}</span> to the nexus.
-                    </p>
-                    <div className="mt-2 flex items-center gap-3">
-                         <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            onClick={() => {
-                                window.location.href = `/admin/orders/${order.id}`;
-                                toast.dismiss(t);
-                            }}
-                            className="bg-white/5 text-white/40 border border-white/5 rounded-lg text-[9px] font-black uppercase tracking-widest hover:bg-white hover:text-black transition-all"
-                         >
-                            Audit Details
-                         </Button>
-                         <Button 
-                             variant="ghost" 
-                             size="sm" 
-                             onClick={() => toast.dismiss(t)}
-                             className="text-[9px] font-black uppercase text-white/20 hover:text-white"
-                         >
-                             Ignore
-                         </Button>
+
+                    <div className="absolute bottom-0 left-0 w-full h-[2px] bg-white/5">
+                        <motion.div 
+                            initial={{ width: "100%" }}
+                            animate={{ width: "0%" }}
+                            transition={{ duration: 10, ease: "linear" }}
+                            className="h-full bg-emerald-500 shadow-[0_0_10px_#10b981]"
+                        />
                     </div>
                 </div>
-                <button onClick={() => toast.dismiss(t)} className="absolute top-4 right-4 text-white/10 hover:text-white transition-colors">
-                    <X className="w-4 h-4" />
-                </button>
             </div>
         ), { duration: 10000 });
     };

@@ -18,7 +18,7 @@ const arabicFont = Amiri({
 
 export const metadata: Metadata = {
   title: {
-    default: "Local Bazar | The Excellence of Luxury & Heritage",
+    default: "Local Bazar | Premium Luxury & Heritage",
     template: "%s | Local Bazar",
   },
   description: "Discover Local Bazar, the premier destination for luxury fashion in Qatar. Exquisite abayas, elegant jalabiyas, and premium oriental perfumes.",
@@ -60,14 +60,20 @@ export const metadata: Metadata = {
 
 import { LayoutWrapper } from "@/components/providers/layout-wrapper";
 import { getAdminSettings } from "@/lib/actions/admin";
+import { getCategories } from "@/lib/actions/product";
 import { WatermarkBackground } from "@/components/store/WatermarkBackground";
+import { InitialLoader } from "@/components/store/InitialLoader";
+import NextTopLoader from 'nextjs-toploader';
 
 export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const settings = await getAdminSettings();
+  const [settings, categories] = await Promise.all([
+    getAdminSettings(),
+    getCategories()
+  ]);
 
   return (
     <html lang="en" suppressHydrationWarning>
@@ -77,9 +83,20 @@ export default async function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet" />
       </head>
       <body className={`${font.className} ${arabicFont.variable} bg-[#20080B] text-white relative antialiased selection:bg-white/10 selection:text-white`} suppressHydrationWarning>
+        <NextTopLoader
+          color="#FFF"
+          initialPosition={0.08}
+          crawlSpeed={200}
+          height={3}
+          crawl={true}
+          showSpinner={false}
+          easing="ease"
+          speed={200}
+          shadow="0 0 10px #FFF,0 0 5px #FFF"
+        />
         <WatermarkBackground />
         <Providers>
-          <LayoutWrapper settings={settings}>
+          <LayoutWrapper settings={settings} categories={categories}>
             <div className="relative z-10 w-full">
               {children}
             </div>

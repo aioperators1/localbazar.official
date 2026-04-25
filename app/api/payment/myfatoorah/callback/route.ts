@@ -24,7 +24,7 @@ export async function GET(req: NextRequest) {
                 data: { status: "FAILED" }
             }).catch((e) => console.error("[MyFatoorah Callback] Status Update Error:", e));
         }
-        return NextResponse.redirect(`${baseUrl}/cart?error=PaymentCancelled`);
+        return NextResponse.redirect(`${baseUrl}/payment-error?error=PaymentCancelled`);
     }
 
     try {
@@ -62,13 +62,13 @@ export async function GET(req: NextRequest) {
                 }).catch((e) => console.error("[MyFatoorah Callback] Failure Update Error:", e));
             }
             
-            return NextResponse.redirect(`${baseUrl}/cart?error=PaymentStatus_${paymentData.InvoiceStatus}`);
+            return NextResponse.redirect(`${baseUrl}/payment-error?error=PaymentStatus_${paymentData.InvoiceStatus}`);
         }
     } catch (error: any) {
         console.error("[MyFatoorah Callback] Verification Error:", error);
         
         const errorMsg = error?.message || "VerificationFailed";
         const cleanError = errorMsg.includes("Unauthorized") ? "InvalidGatewayToken" : encodeURIComponent(errorMsg);
-        return NextResponse.redirect(`${baseUrl}/cart?error=${cleanError}`);
+        return NextResponse.redirect(`${baseUrl}/payment-error?error=${cleanError}`);
     }
 }

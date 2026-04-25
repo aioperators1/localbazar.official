@@ -1,13 +1,14 @@
 "use client";
 
 import { useCart } from "@/hooks/use-cart";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { placeOrder } from "@/lib/actions/checkout";
 import { validateVoucher } from "@/lib/actions/voucher";
+import { getAdminSettings } from "@/lib/actions/admin";
 import { ShoppingCart, Banknote, ShieldCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCurrency } from "@/components/providers/currency-provider";
@@ -20,11 +21,14 @@ export default function CheckoutPage() {
     const router = useRouter();
     const { formatPrice: formatCurrency, currency } = useCurrency();
     const { t, language } = useLanguage();
+
     const [mounted, setMounted] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [isApplying, setIsApplying] = useState(false);
     const [voucherCode, setVoucherCode] = useState("");
     const [paymentMethod, setPaymentMethod] = useState("COD");
+    const [shippingMethods, setShippingMethods] = useState<any[]>([]);
+    const [selectedShippingMethodId, setSelectedShippingMethodId] = useState<string>("");
 
     const subtotal = items.reduce((acc, item) => acc + (item.price * item.quantity), 0);
 
@@ -39,8 +43,86 @@ export default function CheckoutPage() {
         zip: ""
     });
 
+    // --- Abandoned Checkout Tracking ---
+    const orderCompletedRef = useRef(false);
+    const lastSavedRef = useRef("");
+
+    const saveAbandonedCheckout = useCallback(async () => {
+        if (orderCompletedRef.current) return;
+        if (!formData.email && !formData.phone) return;
+        
+        const fingerprint = JSON.stringify({ ...formData, itemCount: items.length });
+        if (fingerprint === lastSavedRef.current) return; // Skip if nothing changed
+        lastSavedRef.current = fingerprint;
+
+        try {
+            await fetch("/api/abandoned-checkout", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    ...formData,
+                    cartItems: items.map(item => ({
+                        id: item.id,
+                        name: item.name,
+                        price: item.price,
+                        quantity: item.quantity,
+                        image: item.image,
+                        size: item.size,
+                        color: item.color
+                    })),
+                    cartTotal: totalPrice()
+                }),
+            });
+        } catch {} // Silent - never break UX
+    }, [formData, items, totalPrice]);
+
+    // Save abandoned checkout when user navigates away
+    useEffect(() => {
+        const handleBeforeUnload = () => {
+            if (orderCompletedRef.current) return;
+            if (!formData.email && !formData.phone) return;
+            
+            const payload = JSON.stringify({
+                ...formData,
+                cartItems: items.map(item => ({
+                    id: item.id, name: item.name, price: item.price,
+                    quantity: item.quantity, image: item.image
+                })),
+                cartTotal: totalPrice()
+            });
+            
+            navigator.sendBeacon("/api/abandoned-checkout", 
+                new Blob([payload], { type: "application/json" })
+            );
+        };
+
+        window.addEventListener("beforeunload", handleBeforeUnload);
+        return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+    }, [formData, items, totalPrice]);
+
+    // Periodically save if user has entered info (every 10 seconds)
+    useEffect(() => {
+        const interval = setInterval(() => {
+            if (formData.email || formData.phone) {
+                saveAbandonedCheckout();
+            }
+        }, 10000);
+        return () => clearInterval(interval);
+    }, [saveAbandonedCheckout, formData.email, formData.phone]);
+
     useEffect(() => {
         const timer = setTimeout(() => setMounted(true), 0);
+        async function loadShipping() {
+            const settings = await getAdminSettings();
+            if (settings.shippingMethods) {
+                try {
+                    const parsed = JSON.parse(settings.shippingMethods);
+                    setShippingMethods(parsed);
+                    if (parsed.length > 0) setSelectedShippingMethodId(parsed[0].id);
+                } catch (e) {}
+            }
+        }
+        loadShipping();
         return () => clearTimeout(timer);
     }, []);
 
@@ -63,18 +145,23 @@ export default function CheckoutPage() {
             })),
             total: totalPrice(),
             paymentMethod,
-            voucherId: voucher?.id
+            voucherId: voucher?.id,
+            shippingMethodId: selectedShippingMethodId,
+            shippingMethodName: selectedShippingMethod.name,
+            shippingCost: shippingMethods.length > 0 ? Number(shippingMethods.find(m => m.id === selectedShippingMethodId)?.price || 35) : 35
         };
 
         const res = await placeOrder(orderData) as { success: boolean; orderId?: string; paymentUrl?: string; error?: string };
 
         if (res.success) {
+            orderCompletedRef.current = true; // Prevent abandoned checkout tracking
             sessionStorage.setItem('localbazar_last_order', JSON.stringify({
                 ...orderData,
                 items: items, 
                 orderId: res.orderId
             }));
-            clearCart();
+            // clearCart() removed from here - now handled only on success page to preserve cart on payment failure
+            
 
             if (res.paymentUrl) {
                 window.location.href = res.paymentUrl;
@@ -104,14 +191,15 @@ export default function CheckoutPage() {
         )
     }
 
-    const shippingCost = 35;
+    const selectedShippingMethod = shippingMethods.find(m => m.id === selectedShippingMethodId) || { price: 35, name: "Standard", duration: "2-3 days", nameAr: "توصيل عادي" };
+    const shippingCost = shippingMethods.length > 0 ? Number(selectedShippingMethod.price) : 35;
 
     return (
         <div className="min-h-screen bg-transparent text-white" dir={language === 'ar' ? 'rtl' : 'ltr'}>
             {/* Minimal Header */}
             <header className="border-b border-white/5 py-6 bg-transparent sticky top-0 z-50">
                 <div className="container mx-auto px-4 max-w-[1200px] flex items-center justify-between">
-                    <Branding size="md" variant="luxury" />
+                    <span className="text-[14px] font-black uppercase tracking-[0.4em] text-white/40">CHECKOUT</span>
                     <Link href="/cart" className="text-[12px] font-bold uppercase tracking-widest text-zinc-400 hover:text-[#111111] transition-colors">
                        <ShoppingCart className="w-5 h-5" />
                     </Link>
@@ -186,7 +274,7 @@ export default function CheckoutPage() {
                                             setIsApplying(false);
                                         }}
                                         disabled={isApplying}
-                                        className="h-[48px] px-6 bg-white hover:bg-white/80 text-[#1A0306] font-black rounded-[4px] text-[12px] transition-colors uppercase tracking-widest disabled:opacity-50"
+                                        className="h-[48px] px-4 md:px-6 shrink-0 whitespace-nowrap bg-white hover:bg-white/80 text-[#1A0306] font-black rounded-[4px] text-[12px] transition-colors uppercase tracking-widest disabled:opacity-50"
                                     >
                                         {isApplying ? '. .' : t('cart.apply')}
                                     </button>
@@ -331,12 +419,38 @@ export default function CheckoutPage() {
                             {/* 3. Shipping Method */}
                             <section>
                                 <h2 className="text-[18px] font-bold text-white uppercase tracking-tight mb-6">{t('checkout.shippingMethod')}</h2>
-                                <div className="bg-black/20 border border-white/20 rounded-[4px] p-4 flex items-center justify-between">
-                                    <div className="flex flex-col">
-                                       <span className="text-[13px] font-bold text-white tracking-tight uppercase">{t('checkout.express')}</span>
-                                       <span className="text-[11px] text-white/50 font-medium">{t('checkout.deliveryTime')}</span>
-                                    </div>
-                                    <span className="text-[14px] font-bold text-white">{formatCurrency(shippingCost)}</span>
+                                <div className="space-y-3">
+                                    {shippingMethods.length > 0 ? shippingMethods.map((method) => (
+                                        <div 
+                                            key={method.id}
+                                            onClick={() => setSelectedShippingMethodId(method.id)}
+                                            className={cn(
+                                                "border rounded-[4px] p-4 flex items-center justify-between cursor-pointer transition-colors",
+                                                selectedShippingMethodId === method.id 
+                                                    ? "bg-black/40 border-white/80" 
+                                                    : "bg-black/20 border-white/20 hover:border-white/50"
+                                            )}
+                                        >
+                                            <div className="flex items-center gap-4">
+                                                <div className={cn("w-4 h-4 rounded-full border flex items-center justify-center", selectedShippingMethodId === method.id ? "border-white" : "border-white/40")}>
+                                                    {selectedShippingMethodId === method.id && <div className="w-2.5 h-2.5 bg-white rounded-full" />}
+                                                </div>
+                                                <div className="flex flex-col">
+                                                   <span className="text-[13px] font-bold text-white tracking-tight uppercase">{language === 'ar' && method.nameAr ? method.nameAr : method.name}</span>
+                                                   <span className="text-[11px] text-white/50 font-medium">{method.duration}</span>
+                                                </div>
+                                            </div>
+                                            <span className="text-[14px] font-bold text-white">{formatCurrency(Number(method.price))}</span>
+                                        </div>
+                                    )) : (
+                                        <div className="bg-black/20 border border-white/20 rounded-[4px] p-4 flex items-center justify-between">
+                                            <div className="flex flex-col">
+                                               <span className="text-[13px] font-bold text-white tracking-tight uppercase">{t('checkout.express')}</span>
+                                               <span className="text-[11px] text-white/50 font-medium">{t('checkout.deliveryTime')}</span>
+                                            </div>
+                                            <span className="text-[14px] font-bold text-white">{formatCurrency(35)}</span>
+                                        </div>
+                                    )}
                                 </div>
                             </section>
 

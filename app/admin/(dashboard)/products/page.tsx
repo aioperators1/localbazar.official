@@ -7,28 +7,38 @@ import { Input } from "@/components/ui/input";
 import { ProductTabs } from "@/components/admin/ProductTabs";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { cn } from "@/lib/utils";
+
+import { ProductSearchForm } from "@/components/admin/ProductSearchForm";
+import { ExportProductsModal } from "@/components/admin/ExportProductsModal";
+import { ImportProductsModal } from "@/components/admin/ImportProductsModal";
 
 export const dynamic = 'force-dynamic';
 
 interface SearchParams {
     q?: string;
     tab?: string;
+    page?: string;
 }
 
 export default async function AdminProductsPage(props: { searchParams: Promise<SearchParams> }) {
     const searchParams = await props.searchParams;
-    const { q, tab } = searchParams;
+    const { q, tab, page = "1" } = searchParams;
+    const brandId = (searchParams as any).brandId as string | undefined;
+    const currentPage = Math.max(1, parseInt(page));
+    const pageSize = 20;
+
     const session = await getServerSession(authOptions);
 
     const isSuperAdmin = session?.user?.role === "SUPER_ADMIN";
     const canEdit = isSuperAdmin || session?.user?.permissions?.some((p) => p.id === 'products' && p.access === 'editor');
 
     const where: any = {};
-    
+
     if (q) {
         where.OR = [
-            { name: { contains: q } },
-            { category: { name: { contains: q } } }
+            { name: { contains: q, mode: 'insensitive' } },
+            { category: { name: { contains: q, mode: 'insensitive' } } }
         ];
     }
 
@@ -37,45 +47,44 @@ export default async function AdminProductsPage(props: { searchParams: Promise<S
         if (tab === "Draft") where.stock = { lte: 0 };
     }
 
-    const products = await prisma.product.findMany({
-        where,
-        include: { category: true },
-        orderBy: { createdAt: 'desc' }
-    });
+    if (brandId && brandId !== "all") {
+        where.brandId = brandId;
+    }
 
-    const allStats = await prisma.product.findMany({
-        select: {
-            stock: true,
-            price: true,
-        }
-    });
+    // OPTIMIZED: Parallel fetching with pagination
+    const [products, totalCount, activeCount, draftCount, brands] = await Promise.all([
+        prisma.product.findMany({
+            where,
+            include: { category: true },
+            orderBy: [{ position: 'asc' }, { createdAt: 'desc' }],
+            take: pageSize,
+            skip: (currentPage - 1) * pageSize,
+        }),
+        prisma.product.count({ where }),
+        prisma.product.count({ where: { ...where, stock: { gt: 0 } } }),
+        prisma.product.count({ where: { ...where, stock: { lte: 0 } } }),
+        prisma.brand.findMany({ select: { id: true, name: true }, orderBy: { name: 'asc' } })
+    ]);
 
-    const totalProducts = allStats.length;
-    const activeProducts = allStats.filter(p => p.stock > 0).length;
-    const draftProducts = allStats.filter(p => p.stock <= 0).length;
-
+    const totalPages = Math.ceil(totalCount / pageSize);
     const activeTab = tab || "All";
 
     return (
         <div className="space-y-10 pb-20">
             {/* Header Area */}
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
-                <div className="space-y-2">
-                    <h1 className="text-3xl font-black text-white uppercase tracking-tighter italic">Products</h1>
-                    <p className="text-[13px] text-white/40 font-medium uppercase tracking-[0.2em]">Manage your boutique inventory and collections.</p>
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+                <div>
+                    <h1 className="text-3xl font-bold text-black tracking-tight mb-2">Products</h1>
+                    <p className="text-[13px] text-gray-500">Manage your boutique inventory and collections.</p>
                 </div>
                 <div className="flex items-center gap-3">
                     {canEdit && (
                         <>
-                            <Button variant="outline" className="h-10 text-[11px] border-white/10 bg-white/5 text-white hover:bg-white hover:text-black font-black uppercase tracking-widest px-5 rounded-full transition-all shadow-sm">
-                                <Download className="w-3.5 h-3.5 mr-2.5 opacity-40" /> Export
-                            </Button>
-                            <Button variant="outline" className="h-10 text-[11px] border-white/10 bg-white/5 text-white hover:bg-white hover:text-black font-black uppercase tracking-widest px-5 rounded-full transition-all shadow-sm">
-                                <Upload className="w-3.5 h-3.5 mr-2.5 opacity-40" /> Import
-                            </Button>
-                            <Button asChild className="h-10 bg-black text-white hover:bg-[#333] px-6 rounded-full text-[11px] font-black uppercase tracking-[0.2em] transition-all shadow-xl shadow-black/10 active:scale-95">
+                            <ExportProductsModal brands={brands} />
+                            <ImportProductsModal brands={brands} />
+                            <Button asChild className="h-10 bg-black text-white hover:bg-[#333] px-6 rounded-lg text-[12px] font-semibold uppercase tracking-wider shadow-sm">
                                 <Link href="/admin/products/new">
-                                   Add product
+                                    Add product
                                 </Link>
                             </Button>
                         </>
@@ -83,64 +92,93 @@ export default async function AdminProductsPage(props: { searchParams: Promise<S
                 </div>
             </div>
 
-            {/* Ultra Pro Stats Grid */}
+            {/* Stats Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
                 {[
-                    { label: "Total Inventory", value: totalProducts, sub: "Unique Products", border: "border-indigo-500/10" },
-                    { label: "Active Operational", value: activeProducts, sub: "In Stock", border: "border-emerald-500/10" },
-                    { label: "Draft / Pending", value: draftProducts, sub: "Out of Stock", border: "border-amber-500/10" },
+                    { label: "Total Inventory", value: totalCount, sub: "Unique Products", border: "border-gray-200 bg-white text-black" },
+                    { label: "Active Operational", value: activeCount, sub: "In Stock", border: "border-gray-200 bg-white text-black" },
+                    { label: "Draft / Pending", value: draftCount, sub: "Out of Stock", border: "border-gray-200 bg-white text-black" },
                 ].map((stat, i) => (
-                    <div key={i} className={`glass-card p-8 rounded-3xl border ${stat.border} shadow-sm group hover:border-white/20 transition-all duration-500`}>
-                        <p className="pro-label mb-4 group-hover:text-white transition-colors">{stat.label}</p>
+                    <div key={i} className={`p-6 rounded-xl border ${stat.border} shadow-sm transition-all duration-300`}>
+                        <p className="text-[11px] font-semibold text-gray-500 uppercase tracking-widest mb-4">{stat.label}</p>
                         <div className="flex flex-col gap-1">
-                            <span className="text-[28px] font-black text-white tracking-tighter leading-none">{stat.value}</span>
-                            <span className="text-[11px] font-bold text-white/40 uppercase tracking-widest mt-1">{stat.sub}</span>
+                            <span className="text-[28px] font-bold text-black leading-none">{stat.value}</span>
+                            <span className="text-[11px] font-medium text-gray-500 mt-1">{stat.sub}</span>
                         </div>
                     </div>
                 ))}
             </div>
 
-            {/* Premium Repository Interface */}
-            <div className="glass-table rounded-[40px] border-white/5 shadow-2xl overflow-hidden flex flex-col">
+            {/* Main Interface */}
+            <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden flex flex-col">
                 {/* Minimalist Tabs */}
-                <div className="px-8 pt-6 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">
+                <div className="px-6 pt-4 border-b border-gray-200 flex items-center justify-between bg-gray-50/50">
                     <ProductTabs activeTab={activeTab} q={q} />
 
-                    <div className="hidden lg:flex items-center gap-2 mb-6">
-                        <span className="pro-label text-white/10">Viewing</span>
-                        <span className="pro-label text-white/60">{activeTab} Repository</span>
+                    <div className="hidden lg:flex items-center gap-2 mb-4">
+                        <span className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Viewing</span>
+                        <span className="text-[11px] font-semibold text-gray-600 uppercase tracking-wider">{activeTab} Repository</span>
                     </div>
                 </div>
 
-                {/* Refined Filter Sub-bar */}
-                <div className="p-6 lg:p-10 bg-white/[0.01]">
-                    <form className="flex flex-col sm:flex-row items-center gap-4">
-                        <div className="relative flex-1 group w-full">
-                            <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20 group-focus-within:text-white transition-colors" />
-                            <Input 
-                                name="q"
-                                defaultValue={q}
-                                placeholder="Search products, categories, or IDs..." 
-                                className="pl-14 h-14 text-[13px] bg-white/[0.03] border-white/10 rounded-2xl focus:bg-white/10 focus:ring-4 focus:ring-white/5 transition-all placeholder:text-white/20 text-white font-medium tracking-tight shadow-inner" 
-                            />
-                            <input type="hidden" name="tab" value={activeTab} />
-                        </div>
-                        <Button type="submit" className="h-14 px-10 bg-white text-black hover:bg-white/80 rounded-2xl text-[11px] font-black uppercase tracking-[0.3em] transition-all w-full sm:w-auto active:scale-95 shadow-lg shadow-white/5">
-                            Search
-                        </Button>
-                    </form>
+                {/* Filter Sub-bar */}
+                <div className="p-6">
+                    <ProductSearchForm defaultValue={q} activeTab={activeTab} brands={brands} defaultBrandId={brandId} />
                 </div>
 
-                <div className="px-6 lg:px-10 pb-10">
+                <div className="px-6 pb-6">
                     <ProductList products={products.map(p => ({
                         id: p.id,
                         name: p.name,
                         images: p.images,
                         category: { name: p.category?.name || "Uncategorized" },
                         price: Number(p.price),
-                        stock: p.stock
+                        stock: p.stock,
+                        position: (p as any).position ?? 0
                     }))} />
                 </div>
+
+                {/* Pagination UI */}
+                {totalPages > 1 && (
+                    <div className="px-6 py-6 border-t border-gray-100 flex items-center justify-between bg-gray-50/30">
+                        <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">
+                            Showing <span className="text-black">{(currentPage - 1) * pageSize + 1} - {Math.min(currentPage * pageSize, totalCount)}</span> of {totalCount} Products
+                        </p>
+                        <div className="flex items-center gap-2">
+                           <Button 
+                             variant="outline" 
+                             asChild 
+                             className={cn("h-9 text-[10px] uppercase font-black px-4", currentPage <= 1 && "opacity-30 pointer-events-none")}
+                           >
+                              <Link href={`?page=${currentPage - 1}${tab ? `&tab=${tab}` : ''}${q ? `&q=${q}` : ''}`}>Previous</Link>
+                           </Button>
+                           <div className="flex items-center gap-1 mx-2">
+                              {Array.from({ length: Math.min(5, totalPages) }).map((_, i) => {
+                                  const pageNum = i + 1;
+                                  return (
+                                    <Link 
+                                        key={pageNum}
+                                        href={`?page=${pageNum}${tab ? `&tab=${tab}` : ''}${q ? `&q=${q}` : ''}`}
+                                        className={cn(
+                                            "w-9 h-9 flex items-center justify-center rounded-lg text-[11px] font-black transition-all",
+                                            currentPage === pageNum ? "bg-black text-white" : "hover:bg-gray-100 text-gray-400"
+                                        )}
+                                    >
+                                        {pageNum}
+                                    </Link>
+                                  )
+                              })}
+                           </div>
+                           <Button 
+                             variant="outline" 
+                             asChild 
+                             className={cn("h-9 text-[10px] uppercase font-black px-4", currentPage >= totalPages && "opacity-30 pointer-events-none")}
+                           >
+                               <Link href={`?page=${currentPage + 1}${tab ? `&tab=${tab}` : ''}${q ? `&q=${q}` : ''}`}>Next</Link>
+                           </Button>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );

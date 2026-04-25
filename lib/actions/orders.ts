@@ -66,9 +66,26 @@ export async function getOrderById(orderId: string) {
         const serializedOrder = {
             ...order,
             total: Number(order.total),
+            createdAt: order.createdAt.toISOString(),
+            updatedAt: order.updatedAt.toISOString(),
             items: order.items.map(item => ({
-                ...item,
-                price: Number(item.price)
+                id: item.id,
+                orderId: item.orderId,
+                productId: item.productId,
+                quantity: item.quantity,
+                price: Number(item.price),
+                size: item.size || null,
+                color: item.color || null,
+                product: item.product ? {
+                    id: item.product.id,
+                    name: item.product.name,
+                    price: Number(item.product.price),
+                    salePrice: item.product.salePrice ? Number(item.product.salePrice) : null,
+                    images: item.product.images,
+                    slug: item.product.slug,
+                    categoryId: item.product.categoryId,
+                    sku: item.product.sku,
+                } : null
             }))
         };
 

@@ -22,7 +22,7 @@
 
 3. **Enter credentials**:
    - **Username or Email:** You can use either `admin` or `admin@localbazar.com`
-   - **Password:** `localbazar_admin_2024!`
+   - **Password:** `localbazaraio`
 
 4. **Click "Sign In"** to access the premium management suite.
 

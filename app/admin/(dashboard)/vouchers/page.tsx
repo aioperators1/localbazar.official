@@ -24,32 +24,23 @@ export default async function AdminVouchersPage() {
     const vouchers = await getAdminVouchers();
 
     return (
-        <div className="space-y-10 animate-in fade-in duration-1000">
-            {/* Ultra Pro Max Header */}
-            <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between group">
-                <div className="space-y-2">
-                    <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-black shadow-2xl shadow-white/10 group-hover:scale-110 transition-transform duration-700">
-                            <Ticket className="w-6 h-6" />
-                        </div>
-                        <h1 className="text-4xl font-black text-white tracking-tighter uppercase italic">Voucher Terminal</h1>
-                    </div>
-                    <p className="text-[10px] font-black text-white/40 uppercase tracking-[0.4em] pl-1.5 relative">
-                        Strategic Discount Management
-                        <span className="absolute -bottom-3 left-1 w-20 h-1.5 bg-white rounded-full shadow-lg shadow-white/10 transition-all group-hover:w-32" />
-                    </p>
+        <div className="space-y-8 pb-12">
+            {/* Header */}
+            <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+                <div>
+                    <h1 className="text-3xl font-bold text-black tracking-tight mb-2">Vouchers</h1>
+                    <p className="text-[13px] text-gray-500">Manage promotional codes and discounts.</p>
                 </div>
                 <VoucherModal />
             </div>
 
-            {/* Tactical Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8 pb-10">
+            {/* Voucher Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 pb-10">
                 {vouchers.length === 0 ? (
-                    <div className="lg:col-span-2 xl:col-span-3 p-32 text-center rounded-[40px] border-4 border-dashed border-white/5 bg-white/[0.02] group hover:border-white/10 transition-all">
-                        <div className="flex flex-col items-center gap-6 opacity-40 group-hover:opacity-100 transition-opacity">
-                            <Ticket className="w-16 h-16 group-hover:scale-125 transition-transform duration-700 text-white" />
-                            <p className="text-white font-black uppercase text-xs tracking-[0.3em]">No Coupons Forge Yet</p>
-                        </div>
+                    <div className="lg:col-span-2 xl:col-span-3 py-20 text-center rounded-xl border border-dashed border-gray-200 bg-gray-50 flex flex-col items-center">
+                        <Ticket className="w-10 h-10 text-gray-400 mb-4" />
+                        <h3 className="text-black font-semibold text-[14px]">No Vouchers Active</h3>
+                        <p className="text-gray-500 text-[12px] mt-1">Create a new voucher code to offer discounts.</p>
                     </div>
                 ) : (
                     vouchers.map((voucher: Voucher) => {
@@ -61,85 +52,78 @@ export default async function AdminVouchersPage() {
                              <div 
                                 key={voucher.id} 
                                 className={cn(
-                                    "flex flex-col glass-card rounded-[40px] border-2 p-8 shadow-2xl group transition-all duration-700 relative overflow-hidden",
-                                    isLocked ? "border-rose-500/10 grayscale opacity-80" : "border-white/5 hover:border-white/20"
+                                    "flex flex-col bg-white rounded-xl border p-6 shadow-sm relative overflow-hidden",
+                                    isLocked ? "border-red-100 grayscale opacity-80" : "border-gray-200"
                                 )}
                             >
-                                {/* Ambient Glow */}
-                                <div className="absolute top-0 right-0 w-40 h-40 bg-white/5 blur-[50px] pointer-events-none group-hover:bg-white/10 transition-colors" />
-                                
                                  {/* Identity Block */}
-                                <div className="flex items-center justify-between mb-8 relative z-10">
+                                <div className="flex items-center justify-between mb-6">
                                     <div className="flex flex-col">
-                                        <div className="flex items-center gap-3">
-                                            <span className="text-2xl font-black italic tracking-tighter text-white group-hover:scale-110 origin-left transition-transform duration-500 uppercase">{voucher.code}</span>
-                                            <button className="p-2 bg-white/5 rounded-xl hover:bg-white hover:text-black transition-all">
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-xl font-bold text-black uppercase">{voucher.code}</span>
+                                            <button className="p-1.5 text-gray-400 hover:text-black hover:bg-gray-100 rounded-md transition-colors">
                                                 <Copy className="w-3.5 h-3.5" />
                                             </button>
                                         </div>
                                         <span className={cn(
-                                            "text-[10px] font-black uppercase tracking-[0.2em] mt-1.5",
-                                            isLocked ? "text-rose-500" : "text-emerald-500"
+                                            "text-[10px] font-semibold uppercase tracking-wider mt-1",
+                                            isLocked ? "text-red-500" : "text-emerald-500"
                                         )}>
-                                            {isLocked ? "Protocol Locked" : "Execution Active"}
+                                            {isLocked ? "Locked / Expired" : "Active"}
                                         </span>
                                     </div>
                                     <div className={cn(
-                                        "w-16 h-16 rounded-[24px] flex flex-col items-center justify-center text-black shadow-2xl transition-all",
-                                        isLocked ? "bg-white/20" : "bg-white group-hover:scale-110 group-hover:rotate-3"
+                                        "px-4 py-2 rounded-lg flex flex-col items-center justify-center border",
+                                        isLocked ? "bg-gray-50 border-gray-200 text-gray-500" : "bg-black text-white border-black"
                                     )}>
-                                        <span className="text-[18px] font-black leading-none">{voucher.type === 'PERCENTAGE' ? `${voucher.value}%` : formatCurrency(voucher.value)}</span>
-                                        <span className="text-[8px] font-bold uppercase tracking-widest mt-1 opacity-60">Reward</span>
+                                        <span className="text-[14px] font-bold">{voucher.type === 'PERCENTAGE' ? `${voucher.value}%` : formatCurrency(voucher.value)}</span>
+                                        <span className="text-[9px] font-medium uppercase tracking-wider mt-0.5 opacity-80">Discount</span>
                                     </div>
                                 </div>
 
                                 {/* Analytics Strip */}
-                                <div className="grid grid-cols-2 gap-4 mb-8 relative z-10">
-                                    <div className="bg-white/5 p-4 rounded-3xl flex items-center gap-4 border border-white/5">
-                                        <div className="w-10 h-10 bg-white/5 rounded-xl shadow-sm flex items-center justify-center text-white/60">
-                                            <Receipt className="w-4 h-4" />
-                                        </div>
+                                <div className="grid grid-cols-2 gap-3 mb-6">
+                                    <div className="bg-gray-50 px-3 py-2 rounded-lg flex items-center gap-3 border border-gray-100">
+                                        <Receipt className="w-4 h-4 text-gray-400" />
                                         <div className="flex flex-col">
-                                            <span className="text-[9px] font-black uppercase tracking-widest text-white/20">Status</span>
-                                            <span className="font-black text-[11px] text-white uppercase ">{voucher.type === 'PERCENTAGE' ? 'Variable %' : 'Static Val'}</span>
+                                            <span className="text-[9px] font-semibold uppercase tracking-wider text-gray-500">Type</span>
+                                            <span className="font-bold text-[11px] text-black uppercase">{voucher.type === 'PERCENTAGE' ? 'Percentage' : 'Fixed Amount'}</span>
                                         </div>
                                     </div>
-                                    <div className="bg-white/5 p-4 rounded-3xl flex items-center gap-4 border border-white/5">
-                                        <div className="w-10 h-10 bg-white/5 rounded-xl shadow-sm flex items-center justify-center text-white/60">
-                                            <Clock className="w-4 h-4" />
-                                        </div>
+                                    <div className="bg-gray-50 px-3 py-2 rounded-lg flex items-center gap-3 border border-gray-100">
+                                        <Clock className="w-4 h-4 text-gray-400" />
                                         <div className="flex flex-col shrink-0">
-                                            <span className="text-[9px] font-black uppercase tracking-widest text-white/20">Terminal</span>
-                                            <span className="font-black text-[11px] text-white uppercase truncate max-w-[80px]">
-                                                {voucher.expiryDate ? new Date(voucher.expiryDate).toLocaleDateString() : 'INF'}
+                                            <span className="text-[9px] font-semibold uppercase tracking-wider text-gray-500">Expiry</span>
+                                            <span className="font-bold text-[11px] text-black uppercase truncate max-w-[80px]">
+                                                {voucher.expiryDate ? new Date(voucher.expiryDate).toLocaleDateString() : 'Never'}
                                             </span>
                                         </div>
                                     </div>
                                 </div>
 
                                 {/* Progress Module */}
-                                <div className="space-y-3 mb-10 relative z-10">
-                                    <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-widest">
-                                        <span className="text-white/60">Usage Capture</span>
-                                        <span className="text-white/20">{voucher.usedCount} / {voucher.usageLimit === 0 ? 'INF' : voucher.usageLimit}</span>
+                                <div className="space-y-2 mb-6">
+                                    <div className="flex items-center justify-between text-[11px] font-semibold text-gray-600">
+                                        <span>Usage Limit</span>
+                                        <span>{voucher.usedCount} / {voucher.usageLimit === 0 ? 'ထ' : voucher.usageLimit}</span>
                                     </div>
-                                    <div className="h-4 bg-white/5 rounded-full p-1.5 overflow-hidden border border-white/5">
+                                    <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
                                         <div 
-                                            className="h-full bg-white rounded-full transition-all duration-1000 shadow-lg shadow-white/10"
+                                            className="h-full bg-black transition-all duration-500"
                                             style={{ width: `${voucher.usageLimit === 0 ? 0 : Math.min(usagePercent, 100)}%` }}
                                         />
                                     </div>
                                 </div>
 
                                 {/* Footer Commands */}
-                                <div className="mt-auto flex items-center justify-between pt-6 border-t border-white/5 relative z-10">
+                                <div className="mt-auto flex items-center justify-between pt-4 border-t border-gray-100">
                                     <VoucherUsagePanel voucher={voucher} />
                                     
                                     <div className="flex items-center gap-2">
                                         <VoucherModal 
                                             voucher={voucher} 
                                             trigger={
-                                                <button className="p-3 bg-white/5 border border-white/10 rounded-xl hover:bg-white hover:text-black transition-all shadow-sm">
+                                                <button className="h-8 w-8 flex items-center justify-center text-gray-500 hover:text-black hover:bg-gray-100 bg-gray-50 border border-gray-200 rounded-md transition-all">
                                                     <Settings className="w-4 h-4" />
                                                 </button>
                                             }
@@ -149,7 +133,7 @@ export default async function AdminVouchersPage() {
                                             await deleteVoucher(voucher.id);
                                             revalidatePath('/admin/vouchers');
                                         }}>
-                                            <button className="p-3 bg-white/5 border border-white/10 rounded-xl hover:bg-rose-500 hover:text-white text-white/40 transition-all shadow-sm">
+                                            <button className="h-8 w-8 flex items-center justify-center text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-all">
                                                 <Trash2 className="w-4 h-4" />
                                             </button>
                                         </form>

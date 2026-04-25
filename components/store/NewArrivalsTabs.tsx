@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { ProductCard } from "@/components/store/ProductCard";
 import { ChevronLeft, ChevronRight, ShoppingBag } from "lucide-react";
 import useEmblaCarousel from "embla-carousel-react";
@@ -18,13 +18,17 @@ interface NewArrivalsTabsProps {
 
 export function NewArrivalsTabs({ products, categories = [] }: NewArrivalsTabsProps) {
     const { t, language } = useLanguage();
+    const [mounted, setMounted] = useState(false);
     
+    useEffect(() => setMounted(true), []);
+
     const dynamicTabs = categories.map(c => ({
         label: c.name,
         slug: c.slug
     }));
 
     const [activeTab, setActiveTab] = useState(dynamicTabs[0]?.slug || "");
+
     
     const [emblaRef, emblaApi] = useEmblaCarousel({
         align: "start",
@@ -44,10 +48,10 @@ export function NewArrivalsTabs({ products, categories = [] }: NewArrivalsTabsPr
     const scrollPrev = () => emblaApi && emblaApi.scrollPrev();
 
     return (
-        <section className={`py-24 sm:py-32 bg-transparent overflow-hidden font-sans ${language === 'ar' ? 'rtl' : 'ltr'}`}>
-            <div className="container mx-auto px-6 lg:px-24 mb-16 lg:mb-24">
-                <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-12 border-b border-white/5 pb-12">
-                    <div className="space-y-10 max-w-4xl">
+        <section className={`py-10 sm:py-16 bg-transparent overflow-hidden font-sans ${language === 'ar' ? 'rtl' : 'ltr'}`}>
+            <div className="container mx-auto px-6 lg:px-24 mb-8 lg:mb-12">
+                <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 border-b border-white/5 pb-6">
+                    <div className="space-y-4 max-w-4xl">
                         <div className="space-y-4">
                             <div className="flex items-center gap-4 mb-2">
                                 <motion.div 
@@ -55,22 +59,29 @@ export function NewArrivalsTabs({ products, categories = [] }: NewArrivalsTabsPr
                                     whileInView={{ width: 60 }}
                                     className="h-px bg-white/20"
                                 />
-                                <span className="text-[11px] font-black tracking-[0.5em] text-white/30 uppercase">{t('home.curateSelection')}</span>
+                                <span className="text-[11px] font-black tracking-[0.5em] text-white/30 uppercase">
+                                    {mounted ? t('home.curateSelection') : 'CURATED SELECTION'}
+                                </span>
                             </div>
-                            <h2 className="font-serif text-[42px] sm:text-[64px] lg:text-[84px] text-white leading-[0.9] font-medium tracking-tighter">
-                                {t('nav.newArrivals').split(' ')[0]} <br />
-                                <span className="italic font-extralight text-white/40 ml-[-2px]">{t('nav.newArrivals').split(' ').slice(1).join(' ')}</span>
+                            <h2 
+                                className="font-serif text-[42px] sm:text-[64px] lg:text-[84px] text-white leading-[0.9] font-medium tracking-tighter"
+                                style={{ fontFamily: language === 'ar' && mounted ? 'var(--font-amiri), serif' : undefined }}
+                            >
+                                {mounted ? t('nav.newArrivals').split(' ')[0] : 'NEW'} <br />
+                                <span className="italic font-extralight text-white/40 ml-[-2px]">
+                                    {mounted ? t('nav.newArrivals').split(' ').slice(1).join(' ') : 'ARRIVALS'}
+                                </span>
                             </h2>
                         </div>
                         
                         {/* Categories Tabs - Ultra Minimal */}
-                        <div className="flex items-center gap-12 overflow-x-auto no-scrollbar pt-6">
+                        <div className="flex items-center gap-6 overflow-x-auto no-scrollbar pt-2">
                             {dynamicTabs.map((tab) => (
                                 <button
                                     key={tab.slug}
                                     onClick={() => setActiveTab(tab.slug)}
                                     className={cn(
-                                        "pb-6 text-[11px] font-black uppercase tracking-[0.4em] whitespace-nowrap transition-all relative group",
+                                        "pb-3 text-[11px] font-black uppercase tracking-[0.4em] whitespace-nowrap transition-all relative group",
                                         activeTab === tab.slug 
                                             ? "text-white" 
                                             : "text-white/20 hover:text-white/60"
@@ -89,7 +100,7 @@ export function NewArrivalsTabs({ products, categories = [] }: NewArrivalsTabsPr
                         </div>
                     </div>
                     
-                    <div className="flex flex-col items-start lg:items-end gap-12 self-start lg:self-auto min-w-[200px]">
+                    <div className="flex flex-col items-start lg:items-end gap-6 self-start lg:self-auto min-w-[200px]">
                         {filteredProducts.length > 0 && (
                             <div className="hidden lg:flex gap-4">
                                 <button
@@ -127,12 +138,12 @@ export function NewArrivalsTabs({ products, categories = [] }: NewArrivalsTabsPr
                         className="relative group/carousel"
                     >
                         <div className="overflow-visible" ref={emblaRef}>
-                            <div className="flex -ml-10 lg:-ml-16">
+                            <div className="flex -ml-6 lg:-ml-10">
                                 {filteredProducts.length > 0 ? (
                                     filteredProducts.map((product) => (
                                         <div
                                             key={product.id}
-                                            className="pl-10 lg:pl-16 min-w-[280px] md:min-w-[340px] lg:min-w-[420px] flex-[0_0_auto]"
+                                            className="pl-6 lg:pl-10 min-w-[280px] md:min-w-[340px] lg:min-w-[420px] flex-[0_0_auto]"
                                         >
                                             <ProductCard product={product} />
                                         </div>
@@ -151,7 +162,7 @@ export function NewArrivalsTabs({ products, categories = [] }: NewArrivalsTabsPr
 
                         {/* Mobile Navigation */}
                         {filteredProducts.length > 0 && (
-                            <div className="flex lg:hidden justify-center gap-6 mt-16 scale-90">
+                            <div className="flex lg:hidden justify-center gap-6 mt-6 scale-90">
                                 <button
                                     onClick={scrollPrev}
                                     className="w-16 h-16 rounded-full border border-white/10 flex items-center justify-center text-white/60 transition-all hover:bg-white hover:text-[#592C2F]"

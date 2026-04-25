@@ -7,10 +7,10 @@ export function HomeBrands({ brands }: { brands: Brand[] }) {
     if (!brands || brands.length === 0) return null;
 
     return (
-        <section className="py-20 relative">
+        <section className="py-8 relative">
             <div className="max-w-[1400px] mx-auto px-4 md:px-8">
                 <ScrollReveal>
-                    <div className="flex flex-col items-center mb-16 space-y-4">
+                    <div className="flex flex-col items-center mb-6 space-y-2">
                         <h2 className="text-3xl md:text-4xl lg:text-[40px] font-serif text-white text-center">
                             Our Brands - علاماتنا التجارية
                         </h2>
@@ -20,7 +20,7 @@ export function HomeBrands({ brands }: { brands: Brand[] }) {
                     </div>
                 </ScrollReveal>
 
-                <div className="flex flex-wrap justify-center gap-6 md:gap-10">
+                <div className="flex flex-wrap justify-center gap-4 md:gap-8">
                     {brands.map((brand, idx) => (
                         <ScrollReveal key={brand.id} delay={0.1 * idx}>
                             <Link href={`/shop?brand=${brand.slug}`} className="group flex flex-col items-center justify-center transition-all duration-500">

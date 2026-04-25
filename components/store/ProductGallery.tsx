@@ -53,7 +53,7 @@ export function ProductGallery({ images, name }: ProductGalleryProps) {
             </div>
 
             {/* Thumbnail Selection - Vertical on Desktop */}
-            <div className="flex lg:flex-col gap-4 overflow-x-auto lg:overflow-y-auto lg:max-h-[600px] no-scrollbar py-1">
+            <div className="flex lg:flex-col gap-4 overflow-x-auto lg:overflow-y-auto lg:max-h-[600px] no-scrollbar py-1 justify-center lg:justify-start">
                 {images.map((image, index) => (
                     <button
                         key={index}

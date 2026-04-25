@@ -90,6 +90,8 @@ function CategoryCard({
                         src={image}
                         alt={title}
                         fill
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        quality={100}
                         className="object-cover opacity-100 dark:opacity-60 group-hover:scale-105 transition-transform duration-700"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent z-10" />
