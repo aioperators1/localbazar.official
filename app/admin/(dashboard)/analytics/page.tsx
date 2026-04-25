@@ -89,7 +89,7 @@ export default async function AnalyticsPage() {
                             <div className="p-6 text-center text-[13px] text-[#616161] font-medium">No recent orders found.</div>
                         ) : (
                             <div className="divide-y divide-[#F1F1F1]">
-                                {recentOrders.map(order => (
+                                {recentOrders.map((order: any) => (
                                     <div key={order.id} className="flex items-center justify-between p-4 px-6 hover:bg-[#F9F9F9] transition-colors">
                                         <div className="flex items-center gap-4">
                                             <div className="h-10 w-10 rounded-full bg-[#111] text-white flex items-center justify-center font-bold text-[12px]">

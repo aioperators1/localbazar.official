@@ -127,7 +127,7 @@ export default async function AdminProductsPage(props: { searchParams: Promise<S
                 </div>
 
                 <div className="px-6 pb-6">
-                    <ProductList products={products.map(p => ({
+                    <ProductList products={products.map((p: any) => ({
                         id: p.id,
                         name: p.name,
                         images: p.images,
