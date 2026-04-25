@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
         const uploadsDir = path.join(process.cwd(), "public", "uploads");
         try {
             await mkdir(uploadsDir, { recursive: true });
-        } catch (e) {
+        } catch (e: any) {
             // Already exists
         }
 
@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
         const url = `/uploads/${filename}`;
 
         return NextResponse.json({ url });
-    } catch (error) {
+    } catch (error: any) {
         console.error("Upload error:", error);
         return NextResponse.json({ error: "Upload failed" }, { status: 500 });
     }

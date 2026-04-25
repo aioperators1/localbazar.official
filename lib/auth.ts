@@ -65,7 +65,7 @@ export const authOptions: NextAuthOptions = {
                         image: user.image,
                         permissions: user.permissions,
                     };
-                } catch (error) {
+                } catch (error: any) {
                     console.error("[Auth] Critical error during authorization:", error);
                     return null;
                 }

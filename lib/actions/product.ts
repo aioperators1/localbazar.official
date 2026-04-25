@@ -46,7 +46,7 @@ export async function getFeaturedProducts(): Promise<Product[]> {
       ]
     });
     if (products.length > 0) {
-      return products.map(p => ({
+      return products.map((p: any) => ({
         ...p,
         price: Number(p.price),
         salePrice: p.salePrice ? Number(p.salePrice) : null,
@@ -58,10 +58,10 @@ export async function getFeaturedProducts(): Promise<Product[]> {
         } : null
       })) as unknown as Product[];
     }
-    return FALLBACK_PRODUCTS.filter(p => p.featured).slice(0, 4);
-  } catch (error) {
+    return FALLBACK_PRODUCTS.filter((p: any) => p.featured).slice(0, 4);
+  } catch (error: any) {
     console.error("Failed to fetch featured products:", error);
-    return FALLBACK_PRODUCTS.filter(p => p.featured).slice(0, 4);
+    return FALLBACK_PRODUCTS.filter((p: any) => p.featured).slice(0, 4);
   }
 }
 
@@ -148,7 +148,7 @@ export async function getAllProducts(
     });
 
     if (products.length > 0) {
-      return products.map(p => ({
+      return products.map((p: any) => ({
         ...p,
         price: Number(p.price),
         salePrice: p.salePrice ? Number(p.salePrice) : null,
@@ -163,7 +163,7 @@ export async function getAllProducts(
 
     if (categorySlug || search || brandSlug) return [];
     return FALLBACK_PRODUCTS;
-  } catch (error) {
+  } catch (error: any) {
     console.error("Failed to fetch products:", error);
     return FALLBACK_PRODUCTS;
   }
@@ -174,11 +174,11 @@ export async function getCategories(): Promise<Category[]> {
     const categories = await prisma.category.findMany({
       orderBy: { createdAt: 'desc' }
     });
-    return categories.map(c => ({
+    return categories.map((c: any) => ({
       ...c,
       createdAt: c.createdAt.toISOString()
     })) as unknown as Category[];
-  } catch (error) {
+  } catch (error: any) {
     console.error("Failed to fetch categories:", error);
     return [];
   }
@@ -203,7 +203,7 @@ export async function getProductById(id: string): Promise<Product | null> {
         } : null
       } as unknown as Product;
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error("Failed to fetch product by id:", error);
   }
   return FALLBACK_PRODUCTS.find(p => p.id === id) || null;
@@ -238,7 +238,7 @@ export async function getProductBySlug(slug: string): Promise<Product | null> {
         } : null
       } as unknown as Product;
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error("Failed to fetch product by slug/id:", error);
   }
   return FALLBACK_PRODUCTS.find(p => p.slug === slug || p.id === slug) || null;

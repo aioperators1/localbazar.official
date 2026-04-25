@@ -14,7 +14,7 @@ export default async function AdminCategoriesPage() {
     const session = await getServerSession(authOptions) as AppSession | null;
 
     const isSuperAdmin = session?.user?.role === "SUPER_ADMIN";
-    const canEdit = isSuperAdmin || session?.user?.permissions?.some((p) => p.id === 'categories' && p.access === 'editor');
+    const canEdit = isSuperAdmin || session?.user?.permissions?.some((p: any) => p.id === 'categories' && p.access === 'editor');
 
     return (
         <div className="space-y-10 pb-20">

@@ -48,7 +48,7 @@ export default async function AdminCustomersPage() {
                             </td>
                         </tr>
                         ) : (
-                             customers.map((customer) => {
+                             customers.map((customer: any) => {
                                  const lastOrder = customer.orders?.[0];
                                  const lifeValue = customer.orders?.reduce((acc: number, o: any) => acc + o.total, 0) || 0;
                                  const lastItemName = lastOrder?.items?.[0]?.name || "No items";

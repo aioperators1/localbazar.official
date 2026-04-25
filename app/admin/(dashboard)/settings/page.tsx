@@ -71,7 +71,7 @@ export default function SettingsPage() {
                 if (data && Object.keys(data).length > 0) {
                     setSettings(prev => ({ ...prev, ...data }));
                 }
-            } catch (error) {
+            } catch (error: any) {
                 console.error("Failed to load settings:", error);
                 toast.error("Failed to load settings");
             } finally {
@@ -99,7 +99,7 @@ export default function SettingsPage() {
             } else {
                 toast.error("SYNCHRONIZATION FAILED");
             }
-        } catch (error) {
+        } catch (error: any) {
             toast.error("CRITICAL KERNEL ERROR");
         } finally {
             setSaving(false);
@@ -335,7 +335,7 @@ export default function SettingsPage() {
                             {[
                                 { id: 'luxuryTheme', label: 'Use Luxury Theme', sub: 'Enable premium storefront UI', value: settings.luxuryTheme === 'true', icon: Zap },
                                 { id: 'maintenanceMode', label: 'Maintenance Mode', sub: 'Temporarily lock the store', value: settings.maintenanceMode === 'true', icon: Shield },
-                            ].map((opt) => (
+                            ].map((opt: any) => (
                                 <div 
                                     key={opt.id}
                                     onClick={() => canEdit('settings') && handleToggle(opt.id, !opt.value)}
@@ -370,7 +370,7 @@ export default function SettingsPage() {
                                 { id: 'instagramUrl', label: 'Instagram', icon: Instagram },
                                 { id: 'facebookUrl', label: 'Facebook', icon: Facebook },
                                 { id: 'twitterUrl', label: 'Twitter', icon: Twitter },
-                            ].map((social) => (
+                            ].map((social: any) => (
                                 <div key={social.id} className="space-y-2">
                                     <Label className="text-[12px] font-semibold text-gray-700 ml-1">{social.label}</Label>
                                     <div className="relative">

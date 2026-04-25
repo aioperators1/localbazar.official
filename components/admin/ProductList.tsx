@@ -208,16 +208,16 @@ export function ProductList({ products }: { products: AdminProduct[] }) {
         const { active, over } = event;
         
         if (over && active.id !== over.id) {
-            const oldIndex = items.findIndex(item => item.id === active.id);
-            const newIndex = items.findIndex(item => item.id === over.id);
+            const oldIndex = items.findIndex((item: AdminProduct) => item.id === active.id);
+            const newIndex = items.findIndex((item: AdminProduct) => item.id === over.id);
             
             // Optimistic fast UI update
             const newOrder = arrayMove(items, oldIndex, newIndex);
             setItems(newOrder);
 
             // Calculate precise positions based on current bounds safely.
-            const minPos = Math.min(...newOrder.map(i => i.position));
-            const updates = newOrder.map((item, i) => ({
+            const minPos = Math.min(...newOrder.map((i: AdminProduct) => i.position));
+            const updates = newOrder.map((item: AdminProduct, i: number) => ({
                 id: item.id,
                 position: minPos + i // Maintain local sequence globally
             }));
@@ -234,8 +234,8 @@ export function ProductList({ products }: { products: AdminProduct[] }) {
     };
 
     const toggleSelect = (id: string) => {
-        setSelectedIds(prev => 
-            prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
+        setSelectedIds((prev: string[]) => 
+            prev.includes(id) ? prev.filter((i: string) => i !== id) : [...prev, id]
         );
     };
 
@@ -243,7 +243,7 @@ export function ProductList({ products }: { products: AdminProduct[] }) {
         if (selectedIds.length === items.length) {
             setSelectedIds([]);
         } else {
-            setSelectedIds(items.map(p => p.id));
+            setSelectedIds(items.map((p: AdminProduct) => p.id));
         }
     };
 
@@ -314,8 +314,8 @@ export function ProductList({ products }: { products: AdminProduct[] }) {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">
-                            <SortableContext items={items.map(i => i.id)} strategy={verticalListSortingStrategy}>
-                                {items.map((product) => (
+                            <SortableContext items={items.map((i: AdminProduct) => i.id)} strategy={verticalListSortingStrategy}>
+                                {items.map((product: AdminProduct) => (
                                     <SortableProductRow 
                                         key={product.id} 
                                         product={product} 

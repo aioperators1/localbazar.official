@@ -31,7 +31,7 @@ export default async function AdminProductsPage(props: { searchParams: Promise<S
     const session = await getServerSession(authOptions);
 
     const isSuperAdmin = session?.user?.role === "SUPER_ADMIN";
-    const canEdit = isSuperAdmin || session?.user?.permissions?.some((p) => p.id === 'products' && p.access === 'editor');
+    const canEdit = isSuperAdmin || session?.user?.permissions?.some((p: any) => p.id === 'products' && p.access === 'editor');
 
     const where: any = {};
 
@@ -98,7 +98,7 @@ export default async function AdminProductsPage(props: { searchParams: Promise<S
                     { label: "Total Inventory", value: totalCount, sub: "Unique Products", border: "border-gray-200 bg-white text-black" },
                     { label: "Active Operational", value: activeCount, sub: "In Stock", border: "border-gray-200 bg-white text-black" },
                     { label: "Draft / Pending", value: draftCount, sub: "Out of Stock", border: "border-gray-200 bg-white text-black" },
-                ].map((stat, i) => (
+                ].map((stat: any, i: number) => (
                     <div key={i} className={`p-6 rounded-xl border ${stat.border} shadow-sm transition-all duration-300`}>
                         <p className="text-[11px] font-semibold text-gray-500 uppercase tracking-widest mb-4">{stat.label}</p>
                         <div className="flex flex-col gap-1">

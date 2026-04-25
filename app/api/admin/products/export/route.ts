@@ -71,7 +71,7 @@ export async function GET(req: NextRequest) {
                 orderBy: { createdAt: 'desc' }
             });
 
-            dataToExport = products.map(p => ({
+            dataToExport = products.map((p: any) => ({
                 ID: p.id,
                 Name_EN: (p.name || "").substring(0, 32000),
                 Name_AR: (p.nameAr || "").substring(0, 32000),

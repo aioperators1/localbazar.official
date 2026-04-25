@@ -48,7 +48,7 @@ export function CategoryList({ categories }: { categories: AdminCategory[] }) {
                     </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
-                    {categories.map((cat) => (
+                    {categories.map((cat: AdminCategory) => (
                         <tr key={cat.id} className="hover:bg-gray-50/50 transition-colors">
                             <td className="py-4 px-6">
                                 <div className="flex flex-col">

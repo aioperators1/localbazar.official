@@ -22,7 +22,7 @@ export default async function AdminPage() {
         permissionList = typeof permissions === 'string' && permissions.startsWith('[')
             ? JSON.parse(permissions)
             : Array.isArray(permissions) ? permissions : [];
-    } catch (e) {
+    } catch (e: any) {
         permissionList = [];
     }
 

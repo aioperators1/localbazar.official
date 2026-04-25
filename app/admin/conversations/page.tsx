@@ -55,7 +55,7 @@ export default async function AdminConversationsPage() {
                 </div>
             ) : (
                 <div className="grid grid-cols-1 gap-4">
-                    {conversations.map((conv) => {
+                    {conversations.map((conv: any) => {
                         const lastMessage = conv.messages[0];
                         const productImg = conv.product.images;
                         let displayImg = "/placeholder.png";

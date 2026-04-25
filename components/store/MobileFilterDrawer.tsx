@@ -132,7 +132,7 @@ export function MobileFilterDrawer({ isOpen, onClose, categories, brands = [] }:
                                             >
                                                 {t('shop.allCollections')}
                                             </button>
-                                            {categories.map((cat) => (
+                                            {categories.map((cat: Category) => (
                                                 <button
                                                     key={cat.id}
                                                     onClick={() => updateFilter("category", cat.slug)}
@@ -165,7 +165,7 @@ export function MobileFilterDrawer({ isOpen, onClose, categories, brands = [] }:
                                                 >
                                                     All Brands
                                                 </button>
-                                                {brands.map((brand) => (
+                                                {brands.map((brand: Brand) => (
                                                     <button
                                                         key={brand.id}
                                                         onClick={() => updateFilter("brand", brand.slug)}
@@ -196,7 +196,7 @@ export function MobileFilterDrawer({ isOpen, onClose, categories, brands = [] }:
                                             max={5000}
                                             step={50}
                                             onValueChange={setPriceRange}
-                                            onValueCommit={(val) => {
+                                            onValueCommit={(val: number[]) => {
                                                 const params = new URLSearchParams(searchParams.toString());
                                                 params.set("minPrice", val[0].toString());
                                                 params.set("maxPrice", val[1].toString());
@@ -219,7 +219,7 @@ export function MobileFilterDrawer({ isOpen, onClose, categories, brands = [] }:
                                     </AccordionTrigger>
                                     <AccordionContent className="pb-6">
                                         <div className="flex flex-wrap gap-4 pt-4">
-                                            {LUXURY_COLORS.map((color) => (
+                                            {LUXURY_COLORS.map((color: {name: string, hex: string}) => (
                                                 <button
                                                     key={color.name}
                                                     onClick={() => updateColor(color.name)}

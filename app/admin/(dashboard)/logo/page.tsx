@@ -29,7 +29,7 @@ export default function LogoPage() {
                 if (data && data.website_logo_url) {
                     setLogoUrl(data.website_logo_url);
                 }
-            } catch (error) {
+            } catch (error: any) {
                 console.error("Failed to load logo settings:", error);
                 toast.error("Failed to load logo settings");
             } finally {
@@ -51,7 +51,7 @@ export default function LogoPage() {
             } else {
                 toast.error("Failed to update logo");
             }
-        } catch (error) {
+        } catch (error: any) {
             toast.error("A critical error occurred while saving");
         } finally {
             setSaving(false);
@@ -141,7 +141,7 @@ export default function LogoPage() {
                                 <h3 className="text-[12px] font-semibold text-gray-700">Upload New Asset</h3>
                                 <ImageUpload 
                                     value={logoUrl ? [logoUrl] : []}
-                                    onChange={(urls) => setLogoUrl(urls[0] || "")}
+                                    onChange={(urls: string[]) => setLogoUrl(urls[0] || "")}
                                     onRemove={() => setLogoUrl("")}
                                     disabled={!canEdit('logo')}
                                 />

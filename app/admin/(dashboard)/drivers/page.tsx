@@ -30,7 +30,7 @@ export default async function AdminDriversPage() {
                     { label: "Active Carriers", value: drivers.filter((d: any) => d.active).length, icon: Activity, color: "text-emerald-500" },
                     { label: "Total Assignments", value: drivers.reduce((acc: number, d: any) => acc + d._count.orders, 0), icon: Target, color: "text-blue-500" },
                     { label: "Fleet Capacity", value: drivers.length, icon: Compass, color: "text-amber-500" },
-                ].map((stat, i) => (
+                ].map((stat: any, i: number) => (
                     <div key={i} className="bg-white border-2 border-gray-50 rounded-2xl p-6 flex items-center justify-between shadow-sm">
                         <div>
                             <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">{stat.label}</p>

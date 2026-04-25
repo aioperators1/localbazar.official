@@ -80,7 +80,7 @@ export default function AdminOrdersPage() {
                     { label: "Shipped Items", value: stats.shipped, icon: Truck, color: "text-blue-600 bg-blue-50" },
                     { label: "Delivered Success", value: stats.delivered, icon: CheckCircle2, color: "text-emerald-600 bg-emerald-50" },
                     { label: "Cancelled Void", value: stats.cancelled, icon: XCircle, color: "text-red-600 bg-red-50" },
-                ].map((stat, idx) => (
+                ].map((stat: any, idx: number) => (
                     <div
                         key={stat.label}
                         className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm"
@@ -134,7 +134,7 @@ export default function AdminOrdersPage() {
                                     </td>
                                 </tr>
                             ) : (
-                                orders.map((order) => (
+                                orders.map((order: any) => (
                                     <tr 
                                         key={order.id}
                                         className="hover:bg-gray-50 transition-colors"

@@ -27,9 +27,9 @@ export default async function ShopPage({
 
     let currentCategoryName = "Full Catalogue";
     if (params.category) {
-        currentCategoryName = (categories as any[]).find(c => c.slug === params.category)?.name || "Full Catalogue";
+        currentCategoryName = (categories as any[]).find((c: any) => c.slug === params.category)?.name || "Full Catalogue";
     } else if (params.brand) {
-        currentCategoryName = (brands as any[]).find(b => b.slug === params.brand)?.name || "Full Catalogue";
+        currentCategoryName = (brands as any[]).find((b: any) => b.slug === params.brand)?.name || "Full Catalogue";
     }
 
     return (

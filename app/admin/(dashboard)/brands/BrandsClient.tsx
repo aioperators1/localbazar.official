@@ -213,7 +213,7 @@ export default function BrandsClient({ initialBrands }: { initialBrands: Brand[]
                                     {[
                                         { id: 'featured', label: 'Featured Brand', sub: 'Highlight this brand in related lists', value: formData.featured, field: 'featured' },
                                         { id: 'showInHome', label: 'Show on Homepage', sub: 'Display this brand globally on the front page', value: formData.showInHome, field: 'showInHome' }
-                                    ].map((opt) => (
+                                    ].map((opt: any) => (
                                         <div 
                                             key={opt.id}
                                             onClick={() => setFormData({...formData, [opt.field]: !opt.value})}
@@ -240,7 +240,7 @@ export default function BrandsClient({ initialBrands }: { initialBrands: Brand[]
                                     <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
                                         <ImageUpload 
                                             value={formData.logo ? [formData.logo] : []}
-                                            onChange={(urls) => setFormData({...formData, logo: urls[urls.length - 1]})}
+                                            onChange={(urls: string[]) => setFormData({...formData, logo: urls[urls.length - 1]})}
                                             onRemove={() => setFormData({...formData, logo: ""})}
                                         />
                                     </div>
@@ -293,7 +293,7 @@ export default function BrandsClient({ initialBrands }: { initialBrands: Brand[]
 
             {/* Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {brands.map((brand) => (
+                {brands.map((brand: any) => (
                     <div 
                         key={brand.id}
                         className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm flex flex-col relative"

@@ -11,7 +11,7 @@ async function getDeals() {
     return (await prisma.product.findMany({
         orderBy: { price: 'asc' },
         take: 8
-    })).map(p => ({
+    })).map((p: any) => ({
         ...p,
         price: Number(p.price),
         salePrice: p.salePrice ? Number(p.salePrice) : null,
@@ -45,7 +45,7 @@ export default async function DealsPage() {
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                    {products.map((p) => (
+                    {products.map((p: any) => (
                         <ProductCard key={p.id} product={p as any} />
                     ))}
                 </div>

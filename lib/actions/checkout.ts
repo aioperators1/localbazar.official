@@ -42,7 +42,7 @@ export async function placeOrder(data: CheckoutData) {
         const name = `${firstName} ${lastName}`.trim();
 
         // RUN EVERYTHING IN A TRANSACTION FOR ATOMICITY
-        const result = await prisma.$transaction(async (tx) => {
+        const result = await prisma.$transaction(async (tx: any) => {
             // Fetch Shipping Settings securely on server
             const settings = await tx.setting.findUnique({ where: { key: 'shippingMethods' } });
             let currentShippingCost = Object.prototype.hasOwnProperty.call(data, 'shippingCost') ? Number(data.shippingCost) : DEFAULT_SHIPPING_COST;
@@ -51,24 +51,24 @@ export async function placeOrder(data: CheckoutData) {
                 try {
                     const methods = JSON.parse(settings.value);
                     if (Array.isArray(methods) && methods.length > 0) {
-                        const method = data.shippingMethodId ? methods.find(m => m.id === data.shippingMethodId) : methods[0];
+                        const method = data.shippingMethodId ? methods.find((m: any) => m.id === data.shippingMethodId) : methods[0];
                         if (method) {
                             currentShippingCost = Number(method.price);
                         }
                     }
-                } catch (e) {
+                } catch (e: any) {
                     // fallback to provided or default
                 }
             }
 
             // 1. Server-Side Total Verification (Security)
-            const productIds = items.map(i => i.id);
+            const productIds = items.map((i: CheckoutItem) => i.id);
             const products = await tx.product.findMany({
                 where: { id: { in: productIds } },
                 select: { id: true, price: true }
             });
 
-            const productPriceMap = new Map(products.map(p => [p.id, Number(p.price)]));
+            const productPriceMap = new Map(products.map((p: any) => [p.id, Number(p.price)]));
             
             // Re-calculate subtotal
             let calculatedSubtotal = 0;
@@ -77,10 +77,10 @@ export async function placeOrder(data: CheckoutData) {
             for (const item of items) {
                 const dbPrice = productPriceMap.get(item.id);
                 if (dbPrice !== undefined) {
-                    calculatedSubtotal += dbPrice * item.quantity;
+                    calculatedSubtotal += (dbPrice as number) * item.quantity;
                     validItems.push({
                         ...item,
-                        price: dbPrice // Use DB price for security
+                        price: dbPrice as number // Use DB price for security
                     });
                 }
             }
@@ -170,7 +170,7 @@ export async function placeOrder(data: CheckoutData) {
                     const methods = JSON.parse(settings.value);
                     const method = data.shippingMethodId ? methods.find((m: any) => m.id === data.shippingMethodId) : methods[0];
                     if (method) selectedMethodName = method.name;
-                } catch (e) {}
+                } catch (e: any) {}
             }
 
             // 4. Create Order
@@ -184,7 +184,7 @@ export async function placeOrder(data: CheckoutData) {
                     phone: data.phone || null,
                     shippingMethod: selectedMethodName,
                     items: {
-                        create: validItems.map(item => ({
+                        create: validItems.map((item: any) => ({
                             productId: item.id,
                             quantity: item.quantity,
                             price: item.price,

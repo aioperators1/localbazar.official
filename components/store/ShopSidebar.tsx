@@ -98,7 +98,7 @@ export function ShopSidebar({ categories, brands = [] }: ShopSidebarProps) {
                                         {t('shop.allCollections')}
                                     </button>
                                 </li>
-                                {categories.map((cat) => (
+                                {categories.map((cat: Category) => (
                                     <li key={cat.id}>
                                         <button
                                             onClick={() => updateCategory(cat.slug)}
@@ -134,7 +134,7 @@ export function ShopSidebar({ categories, brands = [] }: ShopSidebarProps) {
                                             All Brands
                                         </button>
                                     </li>
-                                    {brands.map((brand) => (
+                                    {brands.map((brand: Brand) => (
                                         <li key={brand.id}>
                                             <button
                                                 onClick={() => updateBrand(brand.slug)}
@@ -164,7 +164,7 @@ export function ShopSidebar({ categories, brands = [] }: ShopSidebarProps) {
                                 max={5000}
                                 step={50}
                                 onValueChange={setPriceRange}
-                                onValueCommit={(val) => {
+                                onValueCommit={(val: number[]) => {
                                     const params = new URLSearchParams(searchParams.toString());
                                     params.set("minPrice", val[0].toString());
                                     params.set("maxPrice", val[1].toString());
@@ -185,7 +185,7 @@ export function ShopSidebar({ categories, brands = [] }: ShopSidebarProps) {
                         </AccordionTrigger>
                         <AccordionContent className="pb-6">
                             <div className="flex flex-wrap gap-3 pt-2">
-                                {LUXURY_COLORS.map((color) => (
+                                {LUXURY_COLORS.map((color: {name: string, hex: string}) => (
                                     <button
                                         key={color.name}
                                         onClick={() => updateColor(color.name)}

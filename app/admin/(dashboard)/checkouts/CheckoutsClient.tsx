@@ -38,7 +38,7 @@ export default function CheckoutsClient({ initialCheckouts }: { initialCheckouts
                 setCheckouts(data);
                 toast.success("Data refreshed");
             }
-        } catch {
+        } catch (error: any) {
             toast.error("Failed to refresh");
         }
         setRefreshing(false);
@@ -54,7 +54,7 @@ export default function CheckoutsClient({ initialCheckouts }: { initialCheckouts
         total: checkouts.length,
         abandoned: checkouts.filter(c => !c.recovered).length,
         recovered: checkouts.filter(c => c.recovered).length,
-        totalValue: checkouts.filter(c => !c.recovered).reduce((sum, c) => sum + c.cartTotal, 0),
+        totalValue: checkouts.filter(c => !c.recovered).reduce((sum: number, c: AbandonedCheckout) => sum + c.cartTotal, 0),
     };
 
     const handleMarkRecovered = async (id: string) => {
@@ -69,7 +69,7 @@ export default function CheckoutsClient({ initialCheckouts }: { initialCheckouts
                 setSelectedCheckout(null);
                 toast.success("Marked as recovered");
             }
-        } catch {
+        } catch (error: any) {
             toast.error("Failed to update");
         }
     };
@@ -83,7 +83,7 @@ export default function CheckoutsClient({ initialCheckouts }: { initialCheckouts
                 setSelectedCheckout(null);
                 toast.success("Deleted");
             }
-        } catch {
+        } catch (error: any) {
             toast.error("Failed to delete");
         }
     };
@@ -175,7 +175,7 @@ export default function CheckoutsClient({ initialCheckouts }: { initialCheckouts
                     { key: "all", label: "All", count: stats.total },
                     { key: "abandoned", label: "Abandoned", count: stats.abandoned },
                     { key: "recovered", label: "Recovered", count: stats.recovered },
-                ].map((f) => (
+                ].map((f: any) => (
                     <button
                         key={f.key}
                         onClick={() => setFilter(f.key as any)}
@@ -219,7 +219,7 @@ export default function CheckoutsClient({ initialCheckouts }: { initialCheckouts
                                         </div>
                                     </td>
                                 </tr>
-                            ) : filtered.map((checkout) => {
+                            ) : filtered.map((checkout: AbandonedCheckout) => {
                                 const items = parseCartItems(checkout.cartItems);
                                 const customerName = [checkout.firstName, checkout.lastName].filter(Boolean).join(" ") || "Anonymous";
                                 

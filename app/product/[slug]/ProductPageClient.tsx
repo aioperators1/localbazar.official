@@ -52,7 +52,7 @@ export default function ProductPageClient({ product, images, similarProducts }: 
         try {
             const parsed = JSON.parse(data);
             return Array.isArray(parsed) ? parsed : [];
-        } catch (e) {
+        } catch (e: any) {
             return [];
         }
     };
@@ -147,8 +147,8 @@ export default function ProductPageClient({ product, images, similarProducts }: 
         }
     };
 
-    const increaseQty = () => setQuantity(prev => prev + 1);
-    const decreaseQty = () => setQuantity(prev => (prev > 1 ? prev - 1 : 1));
+    const increaseQty = () => setQuantity((prev: number) => prev + 1);
+    const decreaseQty = () => setQuantity((prev: number) => (prev > 1 ? prev - 1 : 1));
 
     const [mounted, setMounted] = useState(false);
     useEffect(() => {

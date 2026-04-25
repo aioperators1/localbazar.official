@@ -244,7 +244,7 @@ export default function ProductForm({ categories, brands, initialData }: Product
                                 <Label className="text-[11px] font-bold text-gray-600 uppercase">Rich Description</Label>
                                 <RichTextEditor 
                                     value={description} 
-                                    onChange={(val) => setDescription(val)} 
+                                    onChange={(val: string) => setDescription(val)} 
                                 />
                             </div>
                         </div>
@@ -255,8 +255,8 @@ export default function ProductForm({ categories, brands, initialData }: Product
                         <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest border-b pb-4">Product Media</h3>
                         <ImageUpload 
                             value={images}
-                            onChange={(urls) => setImages(urls)}
-                            onRemove={(url) => setImages(images.filter(i => i !== url))}
+                            onChange={(urls: string[]) => setImages(urls)}
+                            onRemove={(url: string) => setImages(images.filter((i: string) => i !== url))}
                         />
                     </div>
 
@@ -269,7 +269,7 @@ export default function ProductForm({ categories, brands, initialData }: Product
                             <div className="space-y-4">
                                 <Label className="text-[11px] font-bold text-gray-600 uppercase">Sizes & Variant Pricing</Label>
                                 <div className="flex flex-col gap-2">
-                                    {sizesList.map((sizeObj, i) => (
+                                    {sizesList.map((sizeObj: {name: string, price: number | null}, i: number) => (
                                         <div key={i} className="flex items-center justify-between bg-gray-50 border border-gray-200 px-3 py-2 rounded text-xs group">
                                             <div className="flex items-center gap-2">
                                                 <span className="font-black uppercase">{sizeObj.name}</span>
@@ -279,7 +279,7 @@ export default function ProductForm({ categories, brands, initialData }: Product
                                                     </span>
                                                 )}
                                             </div>
-                                            <button type="button" onClick={() => setSizesList(sizesList.filter((_, idx) => idx !== i))}>
+                                            <button type="button" onClick={() => setSizesList(sizesList.filter((_, idx: number) => idx !== i))}>
                                                 <X className="w-3.5 h-3.5 text-gray-400 group-hover:text-black transition-colors" />
                                             </button>
                                         </div>
@@ -300,11 +300,11 @@ export default function ProductForm({ categories, brands, initialData }: Product
                             <div className="space-y-4">
                                 <Label className="text-[11px] font-bold text-gray-600 uppercase">Colors</Label>
                                 <div className="flex flex-wrap gap-2">
-                                    {colorsList.map((color, i) => (
+                                    {colorsList.map((color: {name: string, hex: string}, i: number) => (
                                         <div key={i} className="flex items-center gap-2 bg-gray-50 border border-gray-200 px-2 py-1 rounded text-xs">
                                             <div className="w-3 h-3 rounded-full border border-gray-200" style={{ backgroundColor: color.hex }} />
                                             <span className="font-bold">{color.name}</span>
-                                            <button type="button" onClick={() => setColorsList(colorsList.filter((_, idx) => idx !== i))}>
+                                            <button type="button" onClick={() => setColorsList(colorsList.filter((_, idx: number) => idx !== i))}>
                                                 <X className="w-3 h-3 text-gray-400 hover:text-black" />
                                             </button>
                                         </div>
@@ -337,7 +337,7 @@ export default function ProductForm({ categories, brands, initialData }: Product
                                 required
                             >
                                 <option value="">Select Category</option>
-                                {categories.map((cat) => (
+                                {categories.map((cat: Category) => (
                                     <option key={cat.id} value={cat.id}>
                                         {cat.parent ? `${cat.parent.name} > ${cat.name}` : cat.name}
                                     </option>
@@ -355,14 +355,14 @@ export default function ProductForm({ categories, brands, initialData }: Product
                                     if (!val) {
                                         setBrandId("");
                                     } else {
-                                        const selectedBrand = brands.find(b => b.name === val);
+                                        const selectedBrand = brands.find((b: any) => b.name === val);
                                         if(selectedBrand) setBrandId(selectedBrand.id);
                                     }
                                 }}
                                 className="w-full h-10 px-3 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-black"
                             >
                                 <option value="">Select Brand</option>
-                                {brands.map((brand) => (
+                                {brands.map((brand: any) => (
                                     <option key={brand.id} value={brand.name}>
                                         {brand.name}
                                     </option>

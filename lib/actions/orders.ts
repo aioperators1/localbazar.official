@@ -68,7 +68,7 @@ export async function getOrderById(orderId: string) {
             total: Number(order.total),
             createdAt: order.createdAt.toISOString(),
             updatedAt: order.updatedAt.toISOString(),
-            items: order.items.map(item => ({
+            items: order.items.map((item: any) => ({
                 id: item.id,
                 orderId: item.orderId,
                 productId: item.productId,
@@ -90,7 +90,7 @@ export async function getOrderById(orderId: string) {
         };
 
         return { order: serializedOrder };
-    } catch (error) {
+    } catch (error: any) {
         console.error("Order Lookup Error:", error);
         return { error: "Failed to fetch order details" };
     }

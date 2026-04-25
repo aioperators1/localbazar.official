@@ -36,13 +36,13 @@ export const useCart = create<CartStore>()(
         (set, get) => ({
             items: [],
             voucher: null,
-            addItem: (item) => {
+            addItem: (item: CartItem) => {
                 const currentItems = get().items
                 // Normalize size/color to null if falsy to prevent key mismatches
                 const targetSize = item.size ?? null;
                 const targetColor = item.color ?? null;
 
-                const existingItem = currentItems.find((i) => 
+                const existingItem = currentItems.find((i: CartItem) => 
                     i.id === item.id && 
                     i.size === targetSize && 
                     i.color === targetColor
@@ -50,7 +50,7 @@ export const useCart = create<CartStore>()(
 
                 if (existingItem) {
                     set({
-                        items: currentItems.map((i) =>
+                        items: currentItems.map((i: CartItem) =>
                             (i.id === item.id && i.size === targetSize && i.color === targetColor)
                                 ? { ...i, quantity: i.quantity + (item.quantity || 1) } 
                                 : i
@@ -62,13 +62,13 @@ export const useCart = create<CartStore>()(
             },
             decreaseItem: (id, size, color) => {
                 const currentItems = get().items
-                const existingItem = currentItems.find((i) => 
+                const existingItem = currentItems.find((i: CartItem) => 
                     i.id === id && i.size === size && i.color === color
                 )
 
                 if (existingItem && existingItem.quantity > 1) {
                     set({
-                        items: currentItems.map((i) =>
+                        items: currentItems.map((i: CartItem) =>
                             (i.id === id && i.size === size && i.color === color)
                                 ? { ...i, quantity: i.quantity - 1 } 
                                 : i
@@ -76,7 +76,7 @@ export const useCart = create<CartStore>()(
                     })
                 } else {
                     set({ 
-                        items: currentItems.filter((i) => 
+                        items: currentItems.filter((i: CartItem) => 
                             !(i.id === id && i.size === size && i.color === color)
                         ) 
                     })
@@ -84,21 +84,21 @@ export const useCart = create<CartStore>()(
             },
             removeItem: (id, size, color) => {
                 set({ 
-                    items: get().items.filter((i) => 
+                    items: get().items.filter((i: CartItem) => 
                         !(i.id === id && i.size === size && i.color === color)
                     ) 
                 })
             },
             clearCart: () => set({ items: [], voucher: null }),
             setVoucher: (voucher) => set({ voucher }),
-            totalItems: () => get().items.reduce((total, item) => total + item.quantity, 0),
+            totalItems: () => get().items.reduce((total: number, item: CartItem) => total + item.quantity, 0),
             totalPrice: () => {
-                const subtotal = get().items.reduce((total, item) => total + (item.price * item.quantity), 0);
+                const subtotal = get().items.reduce((total: number, item: CartItem) => total + (item.price * item.quantity), 0);
                 const discount = get().discountAmount();
                 return Math.max(0, subtotal - discount);
             },
             discountAmount: () => {
-                const subtotal = get().items.reduce((total, item) => total + (item.price * item.quantity), 0);
+                const subtotal = get().items.reduce((total: number, item: CartItem) => total + (item.price * item.quantity), 0);
                 const voucher = get().voucher;
                 if (!voucher) return 0;
                 

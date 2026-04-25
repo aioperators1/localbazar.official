@@ -43,7 +43,7 @@ function SuccessContent() {
 
     const orderId = orderData?.orderId || orderIdParam || "N/A";
     const shipping = orderData?.shippingCost !== undefined ? Number(orderData.shippingCost) : 35;
-    const itemsSubtotal = orderData?.items.reduce((acc, item) => acc + (item.price * item.quantity), 0) || 0;
+    const itemsSubtotal = orderData?.items.reduce((acc: number, item: any) => acc + (item.price * item.quantity), 0) || 0;
     const isOnlinePayment = orderData?.paymentMethod === "CARD";
 
     const handleDownload = () => {
@@ -67,7 +67,7 @@ function SuccessContent() {
             paymentMethod: orderData.paymentMethod,
             total: (orderData.total || itemsSubtotal) + shipping,
             shippingMethod: orderData.shippingMethodName,
-            items: orderData.items.map(item => ({
+            items: orderData.items.map((item: any) => ({
                 id: item.id,
                 price: item.price,
                 quantity: item.quantity,
@@ -89,7 +89,7 @@ function SuccessContent() {
                 try {
                     setOrderData(JSON.parse(saved));
                     clearCart();
-                } catch (e) {
+                } catch (e: any) {
                     console.error("Failed to parse order data");
                 }
             }
@@ -244,7 +244,7 @@ function SuccessContent() {
                             <>
                                 {/* Product List */}
                                 <div className="space-y-4 mb-8">
-                                    {orderData.items.map((item, idx) => (
+                                    {orderData.items.map((item: any, idx: number) => (
                                         <div key={idx} className="flex items-center gap-4">
                                             <div className="relative w-[64px] h-[64px] bg-white/10 border border-white/20 rounded-[8px] flex items-center justify-center shrink-0 shadow-sm">
                                                 <div className={cn("absolute -top-2 w-[22px] h-[22px] bg-white text-[#592C2F] rounded-full flex items-center justify-center text-[11px] font-bold shadow-sm z-10 leading-none", language === 'ar' ? "-left-2" : "-right-2")}>

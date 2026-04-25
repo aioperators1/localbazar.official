@@ -18,7 +18,7 @@ export default function ShopLoading() {
                     <div className="w-full lg:w-64 flex-shrink-0 space-y-8 animate-pulse">
                         <div className="h-6 bg-zinc-100 w-full mb-4" />
                         <div className="space-y-4">
-                            {[1, 2, 3, 4, 5].map(i => (
+                            {[1, 2, 3, 4, 5].map((i: number) => (
                                 <div key={i} className="h-4 bg-zinc-50 w-32" />
                             ))}
                         </div>

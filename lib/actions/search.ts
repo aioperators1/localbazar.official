@@ -31,7 +31,7 @@ export async function searchProducts(query: string): Promise<SearchResult[]> {
             }
         });
 
-        return products.map(p => ({
+        return products.map((p: any) => ({
             id: p.id,
             name: p.name,
             slug: p.slug,

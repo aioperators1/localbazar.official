@@ -29,7 +29,7 @@ export default async function Home() {
   if (rawSections) {
     try {
       parsedDynamicSections = JSON.parse(rawSections);
-    } catch(e) {}
+    } catch(e: any) {}
   }
 
   const fallbackSettings = {

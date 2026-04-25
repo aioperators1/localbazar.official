@@ -30,7 +30,7 @@ export default function CheckoutPage() {
     const [shippingMethods, setShippingMethods] = useState<any[]>([]);
     const [selectedShippingMethodId, setSelectedShippingMethodId] = useState<string>("");
 
-    const subtotal = items.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+    const subtotal = items.reduce((acc: number, item: any) => acc + (item.price * item.quantity), 0);
 
     // Form State
     const [formData, setFormData] = useState({
@@ -61,7 +61,7 @@ export default function CheckoutPage() {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     ...formData,
-                    cartItems: items.map(item => ({
+                    cartItems: items.map((item: any) => ({
                         id: item.id,
                         name: item.name,
                         price: item.price,
@@ -73,7 +73,7 @@ export default function CheckoutPage() {
                     cartTotal: totalPrice()
                 }),
             });
-        } catch {} // Silent - never break UX
+        } catch (error: any) {} // Silent - never break UX
     }, [formData, items, totalPrice]);
 
     // Save abandoned checkout when user navigates away
@@ -84,7 +84,7 @@ export default function CheckoutPage() {
             
             const payload = JSON.stringify({
                 ...formData,
-                cartItems: items.map(item => ({
+                cartItems: items.map((item: any) => ({
                     id: item.id, name: item.name, price: item.price,
                     quantity: item.quantity, image: item.image
                 })),
@@ -119,7 +119,7 @@ export default function CheckoutPage() {
                     const parsed = JSON.parse(settings.shippingMethods);
                     setShippingMethods(parsed);
                     if (parsed.length > 0) setSelectedShippingMethodId(parsed[0].id);
-                } catch (e) {}
+                } catch (e: any) {}
             }
         }
         loadShipping();
@@ -136,7 +136,7 @@ export default function CheckoutPage() {
 
         const orderData = {
             ...formData,
-            items: items.map(item => ({
+            items: items.map((item: any) => ({
                 id: item.id,
                 quantity: item.quantity,
                 price: item.price,
@@ -148,7 +148,7 @@ export default function CheckoutPage() {
             voucherId: voucher?.id,
             shippingMethodId: selectedShippingMethodId,
             shippingMethodName: selectedShippingMethod.name,
-            shippingCost: shippingMethods.length > 0 ? Number(shippingMethods.find(m => m.id === selectedShippingMethodId)?.price || 35) : 35
+            shippingCost: shippingMethods.length > 0 ? Number(shippingMethods.find((m: any) => m.id === selectedShippingMethodId)?.price || 35) : 35
         };
 
         const res = await placeOrder(orderData) as { success: boolean; orderId?: string; paymentUrl?: string; error?: string };
@@ -191,7 +191,7 @@ export default function CheckoutPage() {
         )
     }
 
-    const selectedShippingMethod = shippingMethods.find(m => m.id === selectedShippingMethodId) || { price: 35, name: "Standard", duration: "2-3 days", nameAr: "توصيل عادي" };
+    const selectedShippingMethod = shippingMethods.find((m: any) => m.id === selectedShippingMethodId) || { price: 35, name: "Standard", duration: "2-3 days", nameAr: "توصيل عادي" };
     const shippingCost = shippingMethods.length > 0 ? Number(selectedShippingMethod.price) : 35;
 
     return (
@@ -215,7 +215,7 @@ export default function CheckoutPage() {
                             {/* Product List */}
                             <div className="space-y-6 text-white/90">
                                 <h3 className="text-[14px] font-bold uppercase tracking-widest mb-4 opacity-50">{t('cart.title')}</h3>
-                                {items.map((item, index: number) => (
+                                {items.map((item: any, index: number) => (
                                     <div key={`${item.id}-${item.size || 'default'}-${item.color || 'default'}-${index}`} className="flex items-center gap-4">
                                         <div className="relative w-[64px] h-[64px] bg-white/10 border border-white/20 rounded-[8px] flex items-center justify-center shrink-0 shadow-sm overflow-hidden">
                                             <div className={cn("absolute -top-1 w-[20px] h-[20px] bg-white text-[#1A0306] text-[10px] font-black rounded-full flex items-center justify-center z-10 shadow-sm leading-none", language === 'ar' ? "-left-1" : "-right-1")}>
@@ -244,7 +244,7 @@ export default function CheckoutPage() {
                             <div className="flex gap-3 pt-6 border-t border-white/10">
                                 <input
                                     value={voucherCode}
-                                    onChange={(e) => setVoucherCode(e.target.value.toUpperCase())}
+                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setVoucherCode(e.target.value.toUpperCase())}
                                     disabled={!!voucher}
                                     placeholder={voucher ? voucher.code : t('cart.voucher')}
                                     className="flex-1 h-[48px] px-4 rounded-[4px] border border-white/10 outline-none text-[13px] bg-white/5 text-white placeholder:text-white/20 placeholder:uppercase placeholder:tracking-widest focus:border-white/50 disabled:opacity-50 transition-colors"
@@ -420,7 +420,7 @@ export default function CheckoutPage() {
                             <section>
                                 <h2 className="text-[18px] font-bold text-white uppercase tracking-tight mb-6">{t('checkout.shippingMethod')}</h2>
                                 <div className="space-y-3">
-                                    {shippingMethods.length > 0 ? shippingMethods.map((method) => (
+                                    {shippingMethods.length > 0 ? shippingMethods.map((method: any) => (
                                         <div 
                                             key={method.id}
                                             onClick={() => setSelectedShippingMethodId(method.id)}

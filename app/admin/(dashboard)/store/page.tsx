@@ -10,7 +10,7 @@ export default async function AdminStorePage() {
     prisma.product.findMany({
       select: { id: true, name: true, images: true },
       orderBy: { createdAt: 'desc' }
-    }).catch(err => {
+    }).catch((err: any) => {
       console.error("Store Page Product Fetch Error:", err);
       return [];
     }),
@@ -24,7 +24,7 @@ export default async function AdminStorePage() {
   if (rawSections) {
     try {
       initialSections = JSON.parse(rawSections);
-    } catch(e) {}
+    } catch(e: any) {}
   }
 
   // Pre-populate with default if empty
@@ -88,12 +88,12 @@ export default async function AdminStorePage() {
     ];
   }
 
-  const products = dbProducts.map(p => {
+  const products = dbProducts.map((p: any) => {
     let image = "";
     try {
       const parsed = JSON.parse(p.images);
       image = Array.isArray(parsed) && parsed.length > 0 ? parsed[0] : (typeof parsed === 'string' ? parsed : "");
-    } catch(e) {
+    } catch(e: any) {
       image = p.images || ""; // Fallback
     }
     return {
@@ -106,13 +106,13 @@ export default async function AdminStorePage() {
   const categories = dbCategories.map((c: any) => ({
     id: c.id,
     name: c.name,
-    image: c.image || null
+    image: (c as any).image || null
   }));
 
   const brands = dbBrands.map((b: any) => ({
     id: b.id,
     name: b.name,
-    logo: b.logo || null
+    logo: (b as any).logo || null
   }));
 
   const bannersList = dbBanners.map((b: any) => ({

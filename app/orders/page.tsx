@@ -23,7 +23,7 @@ export default async function OrdersPage() {
         });
 
         // Serialize orders
-        orders = orders.map(order => ({
+        orders = orders.map((order: any) => ({
             ...order,
             createdAt: order.createdAt.toISOString(),
             updatedAt: order.updatedAt.toISOString(),

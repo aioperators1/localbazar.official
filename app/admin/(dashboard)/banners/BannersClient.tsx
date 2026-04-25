@@ -87,7 +87,7 @@ export default function BannersClient({ initialBanners }: { initialBanners: Bann
             } else {
                 toast.error(res.error || "Failed to save banner");
             }
-        } catch (error) {
+        } catch (error: any) {
             toast.error("An error occurred");
         } finally {
             setLoading(false);
@@ -167,7 +167,7 @@ export default function BannersClient({ initialBanners }: { initialBanners: Bann
                             </div>
                             <ImageUpload 
                                 value={formData.image ? [formData.image] : []}
-                                onChange={(urls) => setFormData({ ...formData, image: urls[0] || "" })}
+                                onChange={(urls: string[]) => setFormData({ ...formData, image: urls[0] || "" })}
                                 onRemove={() => setFormData({ ...formData, image: "" })}
                             />
                         </div>
@@ -178,7 +178,7 @@ export default function BannersClient({ initialBanners }: { initialBanners: Bann
                             </div>
                             <ImageUpload 
                                 value={formData.mobileImage ? [formData.mobileImage] : []}
-                                onChange={(urls) => setFormData({ ...formData, mobileImage: urls[0] || "" })}
+                                onChange={(urls: string[]) => setFormData({ ...formData, mobileImage: urls[0] || "" })}
                                 onRemove={() => setFormData({ ...formData, mobileImage: "" })}
                             />
                         </div>
@@ -223,7 +223,7 @@ export default function BannersClient({ initialBanners }: { initialBanners: Bann
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {banners.map(banner => (
+                {banners.map((banner: any) => (
                     <div key={banner.id} className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm flex flex-col hover:shadow-md transition-shadow">
                         <div className="aspect-[2/1] relative bg-gray-50">
                             <Image 

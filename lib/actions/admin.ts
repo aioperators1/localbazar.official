@@ -146,7 +146,7 @@ export async function getDashboardStats() {
             orders: totalOrders,
             products: totalProducts,
             users: totalUsers,
-            recentOrders: (recentOrders as any[]).map((order) => ({
+            recentOrders: (recentOrders as any[]).map((order: any) => ({
                 id: order.id,
                 total: Number(order.total),
                 status: order.status,
@@ -343,7 +343,7 @@ export async function swapProductPositions(id1: string, id2: string) {
                 select: { id: true }
             });
             
-            const updates = allProducts.map((p, index) => 
+            const updates = allProducts.map((p: any, index: number) => 
                 prisma.product.update({
                     where: { id: p.id },
                     data: { position: index * 10 } as any // Space positions by 10 for fine manipulation
@@ -589,15 +589,15 @@ export async function getAdminCustomers() {
             }
         });
 
-        return users.map((user) => ({
+        return users.map((user: any) => ({
             ...user,
             createdAt: user.createdAt.toISOString(),
             updatedAt: user.updatedAt.toISOString(),
-            orders: user.orders.map((order) => ({
+            orders: user.orders.map((order: any) => ({
                 ...order,
                 total: Number(order.total),
                 createdAt: order.createdAt.toISOString(),
-                items: order.items.map(item => ({
+                items: order.items.map((item: any) => ({
                     name: item.product?.name || "Unknown Product"
                 }))
             }))
@@ -673,7 +673,7 @@ export async function getRevenueAnalysis(range: string = 'this_year', customStar
                 const label = `${i}:00`;
                 data[label] = 0;
             }
-            orders.forEach(o => {
+            orders.forEach((o: any) => {
                 const hour = new Date(o.createdAt).getHours();
                 data[`${hour}:00`] += Number(o.total);
             });
@@ -689,7 +689,7 @@ export async function getRevenueAnalysis(range: string = 'this_year', customStar
                 const label = d.toLocaleDateString('default', { month: 'short', day: 'numeric' });
                 data[label] = 0;
             }
-            orders.forEach(o => {
+            orders.forEach((o: any) => {
                 const label = new Date(o.createdAt).toLocaleDateString('default', { month: 'short', day: 'numeric' });
                 if (data[label] !== undefined) data[label] += Number(o.total);
             });
@@ -699,7 +699,7 @@ export async function getRevenueAnalysis(range: string = 'this_year', customStar
 
             if (range === 'year' || range === 'this_year') {
                 // Calendar Year: strictly Jan to Dec
-                monthLabels.forEach(m => data[m] = 0);
+                monthLabels.forEach((m: string) => data[m] = 0);
             } else {
                 // Rolling 3-12 months
                 const monthsToBack = range === 'last_3_months' ? 3 : 12;
@@ -711,7 +711,7 @@ export async function getRevenueAnalysis(range: string = 'this_year', customStar
                 }
             }
 
-            orders.forEach(o => {
+            orders.forEach((o: any) => {
                 const label = monthLabels[new Date(o.createdAt).getMonth()];
                 if (data[label] !== undefined) data[label] += Number(o.total);
             });
@@ -734,7 +734,7 @@ export async function getAdminBanners() {
         const banners = await prisma.banner.findMany({
             orderBy: { order: 'asc' }
         });
-        return banners.map((banner) => ({
+        return banners.map((banner: any) => ({
             ...banner,
             createdAt: banner.createdAt.toISOString(),
             updatedAt: banner.updatedAt.toISOString(),
@@ -835,18 +835,18 @@ export async function getAdminSettings() {
         // Double check prisma.setting exists to avoid runtime crashes before the try-catch
         if (!prisma.setting) return {};
         
-        const settings = await prisma.setting.findMany().catch(err => {
+        const settings = await prisma.setting.findMany().catch((err: any) => {
             console.error("Prisma Settings Fetch Error:", err);
             return [];
         });
 
         if (!settings || !Array.isArray(settings)) return {};
 
-        return settings.reduce((acc: Record<string, string>, setting) => {
+        return settings.reduce((acc: Record<string, string>, setting: any) => {
             acc[setting.key] = setting.value;
             return acc;
         }, {});
-    } catch (error) {
+    } catch (error: any) {
         console.error("Critical Get Settings Error:", error);
         return {};
     }
@@ -887,7 +887,7 @@ export async function getAdminCategories() {
             orderBy: { name: 'asc' }
         });
 
-        return categories.map((cat) => ({
+        return categories.map((cat: any) => ({
             ...cat,
             nameAr: cat.nameAr || null,
             descriptionAr: cat.descriptionAr || null,
@@ -1112,7 +1112,7 @@ export async function getAdminVouchers() {
                 }
             }
         });
-        return vouchers.map((v) => ({
+        return vouchers.map((v: any) => ({
             ...v,
             value: Number(v.value),
             usedCount: v.orders.length,
@@ -1205,7 +1205,7 @@ export async function getAdminTeamMembers() {
             orderBy: { createdAt: 'desc' }
         });
 
-        return staff.map((user) => ({
+        return staff.map((user: any) => ({
             ...user,
             createdAt: user.createdAt.toISOString(),
             updatedAt: user.updatedAt.toISOString(),
@@ -1312,10 +1312,10 @@ export async function getNoticeSettings() {
             }
         });
 
-        const text = settings.find(s => s.key === 'notice_bar_text')?.value || "";
-        const active = settings.find(s => s.key === 'notice_bar_active')?.value === 'true';
-        const bgColor = settings.find(s => s.key === 'notice_bar_bg_color')?.value || "#000000";
-        const textColor = settings.find(s => s.key === 'notice_bar_text_color')?.value || "#FFFFFF";
+        const text = settings.find((s: any) => s.key === 'notice_bar_text')?.value || "";
+        const active = settings.find((s: any) => s.key === 'notice_bar_active')?.value === 'true';
+        const bgColor = settings.find((s: any) => s.key === 'notice_bar_bg_color')?.value || "#000000";
+        const textColor = settings.find((s: any) => s.key === 'notice_bar_text_color')?.value || "#FFFFFF";
 
         return { text, active, bgColor, textColor };
     } catch (error) {
@@ -1402,7 +1402,7 @@ export async function createDriver(data: { name: string; phone: string; email?: 
         const hashedPassword = await hash(data.password, 12);
 
         // Use a transaction to ensure both models are created
-        const result = await prisma.$transaction(async (tx) => {
+        const result = await prisma.$transaction(async (tx: any) => {
             const driver = await (tx as any).driver.create({
                 data: {
                     name: data.name,
@@ -1471,7 +1471,7 @@ export async function deleteDriver(id: string) {
     try {
         const driver = await (prisma as any).driver.findUnique({ where: { id } });
 
-        await prisma.$transaction(async (tx) => {
+        await prisma.$transaction(async (tx: any) => {
             if (driver && driver.email) {
                 await tx.user.deleteMany({
                     where: { email: driver.email }

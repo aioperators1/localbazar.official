@@ -103,7 +103,7 @@ export function Header({ settings, categories = [] }: { settings?: AdminSetting,
                             {[
                                 { id: 'lang', label: mounted ? (language === 'en' ? 'EN' : language === 'fr' ? 'FR' : 'AR') : '...', icon: ChevronDown },
                                 { id: 'curr', label: mounted ? currency : '...', icon: ChevronDown }
-                            ].map((item) => (
+                            ].map((item: any) => (
                                 <DropdownMenu key={item.id}>
                                     <DropdownMenuTrigger className="text-[11px] font-black tracking-[0.3em] text-white/40 hover:text-white uppercase flex items-center gap-2 outline-none group">
                                         {item.label}
@@ -117,7 +117,7 @@ export function Header({ settings, categories = [] }: { settings?: AdminSetting,
                                                 <DropdownMenuItem onClick={() => setLanguage("ar")} className="text-[9px] font-black uppercase tracking-widest text-white/60 focus:bg-white/5 focus:text-white p-4 font-sans text-right cursor-pointer">العربية (QA)</DropdownMenuItem>
                                             </>
                                         ) : (
-                                            ['QAR', 'USD', 'EUR', 'GBP'].map((curr) => (
+                                            ['QAR', 'USD', 'EUR', 'GBP'].map((curr: string) => (
                                                 <DropdownMenuItem 
                                                     key={curr} 
                                                     onClick={() => setCurrency(curr as any)} 
@@ -167,7 +167,7 @@ export function Header({ settings, categories = [] }: { settings?: AdminSetting,
                             {[
                                 { name: t('nav.archive'), href: '/shop' },
                                 { name: t('nav.editions'), href: '/shop?category=new-arrivals' }
-                            ].map((link, idx) => (
+                            ].map((link: {name: string, href: string}, idx: number) => (
                                 <div key={idx} className="flex items-center gap-10">
                                     <Link href={link.href} className="group relative py-2">
                                         <span className={cn(
@@ -291,7 +291,7 @@ export function Header({ settings, categories = [] }: { settings?: AdminSetting,
                                 {t('nav.collections')}
                             </span>
                             <div className="flex flex-col gap-6">
-                                {displayCategories.map((cat, idx) => (
+                                {displayCategories.map((cat: Category, idx: number) => (
                                     <Link 
                                         key={cat.id} 
                                         href={`/shop?category=${cat.slug}`} 

@@ -22,7 +22,7 @@ export async function GET(req: NextRequest) {
             await prisma.order.update({
                 where: { id: orderId },
                 data: { status: "FAILED" }
-            }).catch((e) => console.error("[MyFatoorah Callback] Status Update Error:", e));
+            }).catch((e: any) => console.error("[MyFatoorah Callback] Status Update Error:", e));
         }
         return NextResponse.redirect(`${baseUrl}/payment-error?error=PaymentCancelled`);
     }
@@ -59,7 +59,7 @@ export async function GET(req: NextRequest) {
                 await prisma.order.update({
                     where: { id: finalOrderId },
                     data: { status: "FAILED" }
-                }).catch((e) => console.error("[MyFatoorah Callback] Failure Update Error:", e));
+                }).catch((e: any) => console.error("[MyFatoorah Callback] Failure Update Error:", e));
             }
             
             return NextResponse.redirect(`${baseUrl}/payment-error?error=PaymentStatus_${paymentData.InvoiceStatus}`);

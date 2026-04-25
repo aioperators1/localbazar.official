@@ -21,7 +21,7 @@ export default function CartPage() {
     const { formatPrice: formatCurrency } = useCurrency();
     const { t, language } = useLanguage();
 
-    const subtotal = items.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+    const subtotal = items.reduce((acc: number, item: any) => acc + (item.price * item.quantity), 0);
     const [mounted, setMounted] = useState(false);
     const [suggestions, setSuggestions] = useState<any[]>([]);
 
@@ -78,7 +78,7 @@ export default function CartPage() {
 
                             {/* Table Body (Items) */}
                             <AnimatePresence mode="popLayout">
-                                {items.map((item) => (
+                                {items.map((item: any) => (
                                     <motion.div
                                         key={`${item.id}-${item.size || 'nosize'}-${item.color || 'nocolor'}`}
                                         layout

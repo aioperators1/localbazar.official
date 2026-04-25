@@ -68,7 +68,7 @@ export default function VouchersClient({ initialVouchers }: { initialVouchers: a
         const res = await deleteVoucher(id);
         if (res.success) {
             toast.success("Deleted successfully");
-            setVouchers(vouchers.filter(v => v.id !== id));
+            setVouchers(vouchers.filter((v: any) => v.id !== id));
         } else {
             toast.error("Error deleting");
         }
@@ -182,7 +182,7 @@ export default function VouchersClient({ initialVouchers }: { initialVouchers: a
             )}
 
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                {vouchers.map(voucher => (
+                {vouchers.map((voucher: any) => (
                     <div key={voucher.id} className="bg-white border border-[#E3E3E3] rounded-2xl p-6 shadow-sm hover:shadow-md transition-all group relative overflow-hidden">
                         <div className={cn(
                             "absolute top-0 right-0 px-4 py-1 text-[9px] font-black uppercase tracking-[0.2em] rounded-bl-xl",

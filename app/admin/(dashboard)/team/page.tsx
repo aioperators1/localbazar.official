@@ -68,7 +68,7 @@ export default async function AdminTeamPage() {
                                     </td>
                                 </tr>
                             ) : (
-                                staff.map((member) => {
+                                staff.map((member: any) => {
                                     const style = ROLE_STYLES[member.role] || ROLE_STYLES.STAFF;
                                     const RoleIcon = style.icon;
 
