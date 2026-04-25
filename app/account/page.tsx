@@ -5,6 +5,8 @@ import { prisma } from "@/lib/prisma";
 import AccountView from "@/components/account/AccountView";
 import { User } from "lucide-react";
 
+export const dynamic = 'force-dynamic';
+
 export default async function AccountPage() {
     const session = await getServerSession(authOptions);
 

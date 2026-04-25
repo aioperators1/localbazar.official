@@ -3,6 +3,8 @@ import { ProductCard } from "@/components/store/ProductCard";
 import { Zap } from "lucide-react";
 import { FlashSaleHero } from "@/components/store/FlashSaleHero";
 
+export const dynamic = 'force-dynamic';
+
 async function getDeals() {
     // For now, fetch random products or products with a specific tag if schema supported it.
     // We will just fetch the cheapest 4 items as "Deals"

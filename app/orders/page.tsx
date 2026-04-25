@@ -3,6 +3,8 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import OrdersClientHub from "./OrdersClientHub";
 
+export const dynamic = 'force-dynamic';
+
 export default async function OrdersPage() {
     const session = await getServerSession(authOptions);
 
