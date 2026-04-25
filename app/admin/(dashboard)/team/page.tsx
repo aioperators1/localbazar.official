@@ -1,5 +1,7 @@
 import { getAdminTeamMembers, deleteTeamMember } from "@/lib/actions/admin";
 import { UserCircle, Shield, Mail, Key, Trash2, ShieldCheck, UserCog, Ghost, Activity, Users, Clock, Truck } from "lucide-react";
+
+export const dynamic = 'force-dynamic';
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { AddMemberModal } from "@/components/admin/AddMemberModal";

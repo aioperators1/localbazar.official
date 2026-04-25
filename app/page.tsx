@@ -11,7 +11,7 @@ import { DynamicSectionsBuilder } from "@/components/store/DynamicSectionsBuilde
 
 import { Category, Banner, Brand, Product, AdminSetting } from "@/lib/types";
 
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 
 export default async function Home() {
   const [allProducts, rawBanners, dbSettings, allCategories, allBrands] = await Promise.all([

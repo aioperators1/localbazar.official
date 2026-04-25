@@ -5,6 +5,8 @@ import { CreateDriverDialog } from "@/components/admin/CreateDriverDialog";
 import { DriverActions } from "@/components/admin/DriverActions";
 import { DriverAssignmentsSheet } from "@/components/admin/DriverAssignmentsSheet";
 
+export const dynamic = 'force-dynamic';
+
 export default async function AdminDriversPage() {
     const drivers = await getDrivers();
 

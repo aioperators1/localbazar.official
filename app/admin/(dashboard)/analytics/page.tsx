@@ -4,6 +4,8 @@ import { prisma } from "@/lib/prisma";
 import { getDashboardStats, getMonthlyRevenue } from "@/lib/actions/admin";
 import { Overview } from "@/components/admin/Overview";
 
+export const dynamic = 'force-dynamic';
+
 export default async function AnalyticsPage() {
     const [
         statsData,

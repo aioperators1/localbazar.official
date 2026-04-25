@@ -7,6 +7,8 @@ import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { EB_Garamond } from "next/font/google";
 
+export const dynamic = 'force-dynamic';
+
 const ebGaramond = EB_Garamond({ 
     subsets: ["latin"], 
     weight: ["400", "500", "600", "700", "800"],

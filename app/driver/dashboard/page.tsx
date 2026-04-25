@@ -2,6 +2,8 @@
 import { getDriverSession, clearDriverSession } from "@/lib/driver-auth";
 import { redirect } from "next/navigation";
 import { getAvailableOrders, getDriverActiveOrders } from "@/lib/actions/driver";
+
+export const dynamic = 'force-dynamic';
 import { Truck, LogOut, Package, MapPin, Phone, Zap, Clock, Navigation, CheckCircle2 } from "lucide-react";
 import Image from "next/image";
 import { OrderClaimButton } from "@/components/driver/OrderClaimButton";

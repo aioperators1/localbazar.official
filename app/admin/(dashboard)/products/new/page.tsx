@@ -4,6 +4,8 @@ import { ArrowLeft, Tag } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
+export const dynamic = 'force-dynamic';
+
 export default async function NewProductPage() {
     const prismaAny = prisma as any;
     const rawCategories = await prismaAny.category.findMany({

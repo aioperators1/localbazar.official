@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import CheckoutsClient from "./CheckoutsClient";
 
+export const dynamic = 'force-dynamic';
+
 export default async function AdminCheckoutsPage() {
     const checkouts = await (prisma as any).abandonedCheckout.findMany({
         orderBy: { createdAt: 'desc' },

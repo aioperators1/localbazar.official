@@ -1,5 +1,7 @@
 import { getAdminVouchers, deleteVoucher } from "@/lib/actions/admin";
 import { Voucher } from "@/types/admin";
+
+export const dynamic = 'force-dynamic';
 import { 
     Ticket, 
     Settings, 

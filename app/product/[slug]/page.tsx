@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import ProductPageClient from "./ProductPageClient";
 import JsonLd from "@/components/store/JsonLd";
 
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({
     params,

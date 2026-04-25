@@ -5,6 +5,8 @@ import { ArrowLeft, Tag } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
+export const dynamic = 'force-dynamic';
+
 interface EditProductPageProps {
     params: Promise<{
         id: string;

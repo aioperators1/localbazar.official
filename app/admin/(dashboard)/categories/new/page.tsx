@@ -3,6 +3,8 @@ import CategoryForm from "@/components/admin/CategoryForm";
 import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
 
+export const dynamic = 'force-dynamic';
+
 export default async function NewCategoryPage() {
     const categories = await getAdminCategories();
 

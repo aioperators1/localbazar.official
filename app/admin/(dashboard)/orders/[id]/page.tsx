@@ -1,5 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { OrderChat } from "@/components/order/OrderChat";
+
+export const dynamic = 'force-dynamic';
 import { OrderStatusSelect } from "@/components/admin/OrderStatusSelect";
 import { notFound } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";

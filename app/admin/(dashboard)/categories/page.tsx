@@ -1,5 +1,7 @@
 import { getAdminCategories } from "@/lib/actions/admin";
 import { CategoryList } from "@/components/admin/CategoryList";
+
+export const dynamic = 'force-dynamic';
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import Link from "next/link";
