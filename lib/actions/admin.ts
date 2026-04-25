@@ -1280,10 +1280,10 @@ export async function updateTeamMember(id: string, data: Partial<TeamMemberInput
             : data.permissions ? JSON.stringify(data.permissions) : undefined;
 
         const updateData: Prisma.UserUpdateInput = {
-            name: data.name,
-            email: data.email,
-            role: data.role || 'ADMIN',
-            permissions: permissionsStr,
+            name: data.name || undefined,
+            email: data.email || undefined,
+            role: (data.role as any) || undefined,
+            permissions: permissionsStr || undefined,
         };
 
         if (data.password && data.password.trim() !== "") {

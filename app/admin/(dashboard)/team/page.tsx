@@ -6,6 +6,7 @@ import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { AddMemberModal } from "@/components/admin/AddMemberModal";
 import { EditMemberModal } from "@/components/admin/EditMemberModal";
+import { ChangePasswordModal } from "@/components/admin/ChangePasswordModal";
 import { Button } from "@/components/ui/button";
 import { revalidatePath } from "next/cache";
 
@@ -112,30 +113,28 @@ export default async function AdminTeamPage() {
                                                 </div>
                                             </td>
                                             <td className="p-4 pr-6 text-right">
-                                                {member.role !== 'SUPER_ADMIN' ? (
-                                                    <div className="flex items-center justify-end gap-2">
-                                                        <EditMemberModal member={member} />
-                                                        <form action={async () => {
-                                                            "use server"
-                                                            await deleteTeamMember(member.id);
-                                                            revalidatePath('/admin/team');
-                                                        }}>
-                                                            <Button 
-                                                                variant="ghost" 
-                                                                size="icon" 
-                                                                className="h-8 w-8 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors"
-                                                            >
-                                                                <Trash2 className="w-4 h-4" />
-                                                            </Button>
-                                                        </form>
-                                                    </div>
-                                                ) : (
-                                                    <div className="flex items-center justify-end">
-                                                        <div className="h-8 w-8 flex items-center justify-center bg-gray-50 rounded-md text-gray-400 cursor-not-allowed">
-                                                            <Key className="w-4 h-4" />
-                                                        </div>
-                                                    </div>
-                                                )}
+                                                <div className="flex items-center justify-end gap-2">
+                                                    {member.role !== 'SUPER_ADMIN' ? (
+                                                        <>
+                                                            <EditMemberModal member={member} />
+                                                            <form action={async () => {
+                                                                "use server"
+                                                                await deleteTeamMember(member.id);
+                                                                revalidatePath('/admin/team');
+                                                            }}>
+                                                                <Button 
+                                                                    variant="ghost" 
+                                                                    size="icon" 
+                                                                    className="h-8 w-8 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors"
+                                                                >
+                                                                    <Trash2 className="w-4 h-4" />
+                                                                </Button>
+                                                            </form>
+                                                        </>
+                                                    ) : (
+                                                        <ChangePasswordModal member={member} />
+                                                    )}
+                                                </div>
                                             </td>
                                         </tr>
                                     );

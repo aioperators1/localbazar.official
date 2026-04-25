@@ -58,4 +58,4 @@ Once logged in, you'll have access to:
    Use `npx prisma studio` to view and edit stock/pricing directly.
 
 3. **Reset password if needed:**
-   - Default password is `localbazar_admin_2024!` after seeding.
+   - Default password is `localbazaraio` after seeding.
