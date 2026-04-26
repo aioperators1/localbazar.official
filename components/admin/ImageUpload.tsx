@@ -85,19 +85,33 @@ function SortableImage({ url, index, onRemove, disabled }: SortableImageProps) {
                     alt="Product" 
                     className="object-cover"
                     unoptimized
+                    onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                 />
                 {!disabled && (
-                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <>
+                        {/* Always-visible delete button in corner for broken images */}
                         <Button 
                             type="button" 
                             variant="destructive" 
                             size="icon" 
                             onClick={() => onRemove(url)}
-                            className="h-12 w-12 rounded-full shadow-2xl scale-90 group-hover:scale-100 transition-transform duration-300"
+                            className="absolute top-2 right-2 h-8 w-8 rounded-full shadow-lg z-10 opacity-80 hover:opacity-100"
                         >
-                            <Trash2 className="w-6 h-6" />
+                            <Trash2 className="w-4 h-4" />
                         </Button>
-                    </div>
+                        {/* Hover overlay with larger button */}
+                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <Button 
+                                type="button" 
+                                variant="destructive" 
+                                size="icon" 
+                                onClick={() => onRemove(url)}
+                                className="h-12 w-12 rounded-full shadow-2xl scale-90 group-hover:scale-100 transition-transform duration-300"
+                            >
+                                <Trash2 className="w-6 h-6" />
+                            </Button>
+                        </div>
+                    </>
                 )}
             </div>
         </div>
