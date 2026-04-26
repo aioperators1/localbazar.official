@@ -27,15 +27,10 @@ function LogoContent({ logoUrl, s, align, variant, light }: { logoUrl: string | 
     if (logoUrl) {
         return (
             <div className={cn("relative flex items-center", align === "center" && "justify-center")} style={{ height: `${s.imageHeight}px` }}>
-                <Image 
+                <img 
                     src={logoUrl} 
                     alt="Local Bazar" 
-                    fill
-                    className={cn(
-                        "object-contain transition-all duration-700 brightness-0",
-                        light ? "invert grayscale" : "grayscale-0 invert-0"
-                    )}
-                    unoptimized
+                    className="h-full w-auto object-contain transition-all duration-700"
                 />
             </div>
         );
@@ -87,8 +82,8 @@ function LogoContent({ logoUrl, s, align, variant, light }: { logoUrl: string | 
 
 export function Branding({ className, size = "md", variant = "default", light = false, align = "center" }: BrandingProps) {
     const { language } = useLanguage();
-    // We ignore the actual language for the logo text as per user request
-    const [logoUrl, setLogoUrl] = useState<string | null>(null);
+    // Use the new uploaded logo by default
+    const [logoUrl, setLogoUrl] = useState<string | null>("/logo-white-transparent.png");
 
     useEffect(() => {
         async function loadLogo() {
@@ -110,21 +105,21 @@ export function Branding({ className, size = "md", variant = "default", light = 
             luxuryText: "text-[22px]",
             divider: "h-4",
             gap: "gap-2",
-            imageHeight: 28
+            imageHeight: 32 // Slightly larger for better visibility
         },
         md: {
             text: "text-[18px] lg:text-[30px]",
             luxuryText: "text-[24px] lg:text-[40px]",
             divider: "h-5 lg:h-8",
             gap: "gap-1 lg:gap-4",
-            imageHeight: 40
+            imageHeight: 48 // Taller to show logo clearly
         },
         lg: {
             text: "text-[24px] lg:text-[42px]",
             luxuryText: "text-[32px] lg:text-[52px]",
             divider: "h-6 lg:h-12",
             gap: "gap-2 lg:gap-6",
-            imageHeight: 60
+            imageHeight: 72 // Taller for large areas
         }
     };
 

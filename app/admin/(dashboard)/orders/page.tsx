@@ -5,7 +5,7 @@ import { getAdminOrders, getDrivers } from "@/lib/actions/admin";
 import { OrderStatusSelect } from "@/components/admin/OrderStatusSelect";
 import { OrderDriverSelect } from "@/components/admin/OrderDriverSelect";
 import Link from "next/link";
-import { ShoppingBag, Clock, Truck, CheckCircle2, XCircle, RotateCw } from "lucide-react";
+import { ShoppingBag, Clock, Truck, CheckCircle2, XCircle, RotateCw, Download, FileSpreadsheet, Calendar } from "lucide-react";
 import { formatPrice, cn } from "@/lib/utils";
 
 export default function AdminOrdersPage() {
@@ -14,6 +14,50 @@ export default function AdminOrdersPage() {
     const [isLoading, setIsLoading] = useState(true);
     const [page, setPage] = useState(1);
     const pageSize = 20;
+
+    const [showExportModal, setShowExportModal] = useState(false);
+    const [exportRange, setExportRange] = useState("today");
+    const [customStartDate, setCustomStartDate] = useState("");
+    const [customEndDate, setCustomEndDate] = useState("");
+
+    const handleExport = () => {
+        let start = "";
+        let end = "";
+        const now = new Date();
+
+        const getStartOfDay = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate(), 0, 0, 0, 0).toISOString();
+        const getEndOfDay = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate(), 23, 59, 59, 999).toISOString();
+
+        if (exportRange === "today") {
+            start = getStartOfDay(now);
+            end = getEndOfDay(now);
+        } else if (exportRange === "last7days") {
+            const last7 = new Date(now);
+            last7.setDate(now.getDate() - 7);
+            start = getStartOfDay(last7);
+            end = getEndOfDay(now);
+        } else if (exportRange === "thisMonth") {
+            const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+            start = getStartOfDay(firstDay);
+            end = getEndOfDay(now);
+        } else if (exportRange === "custom") {
+            if (customStartDate) {
+                const parts = customStartDate.split('-');
+                start = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]), 0, 0, 0, 0).toISOString();
+            }
+            if (customEndDate) {
+                const parts = customEndDate.split('-');
+                end = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]), 23, 59, 59, 999).toISOString();
+            }
+        }
+
+        let url = `/api/admin/orders/export?`;
+        if (start) url += `startDate=${start}&`;
+        if (end) url += `endDate=${end}`;
+
+        window.open(url, "_blank");
+        setShowExportModal(false);
+    };
 
     const fetchOrders = async (pageNum: number = 1) => {
         setIsLoading(true);
@@ -56,6 +100,13 @@ export default function AdminOrdersPage() {
                         title="Sync Orders"
                     >
                         <RotateCw className={cn("w-4 h-4", isLoading && "animate-spin")} />
+                    </button>
+                    <button 
+                        onClick={() => setShowExportModal(true)}
+                        className="bg-emerald-600 hover:bg-emerald-700 text-white h-[44px] px-5 rounded-lg flex items-center justify-center gap-2 font-bold text-sm transition-all shadow-sm active:scale-95"
+                    >
+                        <FileSpreadsheet className="w-4 h-4" />
+                        Export
                     </button>
                     <div className="flex items-center gap-4 bg-white border border-gray-200 rounded-lg p-2 shadow-sm">
                        <div className="flex flex-col px-4 border-r border-gray-200">
@@ -200,6 +251,80 @@ export default function AdminOrdersPage() {
                     </div>
                 )}
             </div>
+
+            {/* Export Modal */}
+            {showExportModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
+                    <div className="bg-white rounded-xl shadow-2xl w-full max-w-md p-6 animate-in slide-in-from-bottom-4 duration-300">
+                        <div className="flex items-center justify-between mb-6">
+                            <h3 className="text-xl font-bold text-black flex items-center gap-2">
+                                <FileSpreadsheet className="w-5 h-5 text-emerald-600" />
+                                Export Orders Analytics
+                            </h3>
+                            <button onClick={() => setShowExportModal(false)} className="text-gray-400 hover:text-gray-600">
+                                <XCircle className="w-5 h-5" />
+                            </button>
+                        </div>
+
+                        <div className="space-y-4">
+                            <div>
+                                <label className="block text-[12px] font-bold text-gray-700 uppercase tracking-wider mb-2">Time Range</label>
+                                <select 
+                                    value={exportRange} 
+                                    onChange={(e) => setExportRange(e.target.value)}
+                                    className="w-full h-11 px-4 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-black/5"
+                                >
+                                    <option value="today">Today</option>
+                                    <option value="last7days">Last 7 Days</option>
+                                    <option value="thisMonth">This Month</option>
+                                    <option value="all">All Time</option>
+                                    <option value="custom">Custom Date Range</option>
+                                </select>
+                            </div>
+
+                            {exportRange === "custom" && (
+                                <div className="grid grid-cols-2 gap-4 pt-2">
+                                    <div>
+                                        <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Start Date</label>
+                                        <input 
+                                            type="date" 
+                                            value={customStartDate} 
+                                            onChange={(e) => setCustomStartDate(e.target.value)}
+                                            className="w-full h-10 px-3 border border-gray-200 rounded-md text-sm outline-none focus:border-emerald-500"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">End Date</label>
+                                        <input 
+                                            type="date" 
+                                            value={customEndDate} 
+                                            onChange={(e) => setCustomEndDate(e.target.value)}
+                                            className="w-full h-10 px-3 border border-gray-200 rounded-md text-sm outline-none focus:border-emerald-500"
+                                        />
+                                    </div>
+                                </div>
+                            )}
+
+                            <div className="pt-6 flex items-center gap-3">
+                                <button 
+                                    onClick={() => setShowExportModal(false)}
+                                    className="flex-1 h-11 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-lg transition-colors"
+                                >
+                                    Cancel
+                                </button>
+                                <button 
+                                    onClick={handleExport}
+                                    disabled={exportRange === "custom" && (!customStartDate || !customEndDate)}
+                                    className="flex-1 h-11 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                                >
+                                    <Download className="w-4 h-4" />
+                                    Generate Excel
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

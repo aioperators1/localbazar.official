@@ -27,6 +27,8 @@ interface Address {
     city: string;
     zip: string;
     country: string;
+    buildingNo?: string | null;
+    zoneNo?: string | null;
 }
 
 interface Order {
@@ -146,8 +148,10 @@ export function InvoiceModal({ order, settings, trigger, isOpen, onOpenChange }:
                                     </div>
                                     {shippingAddr ? (
                                         <div className="text-[12px] font-bold text-black uppercase leading-relaxed tracking-wider">
-                                            <p>{shippingAddr.street}</p>
-                                            <p>{shippingAddr.city}, {shippingAddr.zip}</p>
+                                            {shippingAddr.buildingNo && <p>Building {shippingAddr.buildingNo}</p>}
+                                            <p>Street {shippingAddr.street}</p>
+                                            {shippingAddr.zoneNo && <p>Zone {shippingAddr.zoneNo}</p>}
+                                            <p>{shippingAddr.city}, {shippingAddr.zip || "00000"}</p>
                                             <p className="mt-2 text-[10px] bg-black text-white inline-block px-2 py-0.5 rounded-sm">{shippingAddr.country}</p>
                                         </div>
                                     ) : (

@@ -76,6 +76,9 @@ export async function getDashboardStats() {
         const now = new Date();
         const startOfThisMonth = new Date(now.getFullYear(), now.getMonth(), 1);
         const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+        const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const startOfLast7Days = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+        const fiveMinutesAgo = new Date(now.getTime() - 5 * 60 * 1000);
 
         const [
             totalRevenue,
@@ -91,7 +94,13 @@ export async function getDashboardStats() {
             lastMonthOrders,
 
             thisMonthUsers,
-            lastMonthUsers
+            lastMonthUsers,
+            
+            totalViews,
+            todayViews,
+            last7DaysViews,
+            thisMonthViews,
+            activeViews
         ] = await Promise.all([
             prisma.order.aggregate({
                 _sum: { total: true },
@@ -126,7 +135,13 @@ export async function getDashboardStats() {
             prisma.order.count({ where: { createdAt: { gte: startOfLastMonth, lt: startOfThisMonth }, status: { notIn: ['DRAFT', 'FAILED'] } } }),
 
             prisma.user.count({ where: { role: 'USER', createdAt: { gte: startOfThisMonth } } }),
-            prisma.user.count({ where: { role: 'USER', createdAt: { gte: startOfLastMonth, lt: startOfThisMonth } } })
+            prisma.user.count({ where: { role: 'USER', createdAt: { gte: startOfLastMonth, lt: startOfThisMonth } } }),
+            
+            prisma.siteView.count(),
+            prisma.siteView.count({ where: { createdAt: { gte: startOfToday } } }),
+            prisma.siteView.count({ where: { createdAt: { gte: startOfLast7Days } } }),
+            prisma.siteView.count({ where: { createdAt: { gte: startOfThisMonth } } }),
+            prisma.activeSession.count({ where: { lastSeen: { gte: fiveMinutesAgo } } })
         ]);
 
         const calcTrend = (current: number, previous: number) => {
@@ -146,6 +161,13 @@ export async function getDashboardStats() {
             orders: totalOrders,
             products: totalProducts,
             users: totalUsers,
+            views: {
+                total: totalViews,
+                today: todayViews,
+                last7Days: last7DaysViews,
+                thisMonth: thisMonthViews,
+                active: activeViews
+            },
             recentOrders: (recentOrders as any[]).map((order: any) => ({
                 id: order.id,
                 total: Number(order.total),
@@ -166,6 +188,7 @@ export async function getDashboardStats() {
         console.error("Stats Error:", error);
         return {
             revenue: 0, orders: 0, products: 0, users: 0, recentOrders: [],
+            views: { total: 0, today: 0, last7Days: 0, thisMonth: 0, active: 0 },
             trends: {
                 revenue: { change: "0%", trend: "neutral" },
                 orders: { change: "0%", trend: "neutral" },

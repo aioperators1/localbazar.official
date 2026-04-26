@@ -65,7 +65,7 @@ export function NewArrivalsTabs({ products, categories = [] }: NewArrivalsTabsPr
                             </div>
                             <h2 
                                 className="font-serif text-[42px] sm:text-[64px] lg:text-[84px] text-white leading-[0.9] font-medium tracking-tighter"
-                                style={{ fontFamily: language === 'ar' && mounted ? 'var(--font-amiri), serif' : undefined }}
+                                style={{ fontFamily: language === 'ar' && mounted ? 'Calibri, Arial, sans-serif' : undefined }}
                             >
                                 {mounted ? t('nav.newArrivals').split(' ')[0] : 'NEW'} <br />
                                 <span className="italic font-extralight text-white/40 ml-[-2px]">

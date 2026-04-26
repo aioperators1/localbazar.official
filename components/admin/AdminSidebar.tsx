@@ -120,12 +120,13 @@ const SidebarContent = ({
             {/* Logo Section */}
             <div className="px-8 mb-10 flex flex-col gap-6 relative z-10">
                 <Link href="/admin" className="flex flex-col items-center group no-underline text-center">
-                    <div className="relative w-full h-16 transition-transform duration-500 group-hover:scale-105">
+                    <div className="relative h-16 w-full">
                         <Image 
-                            src="/logo-admin-white.svg" 
-                            alt="Local Bazar" 
+                            src="/logo-white-transparent.png" 
+                            alt="Local Bazar Admin" 
                             fill 
-                            className="object-contain brightness-200"
+                            className="object-contain transition-all duration-700"
+                            unoptimized
                         />
                     </div>
                 </Link>

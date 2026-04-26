@@ -29,19 +29,52 @@ export default function CheckoutPage() {
     const [paymentMethod, setPaymentMethod] = useState("COD");
     const [shippingMethods, setShippingMethods] = useState<any[]>([]);
     const [selectedShippingMethodId, setSelectedShippingMethodId] = useState<string>("");
+    const [isCodEnabled, setIsCodEnabled] = useState(true);
 
     const subtotal = items.reduce((acc: number, item: any) => acc + (item.price * item.quantity), 0);
 
+    const GCC_COUNTRIES = {
+        "Qatar": ["Doha", "Al Rayyan", "Al Wakrah", "Al Khor", "Al Shamal", "Umm Salal", "Al Daayen", "Al Shahaniya", "Lusail", "Mesaieed", "Dukhan"],
+        "Saudi Arabia": ["Riyadh", "Jeddah", "Mecca", "Medina", "Dammam", "Taif", "Tabuk", "Buraydah", "Khamis Mushait", "Abha", "Al Khobar"],
+        "UAE": ["Dubai", "Abu Dhabi", "Sharjah", "Ajman", "Ras Al Khaimah", "Fujairah", "Umm Al Quwain"],
+        "Kuwait": ["Kuwait City", "Al Ahmadi", "Hawalli", "Salmiya", "Al Jahra", "Farwaniya"],
+        "Oman": ["Muscat", "Salalah", "Sohar", "Nizwa", "Sur", "Seeb", "Rustaq"],
+        "Bahrain": ["Manama", "Riffa", "Muharraq", "Hamad Town", "A'ali", "Isa Town", "Sitra"]
+    };
+
+    const GCC_COUNTRIES_AR = {
+        "Qatar": ["الدوحة", "الريان", "الوكرة", "الخور", "الشمال", "أم صلال", "الضعاين", "الشيحانية", "لوسيل", "مسيعيد", "دخان"],
+        "Saudi Arabia": ["الرياض", "جدة", "مكة المكرمة", "المدينة المنورة", "الدمام", "الطائف", "تبوك", "بريدة", "خميس مشيط", "أبها", "الخبر"],
+        "UAE": ["دبي", "أبو ظبي", "الشارقة", "عجمان", "رأس الخيمة", "الفجيرة", "أم القيوين"],
+        "Kuwait": ["مدينة الكويت", "الأحمدي", "حولي", "السالمية", "الجهراء", "الفروانية"],
+        "Oman": ["مسقط", "صلالة", "صحار", "نزوى", "صور", "السيب", "الرستاق"],
+        "Bahrain": ["المنامة", "الرفاع", "المحرق", "مدينة حمد", "عالي", "مدينة عيسى", "سترة"]
+    };
+
     // Form State
     const [formData, setFormData] = useState({
-        firstName: "",
-        lastName: "",
+        fullName: "",
         email: "",
         phone: "",
+        country: "Qatar",
+        city: language === 'ar' ? "الدوحة" : "Doha",
         address: "",
-        city: "",
+        buildingNo: "",
+        street: "",
+        zoneNo: "",
         zip: ""
     });
+
+    // Update city when country changes
+    useEffect(() => {
+        const cities = language === 'ar' 
+            ? GCC_COUNTRIES_AR[formData.country as keyof typeof GCC_COUNTRIES_AR] 
+            : GCC_COUNTRIES[formData.country as keyof typeof GCC_COUNTRIES];
+        
+        if (cities && cities.length > 0) {
+            setFormData(prev => ({ ...prev, city: cities[0] }));
+        }
+    }, [formData.country, language]);
 
     // --- Abandoned Checkout Tracking ---
     const orderCompletedRef = useRef(false);
@@ -112,8 +145,14 @@ export default function CheckoutPage() {
 
     useEffect(() => {
         const timer = setTimeout(() => setMounted(true), 0);
-        async function loadShipping() {
+        async function loadSettings() {
             const settings = await getAdminSettings();
+            
+            if (settings.codEnabled === 'false') {
+                setIsCodEnabled(false);
+                setPaymentMethod(prev => prev === "COD" ? "CARD" : prev);
+            }
+            
             if (settings.shippingMethods) {
                 try {
                     const parsed = JSON.parse(settings.shippingMethods);
@@ -122,11 +161,11 @@ export default function CheckoutPage() {
                 } catch (e: any) {}
             }
         }
-        loadShipping();
+        loadSettings();
         return () => clearTimeout(timer);
     }, []);
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
@@ -134,8 +173,12 @@ export default function CheckoutPage() {
         e.preventDefault();
         setIsLoading(true);
 
+        // Map address to include the new fields
+        const fullAddress = formData.address || `${formData.buildingNo ? `Building ${formData.buildingNo}, ` : ''}${formData.street ? `Street ${formData.street}, ` : ''}${formData.zoneNo ? `Zone ${formData.zoneNo}` : ''}`.replace(/,\s*$/, '');
+
         const orderData = {
             ...formData,
+            address: fullAddress, // Send the full concatenated string just in case, but checkout API also handles individual fields now
             items: items.map((item: any) => ({
                 id: item.id,
                 quantity: item.quantity,
@@ -160,9 +203,7 @@ export default function CheckoutPage() {
                 items: items, 
                 orderId: res.orderId
             }));
-            // clearCart() removed from here - now handled only on success page to preserve cart on payment failure
             
-
             if (res.paymentUrl) {
                 window.location.href = res.paymentUrl;
                 return;
@@ -193,6 +234,10 @@ export default function CheckoutPage() {
 
     const selectedShippingMethod = shippingMethods.find((m: any) => m.id === selectedShippingMethodId) || { price: 35, name: "Standard", duration: "2-3 days", nameAr: "توصيل عادي" };
     const shippingCost = shippingMethods.length > 0 ? Number(selectedShippingMethod.price) : 35;
+
+    const currentCities = language === 'ar' 
+        ? GCC_COUNTRIES_AR[formData.country as keyof typeof GCC_COUNTRIES_AR] || []
+        : GCC_COUNTRIES[formData.country as keyof typeof GCC_COUNTRIES] || [];
 
     return (
         <div className="min-h-screen bg-transparent text-white" dir={language === 'ar' ? 'rtl' : 'ltr'}>
@@ -345,53 +390,84 @@ export default function CheckoutPage() {
                                 
                                 <div className="space-y-4">
                                     <div className="relative">
-                                        <select className="w-full h-[52px] px-4 rounded-[4px] border border-white/20 bg-black/20 text-white text-[14px] appearance-none outline-none focus:border-white font-medium">
-                                            <option>{language === 'ar' ? "قطر" : "Qatar"}</option>
+                                        <select 
+                                            name="country"
+                                            value={formData.country}
+                                            onChange={handleInputChange}
+                                            className="w-full h-[52px] px-4 rounded-[4px] border border-white/20 bg-[#1A0306] text-white text-[14px] appearance-none outline-none focus:border-white font-medium"
+                                        >
+                                            <option value="Qatar">{language === 'ar' ? "قطر" : "Qatar"}</option>
+                                            <option value="Saudi Arabia">{language === 'ar' ? "المملكة العربية السعودية" : "Saudi Arabia"}</option>
+                                            <option value="UAE">{language === 'ar' ? "الإمارات العربية المتحدة" : "UAE"}</option>
+                                            <option value="Kuwait">{language === 'ar' ? "الكويت" : "Kuwait"}</option>
+                                            <option value="Oman">{language === 'ar' ? "عمان" : "Oman"}</option>
+                                            <option value="Bahrain">{language === 'ar' ? "البحرين" : "Bahrain"}</option>
                                         </select>
                                         <div className={cn("absolute top-1/2 -translate-y-1/2 pointer-events-none opacity-50 text-[10px] text-white", language === 'ar' ? "left-4" : "right-4")}>▼</div>
                                     </div>
 
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <input
-                                            placeholder={t('checkout.firstName')}
-                                            name="firstName"
-                                            required
-                                            value={formData.firstName}
-                                            onChange={handleInputChange}
-                                            className="h-[52px] px-4 rounded-[4px] border border-white/20 focus:border-white bg-black/20 outline-none text-[14px] placeholder:text-white/40 text-white"
-                                        />
-                                        <input
-                                            placeholder={t('checkout.lastName')}
-                                            name="lastName"
-                                            required
-                                            value={formData.lastName}
-                                            onChange={handleInputChange}
-                                            className="h-[52px] px-4 rounded-[4px] border border-white/20 focus:border-white bg-black/20 outline-none text-[14px] placeholder:text-white/40 text-white"
-                                        />
-                                    </div>
+                                    <input
+                                        placeholder={language === 'ar' ? "الاسم الكامل" : "Full Name"}
+                                        name="fullName"
+                                        required
+                                        value={formData.fullName}
+                                        onChange={handleInputChange}
+                                        className="w-full h-[52px] px-4 rounded-[4px] border border-white/20 focus:border-white bg-black/20 outline-none text-[14px] placeholder:text-white/40 text-white"
+                                    />
 
                                     <input
-                                        placeholder={t('checkout.address')}
+                                        placeholder={language === 'ar' ? "العنوان بالتفصيل (اختياري)" : "Full Address (Optional)"}
                                         name="address"
-                                        required
                                         value={formData.address}
                                         onChange={handleInputChange}
                                         className="w-full h-[52px] px-4 rounded-[4px] border border-white/20 focus:border-white bg-black/20 outline-none text-[14px] placeholder:text-white/40 text-white"
                                     />
 
-                                    <div className="grid grid-cols-2 gap-4">
+                                    <div className="grid grid-cols-3 gap-4">
                                         <input
-                                            placeholder={t('checkout.postalCode')}
-                                            name="zip"
-                                            value={formData.zip}
+                                            placeholder={language === 'ar' ? "رقم المبنى" : "Building No."}
+                                            name="buildingNo"
+                                            required
+                                            value={formData.buildingNo}
                                             onChange={handleInputChange}
                                             className="h-[52px] px-4 rounded-[4px] border border-white/20 focus:border-white bg-black/20 outline-none text-[14px] placeholder:text-white/40 text-white"
                                         />
                                         <input
-                                            placeholder={t('checkout.city')}
-                                            name="city"
+                                            placeholder={language === 'ar' ? "شارع" : "Street"}
+                                            name="street"
                                             required
-                                            value={formData.city}
+                                            value={formData.street}
+                                            onChange={handleInputChange}
+                                            className="h-[52px] px-4 rounded-[4px] border border-white/20 focus:border-white bg-black/20 outline-none text-[14px] placeholder:text-white/40 text-white"
+                                        />
+                                        <input
+                                            placeholder={language === 'ar' ? "رقم المنطقة" : "Zone No."}
+                                            name="zoneNo"
+                                            required
+                                            value={formData.zoneNo}
+                                            onChange={handleInputChange}
+                                            className="h-[52px] px-4 rounded-[4px] border border-white/20 focus:border-white bg-black/20 outline-none text-[14px] placeholder:text-white/40 text-white"
+                                        />
+                                    </div>
+
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div className="relative">
+                                            <select 
+                                                name="city"
+                                                value={formData.city}
+                                                onChange={handleInputChange}
+                                                className="w-full h-[52px] px-4 rounded-[4px] border border-white/20 bg-[#1A0306] text-white text-[14px] appearance-none outline-none focus:border-white font-medium"
+                                            >
+                                                {currentCities.map(city => (
+                                                    <option key={city} value={city}>{city}</option>
+                                                ))}
+                                            </select>
+                                            <div className={cn("absolute top-1/2 -translate-y-1/2 pointer-events-none opacity-50 text-[10px] text-white", language === 'ar' ? "left-4" : "right-4")}>▼</div>
+                                        </div>
+                                        <input
+                                            placeholder={t('checkout.postalCode')}
+                                            name="zip"
+                                            value={formData.zip}
                                             onChange={handleInputChange}
                                             className="h-[52px] px-4 rounded-[4px] border border-white/20 focus:border-white bg-black/20 outline-none text-[14px] placeholder:text-white/40 text-white"
                                         />
@@ -460,25 +536,28 @@ export default function CheckoutPage() {
                                 <p className="text-[12px] text-white/50 mb-6 font-medium uppercase tracking-wider">{t('checkout.secureTransactions')}</p>
 
                                 <div className="border border-white/20 rounded-[4px] overflow-hidden">
-                                    <div
-                                        onClick={() => setPaymentMethod("COD")}
-                                        className={cn(
-                                            "p-5 flex items-center justify-between cursor-pointer transition-colors",
-                                            paymentMethod === "COD" ? "bg-black/40" : "hover:bg-black/20"
-                                        )}
-                                    >
-                                        <div className="flex items-center gap-3">
-                                            <div className={cn("w-4 h-4 rounded-full border flex items-center justify-center", paymentMethod === "COD" ? "border-white" : "border-white/40")}>
-                                                {paymentMethod === "COD" && <div className="w-2.5 h-2.5 bg-white rounded-full" />}
+                                    {isCodEnabled && (
+                                        <div
+                                            onClick={() => setPaymentMethod("COD")}
+                                            className={cn(
+                                                "p-5 flex items-center justify-between cursor-pointer transition-colors",
+                                                paymentMethod === "COD" ? "bg-black/40" : "hover:bg-black/20"
+                                            )}
+                                        >
+                                            <div className="flex items-center gap-3">
+                                                <div className={cn("w-4 h-4 rounded-full border flex items-center justify-center", paymentMethod === "COD" ? "border-white" : "border-white/40")}>
+                                                    {paymentMethod === "COD" && <div className="w-2.5 h-2.5 bg-white rounded-full" />}
+                                                </div>
+                                                <span className="text-[14px] font-bold text-white uppercase tracking-tight">{t('checkout.cod')}</span>
                                             </div>
-                                            <span className="text-[14px] font-bold text-white uppercase tracking-tight">{t('checkout.cod')}</span>
+                                            <Banknote className="w-5 h-5 text-white/40" />
                                         </div>
-                                        <Banknote className="w-5 h-5 text-white/40" />
-                                    </div>
+                                    )}
                                     <div
                                         onClick={() => setPaymentMethod("CARD")}
                                         className={cn(
-                                            "p-5 border-t border-white/20 flex items-center justify-between cursor-pointer transition-colors",
+                                            "p-5 flex items-center justify-between cursor-pointer transition-colors",
+                                            isCodEnabled && "border-t border-white/20",
                                             paymentMethod === "CARD" ? "bg-black/40" : "hover:bg-black/20"
                                         )}
                                     >

@@ -14,11 +14,13 @@ import { AnnouncementBar } from "@/components/store/AnnouncementBar";
 export function LayoutWrapper({ 
   children, 
   settings,
-  categories 
+  categories,
+  brands
 }: { 
   children: React.ReactNode;
   settings: any;
   categories: any[];
+  brands?: any[];
 }) {
   const pathname = usePathname();
   const isAdmin = pathname?.startsWith("/admin");
@@ -66,7 +68,7 @@ export function LayoutWrapper({
       />
       <WelcomePage />
       <ScrollProgress />
-      <Header settings={settings} categories={categories} />
+      <Header settings={settings} categories={categories} brands={brands || []} />
       <main className="flex-grow">{children}</main>
       <Footer settings={settings} categories={categories} />
       <Toaster position="top-center" />

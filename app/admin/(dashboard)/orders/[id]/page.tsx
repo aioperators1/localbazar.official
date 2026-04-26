@@ -214,19 +214,33 @@ export default async function AdminOrderDetailsPage(props: AdminOrderDetailsPage
 
                                 {/* Logistics Section */}
                                 <div className="space-y-6">
-                                    <div className="space-y-1">
-                                        <p className="text-white/40 text-[9px] font-black uppercase tracking-widest">Street Address</p>
-                                        <p className="text-white text-[13px] font-bold leading-relaxed">{serializedOrder.user?.addresses?.[0]?.street || "ADDRESS_PENDING"}</p>
-                                    </div>
                                     <div className="grid grid-cols-2 gap-4">
+                                        <div className="space-y-1">
+                                            <p className="text-white/40 text-[9px] font-black uppercase tracking-widest">Country</p>
+                                            <p className="text-white text-[13px] font-bold uppercase">{serializedOrder.user?.addresses?.[0]?.country || "QATAR"}</p>
+                                        </div>
                                         <div className="space-y-1">
                                             <p className="text-white/40 text-[9px] font-black uppercase tracking-widest">City / Region</p>
                                             <p className="text-white text-[13px] font-bold uppercase">{serializedOrder.user?.addresses?.[0]?.city || "QATAR"}</p>
                                         </div>
+                                    </div>
+                                    <div className="grid grid-cols-3 gap-4">
                                         <div className="space-y-1">
-                                            <p className="text-white/40 text-[9px] font-black uppercase tracking-widest">Postal Code</p>
-                                            <p className="text-white text-[13px] font-bold">{serializedOrder.user?.addresses?.[0]?.zip || "00000"}</p>
+                                            <p className="text-white/40 text-[9px] font-black uppercase tracking-widest">Building</p>
+                                            <p className="text-white text-[13px] font-bold uppercase">{serializedOrder.user?.addresses?.[0]?.buildingNo || "-"}</p>
                                         </div>
+                                        <div className="space-y-1">
+                                            <p className="text-white/40 text-[9px] font-black uppercase tracking-widest">Street</p>
+                                            <p className="text-white text-[13px] font-bold uppercase">{serializedOrder.user?.addresses?.[0]?.street || "ADDRESS_PENDING"}</p>
+                                        </div>
+                                        <div className="space-y-1">
+                                            <p className="text-white/40 text-[9px] font-black uppercase tracking-widest">Zone</p>
+                                            <p className="text-white text-[13px] font-bold uppercase">{serializedOrder.user?.addresses?.[0]?.zoneNo || "-"}</p>
+                                        </div>
+                                    </div>
+                                    <div className="space-y-1">
+                                        <p className="text-white/40 text-[9px] font-black uppercase tracking-widest">Postal Code</p>
+                                        <p className="text-white text-[13px] font-bold">{serializedOrder.user?.addresses?.[0]?.zip || "00000"}</p>
                                     </div>
                                     <div className="grid grid-cols-2 gap-4 pt-2">
                                         <div className="space-y-1">

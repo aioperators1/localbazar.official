@@ -23,7 +23,7 @@ import {
 
 import { AdminSetting, AppSession, Category } from "@/lib/types";
 
-export function Header({ settings, categories = [] }: { settings?: AdminSetting, categories?: Category[] }) {
+export function Header({ settings, categories = [], brands = [] }: { settings?: AdminSetting, categories?: Category[], brands?: any[] }) {
     const pathname = usePathname();
     const isHome = pathname === "/";
     const { data: sessionData } = useSession();
@@ -164,21 +164,42 @@ export function Header({ settings, categories = [] }: { settings?: AdminSetting,
                         </button>
 
                         <nav className="hidden xl:flex items-center gap-10">
-                            {[
-                                { name: t('nav.archive'), href: '/shop' },
-                                { name: t('nav.editions'), href: '/shop?category=new-arrivals' }
-                            ].map((link: {name: string, href: string}, idx: number) => (
-                                <div key={idx} className="flex items-center gap-10">
-                                    <Link href={link.href} className="group relative py-2">
-                                        <span className={cn(
-                                            "text-[10px] font-black tracking-[0.4em] uppercase transition-colors text-white/60 hover:text-white"
-                                        )}>
-                                            {link.name}
-                                        </span>
-                                    </Link>
-                                    {idx === 0 && <div className="w-[1px] h-3 bg-white/20" />}
-                                </div>
-                            ))}
+                            <DropdownMenu>
+                                <DropdownMenuTrigger className="text-[10px] font-black tracking-[0.4em] uppercase transition-colors text-white/60 hover:text-white outline-none flex items-center gap-2 group">
+                                    {isAr ? "الماركات" : "BRANDS"}
+                                    <ChevronDown className="w-3 h-3 opacity-40 group-hover:opacity-100 transition-opacity" />
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent className="bg-[#20080B] border-white/5 rounded-none min-w-[200px] p-0 shadow-2xl z-[250]">
+                                    {brands?.map((brand) => (
+                                        <DropdownMenuItem key={brand.id} asChild className="rounded-none cursor-pointer">
+                                            <Link href={`/shop?brand=${brand.slug}`} className="w-full block text-[10px] font-bold uppercase tracking-widest text-white/60 focus:bg-white/5 focus:text-white p-4 border-b border-white/5 last:border-0 cursor-pointer">
+                                                {brand.name}
+                                            </Link>
+                                        </DropdownMenuItem>
+                                    ))}
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+
+                            <div className="w-[1px] h-3 bg-white/20" />
+
+                            <DropdownMenu>
+                                <DropdownMenuTrigger className="text-[10px] font-black tracking-[0.4em] uppercase transition-colors text-white/60 hover:text-white outline-none flex items-center gap-2 group">
+                                    {isAr ? "الأقسام" : "CATEGORIES"}
+                                    <ChevronDown className="w-3 h-3 opacity-40 group-hover:opacity-100 transition-opacity" />
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent className="bg-[#20080B] border-white/5 rounded-none min-w-[200px] p-0 shadow-2xl z-[250]">
+                                    {categories?.map((cat) => (
+                                        <DropdownMenuItem key={cat.id} asChild className="rounded-none cursor-pointer">
+                                            <Link href={`/shop?category=${cat.slug}`} className={cn(
+                                                "w-full block text-[10px] font-bold uppercase tracking-widest text-white/60 focus:bg-white/5 focus:text-white p-4 border-b border-white/5 last:border-0 cursor-pointer",
+                                                isAr && "text-right font-sans"
+                                            )}>
+                                                {isAr && cat.nameAr ? cat.nameAr : cat.name}
+                                            </Link>
+                                        </DropdownMenuItem>
+                                    ))}
+                                </DropdownMenuContent>
+                            </DropdownMenu>
                         </nav>
                     </div>
 
@@ -327,6 +348,35 @@ export function Header({ settings, categories = [] }: { settings?: AdminSetting,
                                 </Link>
                             </div>
                         </div>
+
+                        {/* 2.5 Brands Navigation */}
+                        {brands && brands.length > 0 && (
+                            <div className="space-y-6">
+                                <span className={cn("text-[9px] font-black tracking-[0.5em] text-white/20 uppercase block", isAr && "text-right")}>
+                                    {isAr ? 'الماركات' : 'BRANDS'}
+                                </span>
+                                <div className="flex flex-col gap-6">
+                                    {brands.map((brand: any) => (
+                                        <Link 
+                                            key={brand.id} 
+                                            href={`/shop?brand=${brand.slug}`} 
+                                            onClick={() => setIsMenuOpen(false)}
+                                            className={cn(
+                                                "group flex items-center gap-4",
+                                                isAr && "flex-row-reverse"
+                                            )}
+                                        >
+                                            <span className={cn(
+                                                "text-[24px] lg:text-[28px] font-serif font-light text-white/80 group-hover:text-white tracking-tight uppercase transition-all duration-500",
+                                                isAr ? "text-right font-sans font-black" : "text-left"
+                                            )}>
+                                                {brand.name}
+                                            </span>
+                                        </Link>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
 
                         {/* 3. Concierge & Company */}
                         <div className="space-y-8 pt-8 border-t border-white/5">

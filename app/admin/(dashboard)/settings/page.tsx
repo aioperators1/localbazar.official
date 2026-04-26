@@ -23,7 +23,9 @@ import {
     Monitor,
     Instagram,
     Facebook,
-    Twitter
+    Twitter,
+    FileText,
+    Banknote
 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ImageUpload } from "@/components/admin/ImageUpload";
@@ -57,11 +59,24 @@ export default function SettingsPage() {
         homepageTitle: "Doha Signature",
         homepageSubtitle: "LUXURY COLLECTION",
         aboutText: "Experience the ultimate expression of modesty and elegance with our handcrafted abayas.",
+        codEnabled: "true",
         homepageImage: "https://images.unsplash.com/photo-1566174053879-31528523f8ae?q=80&w=2000",
         heroWatermark: "AUTHENTIC",
         shippingMethods: JSON.stringify([
             { id: "standard", name: "Standard Delivery", nameAr: "توصيل عادي", price: 35, duration: "2-3 Business Days" }
         ]),
+        page_about: "Welcome to Local Bazar...",
+        page_about_ar: "مرحبا بكم في لوكال بازار...",
+        page_shipping: "Shipping details go here...",
+        page_shipping_ar: "تفاصيل الشحن هنا...",
+        page_terms: "Terms of service go here...",
+        page_terms_ar: "شروط الخدمة هنا...",
+        page_privacy: "Privacy policy goes here...",
+        page_privacy_ar: "سياسة الخصوصية هنا...",
+        page_about_image: "",
+        page_shipping_image: "",
+        page_terms_image: "",
+        page_privacy_image: ""
     });
 
     useEffect(() => {
@@ -321,6 +336,96 @@ export default function SettingsPage() {
                         onChange={(val) => handleChange('shippingMethods', val)}
                         disabled={!canEdit('settings')}
                     />
+
+                    {/* Company Pages Content Area */}
+                    <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+                        <div className="flex items-center gap-3 mb-6">
+                            <FileText className="w-5 h-5 text-gray-500" />
+                            <h3 className="text-[14px] font-bold text-black uppercase tracking-wider">Company Pages Content</h3>
+                        </div>
+                        
+                        <div className="space-y-8">
+                            <div className="grid md:grid-cols-2 gap-4 border-b border-gray-100 pb-8">
+                                <div className="space-y-3">
+                                    <Label className="text-[12px] font-semibold text-gray-700">Our Story (EN)</Label>
+                                    <Textarea value={settings.page_about || ""} onChange={(e) => handleChange("page_about", e.target.value)} className="min-h-[120px] bg-white" disabled={!canEdit('settings')} />
+                                </div>
+                                <div className="space-y-3">
+                                    <Label className="text-[12px] font-semibold text-gray-700">Our Story (AR)</Label>
+                                    <Textarea value={settings.page_about_ar || ""} onChange={(e) => handleChange("page_about_ar", e.target.value)} dir="rtl" className="min-h-[120px] bg-white text-right" disabled={!canEdit('settings')} />
+                                </div>
+                                <div className="md:col-span-2 space-y-3">
+                                    <Label className="text-[12px] font-semibold text-gray-700">Our Story Image</Label>
+                                    <ImageUpload 
+                                        value={settings.page_about_image ? [settings.page_about_image] : []}
+                                        onChange={(urls) => handleChange("page_about_image", urls[0] || "")}
+                                        onRemove={() => handleChange("page_about_image", "")}
+                                        disabled={!canEdit('settings')}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="grid md:grid-cols-2 gap-4 border-b border-gray-100 pb-8">
+                                <div className="space-y-3">
+                                    <Label className="text-[12px] font-semibold text-gray-700">Shipping Policy (EN)</Label>
+                                    <Textarea value={settings.page_shipping || ""} onChange={(e) => handleChange("page_shipping", e.target.value)} className="min-h-[120px] bg-white" disabled={!canEdit('settings')} />
+                                </div>
+                                <div className="space-y-3">
+                                    <Label className="text-[12px] font-semibold text-gray-700">Shipping Policy (AR)</Label>
+                                    <Textarea value={settings.page_shipping_ar || ""} onChange={(e) => handleChange("page_shipping_ar", e.target.value)} dir="rtl" className="min-h-[120px] bg-white text-right" disabled={!canEdit('settings')} />
+                                </div>
+                                <div className="md:col-span-2 space-y-3">
+                                    <Label className="text-[12px] font-semibold text-gray-700">Shipping Policy Image</Label>
+                                    <ImageUpload 
+                                        value={settings.page_shipping_image ? [settings.page_shipping_image] : []}
+                                        onChange={(urls) => handleChange("page_shipping_image", urls[0] || "")}
+                                        onRemove={() => handleChange("page_shipping_image", "")}
+                                        disabled={!canEdit('settings')}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="grid md:grid-cols-2 gap-4 border-b border-gray-100 pb-8">
+                                <div className="space-y-3">
+                                    <Label className="text-[12px] font-semibold text-gray-700">Terms of Service (EN)</Label>
+                                    <Textarea value={settings.page_terms || ""} onChange={(e) => handleChange("page_terms", e.target.value)} className="min-h-[120px] bg-white" disabled={!canEdit('settings')} />
+                                </div>
+                                <div className="space-y-3">
+                                    <Label className="text-[12px] font-semibold text-gray-700">Terms of Service (AR)</Label>
+                                    <Textarea value={settings.page_terms_ar || ""} onChange={(e) => handleChange("page_terms_ar", e.target.value)} dir="rtl" className="min-h-[120px] bg-white text-right" disabled={!canEdit('settings')} />
+                                </div>
+                                <div className="md:col-span-2 space-y-3">
+                                    <Label className="text-[12px] font-semibold text-gray-700">Terms Image</Label>
+                                    <ImageUpload 
+                                        value={settings.page_terms_image ? [settings.page_terms_image] : []}
+                                        onChange={(urls) => handleChange("page_terms_image", urls[0] || "")}
+                                        onRemove={() => handleChange("page_terms_image", "")}
+                                        disabled={!canEdit('settings')}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="grid md:grid-cols-2 gap-4">
+                                <div className="space-y-3">
+                                    <Label className="text-[12px] font-semibold text-gray-700">Privacy Policy (EN)</Label>
+                                    <Textarea value={settings.page_privacy || ""} onChange={(e) => handleChange("page_privacy", e.target.value)} className="min-h-[120px] bg-white" disabled={!canEdit('settings')} />
+                                </div>
+                                <div className="space-y-3">
+                                    <Label className="text-[12px] font-semibold text-gray-700">Privacy Policy (AR)</Label>
+                                    <Textarea value={settings.page_privacy_ar || ""} onChange={(e) => handleChange("page_privacy_ar", e.target.value)} dir="rtl" className="min-h-[120px] bg-white text-right" disabled={!canEdit('settings')} />
+                                </div>
+                                <div className="md:col-span-2 space-y-3">
+                                    <Label className="text-[12px] font-semibold text-gray-700">Privacy Image</Label>
+                                    <ImageUpload 
+                                        value={settings.page_privacy_image ? [settings.page_privacy_image] : []}
+                                        onChange={(urls) => handleChange("page_privacy_image", urls[0] || "")}
+                                        onRemove={() => handleChange("page_privacy_image", "")}
+                                        disabled={!canEdit('settings')}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div className="lg:col-span-1 space-y-6">
@@ -335,6 +440,7 @@ export default function SettingsPage() {
                             {[
                                 { id: 'luxuryTheme', label: 'Use Luxury Theme', sub: 'Enable premium storefront UI', value: settings.luxuryTheme === 'true', icon: Zap },
                                 { id: 'maintenanceMode', label: 'Maintenance Mode', sub: 'Temporarily lock the store', value: settings.maintenanceMode === 'true', icon: Shield },
+                                { id: 'codEnabled', label: 'Cash on Delivery (COD)', sub: 'Enable COD payment method', value: settings.codEnabled === 'true', icon: Banknote },
                             ].map((opt: any) => (
                                 <div 
                                     key={opt.id}
@@ -349,9 +455,8 @@ export default function SettingsPage() {
                                     </div>
                                     <Switch 
                                         checked={opt.value} 
-                                        onCheckedChange={(val) => handleToggle(opt.id, val)}
                                         disabled={!canEdit('settings')}
-                                        className="data-[state=checked]:bg-black data-[state=unchecked]:bg-gray-300"
+                                        className="data-[state=checked]:bg-black data-[state=unchecked]:bg-gray-300 pointer-events-none"
                                     />
                                 </div>
                             ))}

@@ -13,13 +13,16 @@ interface CheckoutItem {
 }
 
 interface CheckoutData {
-    firstName: string;
-    lastName: string;
+    fullName: string;
     email: string;
     phone: string;
-    address: string;
+    country: string;
     city: string;
-    zip: string;
+    address: string;
+    buildingNo?: string;
+    street?: string;
+    zoneNo?: string;
+    zip?: string;
     paymentMethod: string;
     items: CheckoutItem[];
     total: number; // Provided total (requested)
@@ -33,13 +36,13 @@ const DEFAULT_SHIPPING_COST = 35;
 
 export async function placeOrder(data: CheckoutData) {
     try {
-        const { firstName, lastName, email, items, address, city, zip, paymentMethod, voucherId } = data;
+        const { fullName, email, items, address, country, city, buildingNo, street, zoneNo, zip, paymentMethod, voucherId } = data;
 
         if (!items || items.length === 0) {
             return { success: false, error: "Empty cart. Please add items before checking out." };
         }
 
-        const name = `${firstName} ${lastName}`.trim();
+        const name = fullName.trim();
 
         // RUN EVERYTHING IN A TRANSACTION FOR ATOMICITY
         const result = await prisma.$transaction(async (tx: any) => {
@@ -156,10 +159,12 @@ export async function placeOrder(data: CheckoutData) {
             await tx.address.create({
                 data: {
                     userId: user.id,
-                    street: address,
+                    street: street || address,
+                    buildingNo,
+                    zoneNo,
                     city,
-                    zip,
-                    country: "Qatar",
+                    zip: zip || "00000",
+                    country: country || "Qatar",
                 }
             });
 

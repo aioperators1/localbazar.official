@@ -8,10 +8,10 @@ export async function POST(req: Request) {
         // Use our existing hardened checkout engine to create the order safely
         // This ensures the order is in the DB, prices are verified, and inventory is tracked
         const res = await placeOrder({
-            firstName: body.firstName || "Guest",
-            lastName: body.lastName || "User",
+            fullName: `${body.firstName || "Guest"} ${body.lastName || "User"}`.trim(),
             email: body.email || "guest@localbazar.com",
             phone: body.phone || "00000000",
+            country: body.country || "Qatar",
             address: body.address || "Cart Express",
             city: body.city || "Doha",
             zip: body.zip || "0000",

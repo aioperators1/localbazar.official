@@ -184,6 +184,22 @@ export async function getCategories(): Promise<Category[]> {
   }
 }
 
+export async function getBrands() {
+  try {
+    const brands = await prisma.brand.findMany({
+      orderBy: { name: 'asc' }
+    });
+    return brands.map((b: any) => ({
+      ...b,
+      createdAt: b.createdAt.toISOString(),
+      updatedAt: b.updatedAt.toISOString()
+    }));
+  } catch (error: any) {
+    console.error("Failed to fetch brands:", error);
+    return [];
+  }
+}
+
 export async function getProductById(id: string): Promise<Product | null> {
   try {
     const p = await prisma.product.findUnique({

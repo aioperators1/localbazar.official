@@ -6,7 +6,7 @@ export const dynamic = 'force-dynamic';
 export async function POST(req: NextRequest) {
     try {
         const body = await req.json();
-        const { email, firstName, lastName, phone, address, city, zip, cartItems, cartTotal } = body;
+        const { email, fullName, phone, address, country, city, buildingNo, street, zoneNo, zip, cartItems, cartTotal } = body;
 
         // Need at least email or phone to be useful for retargeting
         if (!email && !phone) {
@@ -30,11 +30,14 @@ export async function POST(req: NextRequest) {
                 await (prisma as any).abandonedCheckout.update({
                     where: { id: recent.id },
                     data: {
-                        firstName: firstName || recent.firstName,
-                        lastName: lastName || recent.lastName,
+                        fullName: fullName || recent.fullName,
                         phone: phone || recent.phone,
                         address: address || recent.address,
+                        country: country || recent.country,
                         city: city || recent.city,
+                        buildingNo: buildingNo || recent.buildingNo,
+                        street: street || recent.street,
+                        zoneNo: zoneNo || recent.zoneNo,
                         zip: zip || recent.zip,
                         cartItems: cartItems ? JSON.stringify(cartItems) : recent.cartItems,
                         cartTotal: cartTotal || recent.cartTotal,
@@ -47,11 +50,14 @@ export async function POST(req: NextRequest) {
         await (prisma as any).abandonedCheckout.create({
             data: {
                 email: email || null,
-                firstName: firstName || null,
-                lastName: lastName || null,
+                fullName: fullName || null,
                 phone: phone || null,
                 address: address || null,
+                country: country || null,
                 city: city || null,
+                buildingNo: buildingNo || null,
+                street: street || null,
+                zoneNo: zoneNo || null,
                 zip: zip || null,
                 cartItems: cartItems ? JSON.stringify(cartItems) : "[]",
                 cartTotal: cartTotal || 0,

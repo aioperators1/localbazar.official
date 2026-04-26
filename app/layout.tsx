@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Outfit, Amiri } from "next/font/google";
+import { Outfit } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/store/Header";
 import { Footer } from "@/components/store/Footer";
@@ -8,13 +8,10 @@ import { Toaster } from "@/components/ui/sonner";
 
 const font = Outfit({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700", "800", "900"]
+  weight: ["300", "400", "500", "600", "700", "800", "900"],
+  variable: "--font-outfit"
 });
-const arabicFont = Amiri({ 
-  subsets: ["arabic", "latin"], 
-  weight: ["400", "700"],
-  variable: "--font-amiri" 
-});
+
 
 export const metadata: Metadata = {
   title: {
@@ -60,19 +57,21 @@ export const metadata: Metadata = {
 
 import { LayoutWrapper } from "@/components/providers/layout-wrapper";
 import { getAdminSettings } from "@/lib/actions/admin";
-import { getCategories } from "@/lib/actions/product";
+import { getCategories, getBrands } from "@/lib/actions/product";
 import { WatermarkBackground } from "@/components/store/WatermarkBackground";
 import { InitialLoader } from "@/components/store/InitialLoader";
 import NextTopLoader from 'nextjs-toploader';
+import { AnalyticsTracker } from "@/components/store/AnalyticsTracker";
 
 export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const [settings, categories] = await Promise.all([
+  const [settings, categories, brands] = await Promise.all([
     getAdminSettings(),
-    getCategories()
+    getCategories(),
+    getBrands()
   ]);
 
   return (
@@ -80,9 +79,8 @@ export default async function RootLayout({
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet" />
       </head>
-      <body className={`${font.className} ${arabicFont.variable} bg-[#20080B] text-white relative antialiased selection:bg-white/10 selection:text-white`} suppressHydrationWarning>
+      <body className={`${font.className} ${font.variable} bg-[#20080B] text-white relative antialiased selection:bg-white/10 selection:text-white`} suppressHydrationWarning>
         <NextTopLoader
           color="#FFF"
           initialPosition={0.08}
@@ -96,7 +94,8 @@ export default async function RootLayout({
         />
         <WatermarkBackground />
         <Providers>
-          <LayoutWrapper settings={settings} categories={categories}>
+          <AnalyticsTracker />
+          <LayoutWrapper settings={settings} categories={categories} brands={brands}>
             <div className="relative z-10 w-full">
               {children}
             </div>

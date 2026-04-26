@@ -1,5 +1,5 @@
 [build]
-  command = "export DATABASE_URL=$NETLIFY_DATABASE_URL && export DIRECT_URL=${DIRECT_URL:-$NETLIFY_DATABASE_URL} && sed -i 's/provider = \"sqlite\"/provider = \"postgresql\"/g' prisma/schema.prisma && npx prisma generate && npx prisma db push --accept-data-loss && npx prisma db seed && next build"
+  command = "export DATABASE_URL=$NETLIFY_DATABASE_URL && npx prisma generate && npx prisma db push --accept-data-loss && next build"
   publish = ".next"
 
 [build.environment]

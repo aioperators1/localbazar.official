@@ -4,13 +4,20 @@ import { useLanguage } from "@/components/providers/language-provider";
 import { Mail, MapPin, Phone, MessageCircle, ArrowUpRight, Clock, ShieldCheck, Gem } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
+import { getAdminSettings } from "@/lib/actions/admin";
 
 export default function ContactPage() {
     const { language } = useLanguage();
     const isAr = language === "ar";
     const [mounted, setMounted] = useState(false);
+    const [settings, setSettings] = useState<Record<string, string>>({});
 
-    useEffect(() => setMounted(true), []);
+    useEffect(() => {
+        setMounted(true);
+        getAdminSettings().then(data => {
+            if (data) setSettings(data);
+        });
+    }, []);
 
     const tContent = {
         title: isAr ? "اتصل" : "Contact",
@@ -34,8 +41,14 @@ export default function ContactPage() {
         feat3: isAr ? "تغليف هدايا فاخر" : "Premium Gift Packaging"
     };
 
-    const phoneNumber = "97450558884";
-    const whatsappLink = `https://wa.me/${phoneNumber}`;
+    const phoneNumber = settings.contactPhone?.replace(/[^0-9]/g, '') || "97450558884";
+    const whatsappLink = settings.whatsappNumber 
+        ? `https://wa.me/${settings.whatsappNumber.replace(/[^0-9]/g, '')}`
+        : `https://wa.me/${phoneNumber}`;
+    
+    const displayPhone = settings.contactPhone || "+974 5055 8884";
+    const displayEmail = settings.contactEmail || "concierge@localbazar.com";
+    const displayAddress = settings.address || tContent.city + ", " + tContent.country;
 
     if (!mounted) return null;
 
@@ -84,14 +97,14 @@ export default function ContactPage() {
                             <ContactCard
                                 icon={Phone}
                                 title={tContent.hotline}
-                                content={`+${phoneNumber.slice(0,3)} ${phoneNumber.slice(3,7)} ${phoneNumber.slice(7)}`}
+                                content={displayPhone}
                                 sub={tContent.hours}
                                 isAr={isAr}
                             />
                             <ContactCard
                                 icon={Mail}
                                 title={tContent.emailTitle}
-                                content="concierge@localbazar.com"
+                                content={displayEmail}
                                 sub={tContent.response}
                                 isAr={isAr}
                             />
@@ -100,7 +113,7 @@ export default function ContactPage() {
                         <ContactCard
                             icon={MapPin}
                             title={tContent.hq}
-                            content={`${tContent.city}, ${tContent.country}`}
+                            content={displayAddress}
                             sub="Valet Parking Available"
                             isAr={isAr}
                             fullWidth
