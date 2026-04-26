@@ -167,7 +167,7 @@ export default function BannersClient({ initialBanners }: { initialBanners: Bann
                             </div>
                             <ImageUpload 
                                 value={formData.image ? [formData.image] : []}
-                                onChange={(urls: string[]) => setFormData({ ...formData, image: urls[0] || "" })}
+                                onChange={(urls: string[]) => setFormData({ ...formData, image: urls[urls.length - 1] || "" })}
                                 onRemove={() => setFormData({ ...formData, image: "" })}
                             />
                         </div>
@@ -178,7 +178,7 @@ export default function BannersClient({ initialBanners }: { initialBanners: Bann
                             </div>
                             <ImageUpload 
                                 value={formData.mobileImage ? [formData.mobileImage] : []}
-                                onChange={(urls: string[]) => setFormData({ ...formData, mobileImage: urls[0] || "" })}
+                                onChange={(urls: string[]) => setFormData({ ...formData, mobileImage: urls[urls.length - 1] || "" })}
                                 onRemove={() => setFormData({ ...formData, mobileImage: "" })}
                             />
                         </div>
