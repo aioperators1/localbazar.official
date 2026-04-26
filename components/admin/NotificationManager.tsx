@@ -106,16 +106,6 @@ export function NotificationManager() {
     };
 
     useEffect(() => {
-        // Initialize Notification Status
-        if ('Notification' in window) {
-            if (Notification.permission === 'default') {
-                const timer = setTimeout(() => {
-                    setShowPermissionPrompt(true);
-                }, 1000);
-                return () => clearTimeout(timer);
-            }
-        }
-
         // Initialize Audio Context
         audioRef.current = new Audio('https://cdn.pixabay.com/audio/2022/03/15/audio_c8c8a16824.mp3');
         audioRef.current.volume = 0.5;
@@ -160,47 +150,5 @@ export function NotificationManager() {
         }
     };
 
-    return (
-        <AnimatePresence>
-            {showPermissionPrompt && (
-                <motion.div 
-                    initial={{ opacity: 0, y: 100 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.9 }}
-                    className="fixed bottom-10 left-10 z-[100] max-w-sm"
-                >
-                    <div className="glass-card rounded-3xl border border-white/10 bg-[#050505] p-8 shadow-4xl relative overflow-hidden group">
-                        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-white/20 to-transparent" />
-                        <div className="flex items-center gap-5 mb-6">
-                            <div className="w-14 h-14 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 shadow-[0_0_20px_rgba(59,130,246,0.1)]">
-                                <Bell className="w-8 h-8" />
-                            </div>
-                            <div>
-                                <h3 className="text-xl font-black text-white tracking-tighter uppercase leading-none mb-1">Alert Nexus</h3>
-                                <p className="text-[9px] font-black text-white/30 uppercase tracking-widest">Protocol Level Synchronization</p>
-                            </div>
-                        </div>
-                        <p className="text-[13px] font-bold text-white/60 leading-relaxed mb-8">
-                            To ensure <span className="text-white italic">Zero-Latency Operational Awareness</span>, please enable browser notifications to receive incoming order signals in real-time.
-                        </p>
-                        <div className="flex items-center gap-4">
-                            <Button 
-                                onClick={requestPermission}
-                                className="flex-1 bg-white text-black hover:bg-white/90 rounded-2xl h-12 font-black uppercase text-[11px] tracking-widest transition-all shadow-xl"
-                            >
-                                Synchronize Notifications
-                            </Button>
-                            <Button 
-                                variant="ghost" 
-                                onClick={() => setShowPermissionPrompt(false)}
-                                className="px-6 rounded-2xl h-12 border border-white/5 text-white/20 hover:text-white uppercase text-[10px] font-black"
-                            >
-                                Dim
-                            </Button>
-                        </div>
-                    </div>
-                </motion.div>
-            )}
-        </AnimatePresence>
-    );
+    return null;
 }
