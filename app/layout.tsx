@@ -62,6 +62,7 @@ import { WatermarkBackground } from "@/components/store/WatermarkBackground";
 import { InitialLoader } from "@/components/store/InitialLoader";
 import NextTopLoader from 'nextjs-toploader';
 import { AnalyticsTracker } from "@/components/store/AnalyticsTracker";
+import { PixelScripts } from "@/components/store/pixels/PixelScripts";
 
 export default async function RootLayout({
   children,
@@ -93,6 +94,7 @@ export default async function RootLayout({
           shadow="0 0 10px #FFF,0 0 5px #FFF"
         />
         <WatermarkBackground />
+        <PixelScripts settings={settings} />
         <Providers>
           <AnalyticsTracker />
           <LayoutWrapper settings={settings} categories={categories} brands={brands}>

@@ -223,13 +223,14 @@ html {
 
 /* Marquee Animation */
 @keyframes marquee {
-  from {
-    transform: translateX(0);
-  }
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
 
-  to {
-    transform: translateX(-50%);
-  }
+/* Brand logos infinite marquee — GPU accelerated, smooth */
+@keyframes brand-marquee {
+  0% { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(-50%, 0, 0); }
 }
 
 @keyframes shimmer {
@@ -245,13 +246,8 @@ html {
 }
 
 .animate-marquee {
-  animation: marquee 40s linear infinite;
-}
-
-@layer utilities {
-  .animate-marquee:hover {
-    animation-play-state: paused;
-  }
+  animation: marquee 25s linear infinite;
+  will-change: transform;
 }
 
 /* Hide scrollbar but keep functionality */
@@ -282,14 +278,4 @@ html {
 
 .animate-loading-bar-fast {
   animation: loading-bar-fast 1s infinite linear;
-}
-
-@keyframes marquee {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
-}
-
-.animate-marquee {
-  animation: marquee 30s linear infinite;
-  will-change: transform;
 }

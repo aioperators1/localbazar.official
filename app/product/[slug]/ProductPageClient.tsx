@@ -8,6 +8,7 @@ import { AddToCart } from "@/components/store/AddToCart";
 import { ProductGallery } from "@/components/store/ProductGallery";
 import { ProductCarousel } from "@/components/store/ProductCarousel";
 import { Star, Truck, ShieldCheck, ArrowLeft, Minus, Plus, Heart, Share2, Ruler, Info, ChevronDown, ChevronRight } from "lucide-react";
+import { ExpressCheckoutForm } from "@/components/store/ExpressCheckoutForm";
 import Link from "next/link";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
@@ -15,6 +16,7 @@ import { useCurrency } from "@/components/providers/currency-provider";
 import { useLanguage } from "@/components/providers/language-provider";
 import { useWishlist } from "@/hooks/use-wishlist";
 import { toast } from "sonner";
+import { trackEvent } from "@/lib/tracking";
 
 import { Product, Category } from "@/lib/types";
 
@@ -153,6 +155,16 @@ export default function ProductPageClient({ product, images, similarProducts }: 
     const [mounted, setMounted] = useState(false);
     useEffect(() => {
         setMounted(true);
+
+        // Fire ViewContent event for ad pixel retargeting
+        trackEvent({
+            eventName: "ViewContent",
+            value: Number(product.price),
+            currency: "QAR",
+            content_ids: [product.id],
+            content_type: "product",
+            contents: [{ id: product.id, quantity: 1, price: Number(product.price) }]
+        });
     }, []);
 
     if (!mounted) return null;
@@ -275,10 +287,10 @@ export default function ProductPageClient({ product, images, similarProducts }: 
                         )}
 
                         {/* Actions Block */}
-                        <div className="bg-white/5 border border-white/10 rounded-3xl p-6 lg:p-8 mb-6 shadow-2xl backdrop-blur-xl space-y-4">
-                            <div className="flex items-center gap-4">
+                        {categoryObject?.expressCheckout ? (
+                            <div className="space-y-4 mb-6">
                                 <div className={cn(
-                                    "flex items-center border border-white/10 bg-black/20 rounded-2xl h-14 w-32 px-2 shadow-inner transition-opacity",
+                                    "flex items-center border border-white/10 bg-black/20 rounded-2xl h-14 max-w-[150px] px-2 shadow-inner transition-opacity mb-4",
                                     isOutOfStock && "opacity-20 pointer-events-none"
                                 )}>
                                     <button onClick={decreaseQty} className="flex-1 flex items-center justify-center text-white/50 hover:text-white transition-colors">
@@ -289,38 +301,63 @@ export default function ProductPageClient({ product, images, similarProducts }: 
                                         <Plus className="w-4 h-4" />
                                     </button>
                                 </div>
-                                <AddToCart
-                                    disabled={isOutOfStock}
-                                    product={{
-                                        id: product.id,
-                                        name: product.name,
-                                        price: currentPrice,
-                                        image: images[0],
-                                        size: selectedSize,
-                                        color: selectedColor?.name
-                                    }}
+                                <ExpressCheckoutForm 
+                                    productId={product.id}
+                                    productName={displayTitle}
+                                    price={currentPrice}
                                     quantity={quantity}
-                                    className={cn(
-                                        "h-14 flex-1 font-bold text-[12px] uppercase tracking-[0.2em] rounded-2xl shadow-xl transition-all duration-300",
-                                        isOutOfStock 
-                                            ? "bg-red-950/20 text-red-500 border border-red-500/30 cursor-not-allowed"
-                                            : "bg-white text-black hover:scale-[1.02] active:scale-95"
-                                    )}
+                                    selectedSize={selectedSize}
+                                    selectedColor={selectedColor?.name}
                                 />
                             </div>
-                            <button
-                                onClick={handleBuyNow}
-                                disabled={isOutOfStock}
-                                className={cn(
-                                    "h-14 w-full font-bold text-[12px] uppercase tracking-[0.3em] rounded-2xl transition-all duration-300 shadow-lg",
-                                    isOutOfStock
-                                        ? "bg-red-950/10 text-red-800 border border-red-900/20 cursor-not-allowed"
-                                        : "bg-white/5 border border-white/10 text-white hover:bg-white hover:text-black"
-                                )}
-                            >
-                                {isOutOfStock ? (language === 'ar' ? "نفذت الكمية" : "OUT OF STOCK") : t('product.buyNow')}
-                            </button>
-                        </div>
+                        ) : (
+                            <div className="bg-white/5 border border-white/10 rounded-3xl p-6 lg:p-8 mb-6 shadow-2xl backdrop-blur-xl space-y-4">
+                                <div className="flex items-center gap-4">
+                                    <div className={cn(
+                                        "flex items-center border border-white/10 bg-black/20 rounded-2xl h-14 w-32 px-2 shadow-inner transition-opacity",
+                                        isOutOfStock && "opacity-20 pointer-events-none"
+                                    )}>
+                                        <button onClick={decreaseQty} className="flex-1 flex items-center justify-center text-white/50 hover:text-white transition-colors">
+                                            <Minus className="w-4 h-4" />
+                                        </button>
+                                        <span className="flex-1 text-center font-black text-[15px]">{quantity}</span>
+                                        <button onClick={increaseQty} className="flex-1 flex items-center justify-center text-white/50 hover:text-white transition-colors">
+                                            <Plus className="w-4 h-4" />
+                                        </button>
+                                    </div>
+                                    <AddToCart
+                                        disabled={isOutOfStock}
+                                        product={{
+                                            id: product.id,
+                                            name: product.name,
+                                            price: currentPrice,
+                                            image: images[0],
+                                            size: selectedSize,
+                                            color: selectedColor?.name
+                                        }}
+                                        quantity={quantity}
+                                        className={cn(
+                                            "h-14 flex-1 font-bold text-[12px] uppercase tracking-[0.2em] rounded-2xl shadow-xl transition-all duration-300",
+                                            isOutOfStock 
+                                                ? "bg-red-950/20 text-red-500 border border-red-500/30 cursor-not-allowed"
+                                                : "bg-white text-black hover:scale-[1.02] active:scale-95"
+                                        )}
+                                    />
+                                </div>
+                                <button
+                                    onClick={handleBuyNow}
+                                    disabled={isOutOfStock}
+                                    className={cn(
+                                        "h-14 w-full font-bold text-[12px] uppercase tracking-[0.3em] rounded-2xl transition-all duration-300 shadow-lg",
+                                        isOutOfStock
+                                            ? "bg-red-950/10 text-red-800 border border-red-900/20 cursor-not-allowed"
+                                            : "bg-white/5 border border-white/10 text-white hover:bg-white hover:text-black"
+                                    )}
+                                >
+                                    {isOutOfStock ? (language === 'ar' ? "نفذت الكمية" : "OUT OF STOCK") : t('product.buyNow')}
+                                </button>
+                            </div>
+                        )}
 
                         <div className="flex items-center justify-center lg:justify-start gap-8 border-b border-white/10 pb-10 mb-10">
                             <button 

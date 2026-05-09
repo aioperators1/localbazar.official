@@ -545,6 +545,7 @@ export async function getAdminOrders(page: number = 1, pageSize: number = 20) {
         id: order.id,
         userId: order.userId,
         status: order.status,
+        type: order.type,
         paymentMethod: order.paymentMethod,
         total: Number(order.total),
         createdAt: order.createdAt.toISOString(),
@@ -940,6 +941,7 @@ interface CategoryInput {
     orderInHomeTabs?: number;
     showInHomeCurated?: boolean;
     orderInHomeCurated?: number;
+    expressCheckout?: boolean;
 }
 
 export async function createCategory(data: CategoryInput) {
@@ -957,6 +959,7 @@ export async function createCategory(data: CategoryInput) {
                 description: data.description,
                 descriptionAr: data.descriptionAr || null,
                 featured: data.featured ?? false,
+                expressCheckout: data.expressCheckout ?? false,
                 showInHomeTabs: data.showInHomeTabs ?? false,
                 orderInHomeTabs: data.orderInHomeTabs ?? 0,
                 showInHomeCurated: data.showInHomeCurated ?? false,

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
+import { trackEvent } from "@/lib/tracking";
 
 export function AnalyticsTracker() {
     const pathname = usePathname();
@@ -27,6 +28,9 @@ export function AnalyticsTracker() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ sessionId: sessionIdRef.current, url: pathname })
             }).catch(() => {});
+
+            // Fire Tracking Pixel PageView
+            trackEvent({ eventName: "PageView", sourceUrl: window.location.href });
         }
     }, [pathname]);
 

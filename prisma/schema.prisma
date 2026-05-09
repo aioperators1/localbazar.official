@@ -137,6 +137,7 @@ model Category {
   showInHomeCurated  Boolean    @default(false)
   orderInHomeCurated Int        @default(0)
   parentId           String?
+  expressCheckout    Boolean    @default(false)
   createdAt          DateTime   @default(now())
   parent             Category?  @relation("CategoryToCategory", fields: [parentId], references: [id])
   children           Category[] @relation("CategoryToCategory")
@@ -147,6 +148,7 @@ model Order {
   id               String      @id @default(cuid())
   userId           String?
   status           String      @default("PENDING")
+  type             String      @default("REGULAR")
   paymentMethod    String      @default("COD")
   paymentId        String?
   total            Decimal

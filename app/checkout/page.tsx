@@ -15,6 +15,7 @@ import { useCurrency } from "@/components/providers/currency-provider";
 import { useLanguage } from "@/components/providers/language-provider";
 import { EmptyState } from "@/components/store/EmptyState";
 import { Branding } from "@/components/store/Branding";
+import { trackEvent } from "@/lib/tracking";
 
 export default function CheckoutPage() {
     const { items, totalPrice, clearCart, voucher, setVoucher, discountAmount } = useCart();
@@ -162,6 +163,18 @@ export default function CheckoutPage() {
             }
         }
         loadSettings();
+
+        // Track InitiateCheckout
+        if (items.length > 0) {
+            trackEvent({
+                eventName: "InitiateCheckout",
+                value: subtotal,
+                currency: "QAR",
+                content_ids: items.map((i: any) => i.id),
+                contents: items.map((i: any) => ({ id: i.id, quantity: i.quantity, price: i.price }))
+            });
+        }
+
         return () => clearTimeout(timer);
     }, []);
 

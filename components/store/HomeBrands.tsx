@@ -1,50 +1,55 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
-import { ScrollReveal } from "./ScrollReveal";
 import { Brand } from "@/lib/types";
 
 export function HomeBrands({ brands }: { brands: Brand[] }) {
     if (!brands || brands.length === 0) return null;
 
     return (
-        <section className="py-8 relative">
+        <section className="py-12 md:py-16 relative">
             <div className="max-w-[1400px] mx-auto px-4 md:px-8">
-                <ScrollReveal>
-                    <div className="flex flex-col items-center mb-6 space-y-2">
-                        <h2 className="text-3xl md:text-4xl lg:text-[40px] font-serif text-white text-center">
-                            Our Brands - علاماتنا التجارية
-                        </h2>
-                        <span className="text-[14px] md:text-[16px] font-medium text-white/90 text-center">
-                            نفتخر بالشراكة مع أفضل العلامات التجارية العالمية
-                        </span>
-                    </div>
-                </ScrollReveal>
+                
+                {/* Divider top */}
+                <div className="mb-10 md:mb-14">
+                    <div className="h-px w-full bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+                </div>
 
-                <div className="flex flex-wrap justify-center gap-4 md:gap-8">
-                    {brands.map((brand, idx) => (
-                        <ScrollReveal key={brand.id} delay={0.1 * idx}>
-                            <Link href={`/shop?brand=${brand.slug}`} className="group flex flex-col items-center justify-center transition-all duration-500">
-                                <div className="w-[120px] h-[120px] md:w-[150px] md:h-[150px] rounded-full bg-white border-2 border-[#E2D8C5] flex items-center justify-center overflow-hidden relative shadow-lg group-hover:scale-105 transition-all duration-500">
-                                    {brand.logo ? (
-                                        <div className="relative w-3/4 h-3/4">
-                                            <Image
-                                                src={brand.logo}
-                                                alt={brand.name}
-                                                fill
-                                                className="object-contain"
-                                                unoptimized
-                                            />
-                                        </div>
-                                    ) : (
-                                        <div className="w-full h-full flex items-center justify-center">
-                                            <span className="text-xl font-bold text-[#592C2F]">{brand.name.substring(0, 2).toUpperCase()}</span>
-                                        </div>
-                                    )}
-                                </div>
-                            </Link>
-                        </ScrollReveal>
+                {/* Static Grid / Flex container */}
+                <div className="flex flex-wrap items-center justify-center gap-6 md:gap-10 lg:gap-12">
+                    {brands.map((brand) => (
+                        <Link
+                            key={brand.id}
+                            href={`/shop?brand=${brand.slug}`}
+                            className="group flex items-center justify-center shrink-0"
+                        >
+                            <div className="w-[110px] h-[110px] md:w-[130px] md:h-[130px] lg:w-[140px] lg:h-[140px] rounded-full bg-white border border-white/20 flex items-center justify-center overflow-hidden shadow-lg group-hover:scale-105 group-hover:shadow-xl transition-all duration-500">
+                                {brand.logo ? (
+                                    <div className="relative w-3/4 h-3/4">
+                                        <Image
+                                            src={brand.logo}
+                                            alt={brand.name}
+                                            fill
+                                            className="object-contain"
+                                            unoptimized
+                                        />
+                                    </div>
+                                ) : (
+                                    <span className="text-[18px] md:text-[20px] font-bold tracking-wide uppercase text-[#592C2F]">
+                                        {brand.name.substring(0, 2).toUpperCase()}
+                                    </span>
+                                )}
+                            </div>
+                        </Link>
                     ))}
                 </div>
+
+                {/* Divider bottom */}
+                <div className="mt-10 md:mt-14">
+                    <div className="h-px w-full bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+                </div>
+                
             </div>
         </section>
     );

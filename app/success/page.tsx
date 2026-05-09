@@ -12,8 +12,11 @@ import { cn } from "@/lib/utils";
 import { useCurrency } from "@/components/providers/currency-provider";
 import { useLanguage } from "@/components/providers/language-provider";
 import { Branding } from "@/components/store/Branding";
+import React from "react";
 import { generateInvoice } from "@/lib/utils/invoice";
-import { DownloadCloud } from "lucide-react";
+import { DownloadCloud, Loader2 } from "lucide-react";
+import { getOrderById } from "@/lib/actions/orders";
+import { trackEvent } from "@/lib/tracking";
 
 // Simulated type for the order data
 interface OrderInfo {
@@ -40,6 +43,7 @@ function SuccessContent() {
     const { formatPrice: formatCurrency } = useCurrency();
     const { t, language } = useLanguage();
     const { clearCart } = useCart();
+    const trackedRef = React.useRef(false);
 
     const orderId = orderData?.orderId || orderIdParam || "N/A";
     const shipping = orderData?.shippingCost !== undefined ? Number(orderData.shippingCost) : 35;
@@ -82,20 +86,105 @@ function SuccessContent() {
     };
 
     useEffect(() => {
-        const timer = setTimeout(() => {
-            setMounted(true);
+        const fetchOrder = async () => {
             const saved = sessionStorage.getItem('localbazar_last_order');
             if (saved) {
                 try {
                     setOrderData(JSON.parse(saved));
                     clearCart();
+                    setMounted(true);
+                    return;
                 } catch (e: any) {
                     console.error("Failed to parse order data");
                 }
             }
-        }, 0);
-        return () => clearTimeout(timer);
-    }, []);
+
+            if (orderIdParam) {
+                try {
+                    const { order } = await getOrderById(orderIdParam);
+                    if (order) {
+                        const [firstName = "", ...lastNameParts] = (order.user?.name || "Guest").split(" ");
+                        const lastName = lastNameParts.join(" ");
+                        
+                        const addressObj = order.user?.addresses?.[0] || {};
+                        
+                        const mappedOrder: OrderInfo = {
+                            orderId: order.id,
+                            firstName,
+                            lastName,
+                            email: order.user?.email || "",
+                            phone: order.phone || "",
+                            address: addressObj.street || "",
+                            city: addressObj.city || "",
+                            zip: addressObj.zip || "",
+                            paymentMethod: order.paymentMethod,
+                            total: order.total,
+                            shippingCost: 35, // Default or calculated
+                            shippingMethodName: order.shippingMethod || "Express Delivery",
+                            items: order.items.map((item: any) => {
+                                let image = undefined;
+                                if (item.product?.images) {
+                                    try {
+                                        const parsed = JSON.parse(item.product.images);
+                                        image = Array.isArray(parsed) ? parsed[0] : parsed;
+                                    } catch {
+                                        image = item.product.images;
+                                    }
+                                }
+                                return {
+                                    id: item.productId,
+                                    name: item.product?.name || "Product",
+                                    price: item.price,
+                                    quantity: item.quantity,
+                                    image,
+                                    size: item.size,
+                                    color: item.color
+                                };
+                            })
+                        };
+                        setOrderData(mappedOrder);
+                        clearCart();
+                    }
+                } catch (error) {
+                    console.error("Failed to fetch order", error);
+                }
+            }
+            setMounted(true);
+        };
+        fetchOrder();
+    }, []); // Run only once on mount
+
+    useEffect(() => {
+        if (orderData && !trackedRef.current) {
+            trackedRef.current = true;
+            
+            // Collect User Data for CAPI Advanced Matching
+            const userData = {
+                email: orderData.email,
+                phone: orderData.phone,
+                firstName: orderData.firstName,
+                lastName: orderData.lastName,
+                city: orderData.city,
+                zip: orderData.zip
+            };
+
+            const contents = orderData.items.map((item: any) => ({
+                id: item.id,
+                quantity: item.quantity,
+                price: item.price
+            }));
+
+            trackEvent({
+                eventName: "Purchase",
+                eventId: orderData.orderId, // Crucial for deduplication across server/browser
+                value: (orderData.total || itemsSubtotal) + shipping,
+                currency: "QAR",
+                content_ids: orderData.items.map((i: any) => i.id),
+                contents: contents,
+                userData: userData
+            });
+        }
+    }, [orderData, itemsSubtotal, shipping]);
 
     // If still mounting, show skeleton or blank
     if (!mounted) return <div className="min-h-screen bg-transparent" />
@@ -132,11 +221,6 @@ function SuccessContent() {
 
     return (
         <div className="flex flex-col min-h-screen bg-transparent text-white" dir={language === 'ar' ? 'rtl' : 'ltr'}>
-            {/* Full-width Header */}
-            <header className="w-full border-b border-white/10 bg-white sticky top-0 z-50 flex items-center justify-center h-[96px]">
-                <Branding size="md" variant="luxury" />
-            </header>
-
             {/* Split Layout */}
             <div className="flex flex-col lg:flex-row flex-1">
                 {/* LEFT COLUMN: Confirmation Info */}

@@ -191,9 +191,14 @@ export default function AdminOrdersPage() {
                                         className="hover:bg-gray-50 transition-colors"
                                     >
                                         <td className="py-4 px-6">
-                                            <Link href={`/admin/orders/${order.id}`} className="font-medium text-black hover:underline uppercase">
-                                                #{order.id.slice(-8)}
-                                            </Link>
+                                            <div className="flex flex-col gap-1 items-start">
+                                                <Link href={`/admin/orders/${order.id}`} className="font-medium text-black hover:underline uppercase">
+                                                    #{order.id.slice(-8)}
+                                                </Link>
+                                                {order.type === "EXPRESS" && (
+                                                    <span className="text-[9px] font-black tracking-widest uppercase bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded w-fit">Express</span>
+                                                )}
+                                            </div>
                                         </td>
                                         <td className="py-4 px-6">
                                             <div className="flex flex-col">

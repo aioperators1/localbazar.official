@@ -44,6 +44,7 @@ export default function CategoryForm({ initialData, categories }: CategoryFormPr
             description: formData.get("description") as string,
             descriptionAr: formData.get("descriptionAr") as string,
             featured: formData.get("featured") === "on",
+            expressCheckout: formData.get("expressCheckout") === "on",
             showInHomeTabs: formData.get("showInHomeTabs") === "on",
             orderInHomeTabs: parseInt(formData.get("orderInHomeTabs") as string) || 0,
             showInHomeCurated: formData.get("showInHomeCurated") === "on",
@@ -153,6 +154,11 @@ export default function CategoryForm({ initialData, categories }: CategoryFormPr
                         <div className="flex items-center justify-between py-2">
                             <Label className="text-[11px] font-bold text-gray-500 uppercase">Featured Category</Label>
                             <Switch name="featured" defaultChecked={initialData?.featured} />
+                        </div>
+
+                        <div className="flex items-center justify-between py-2">
+                            <Label className="text-[11px] font-bold text-gray-500 uppercase">Express Checkout</Label>
+                            <Switch name="expressCheckout" defaultChecked={initialData?.expressCheckout} />
                         </div>
                     </div>
 

@@ -265,3 +265,109 @@ export async function placeOrder(data: CheckoutData) {
         };
     }
 }
+
+export interface ExpressCheckoutData {
+    fullName: string;
+    phone: string;
+    city: string;
+    address: string;
+    item: CheckoutItem;
+}
+
+export async function placeExpressOrder(data: ExpressCheckoutData) {
+    try {
+        const { fullName, phone, city, address, item } = data;
+        if (!item || item.quantity <= 0) {
+            return { success: false, error: "Invalid product quantity." };
+        }
+
+        const name = fullName.trim();
+
+        const result = await prisma.$transaction(async (tx: any) => {
+            // 1. Verify Price
+            const product = await tx.product.findUnique({
+                where: { id: item.id },
+                select: { id: true, price: true, sizes: true }
+            });
+
+            if (!product) throw new Error("Product not found.");
+            
+            let dbPrice = Number(product.price);
+            if (item.size && product.sizes) {
+                try {
+                    const sizes = JSON.parse(product.sizes);
+                    const sizeObj = Array.isArray(sizes) ? sizes.find((s: any) => typeof s !== 'string' && s.name === item.size) : null;
+                    if (sizeObj && sizeObj.price) {
+                        dbPrice = Number(sizeObj.price);
+                    }
+                } catch (e) {}
+            }
+            
+            const finalTotal = dbPrice * item.quantity + DEFAULT_SHIPPING_COST;
+
+            // 2. Find or Create User
+            let user = await tx.user.findFirst({
+                where: { phone: phone },
+            });
+
+            if (!user) {
+                const password = await hash(Math.random().toString(36).slice(-8) + (process.env.NEXTAUTH_SECRET || "lb_secret"), 10);
+                user = await tx.user.create({
+                    data: {
+                        name,
+                        password,
+                        phone: phone,
+                        role: "USER",
+                    }
+                });
+            }
+
+            // 3. Create Address
+            await tx.address.create({
+                data: {
+                    userId: user.id,
+                    street: address,
+                    city,
+                    country: "Qatar",
+                }
+            });
+
+            // 4. Create Order
+            const order = await tx.order.create({
+                data: {
+                    userId: user.id,
+                    total: finalTotal,
+                    status: "PENDING",
+                    type: "EXPRESS",
+                    paymentMethod: "COD",
+                    phone: phone,
+                    shippingMethod: "Express Delivery",
+                    items: {
+                        create: [{
+                            productId: item.id,
+                            quantity: item.quantity,
+                            price: dbPrice,
+                            size: item.size || null,
+                            color: item.color || null
+                        }]
+                    }
+                }
+            });
+
+            return { success: true, orderId: order.id };
+        });
+
+        revalidatePath('/admin');
+        revalidatePath('/admin/orders');
+        revalidatePath('/admin/dashboard');
+
+        return { success: true, orderId: result.orderId };
+
+    } catch (error: unknown) {
+        console.error("Express Checkout Error:", error);
+        return {
+            success: false,
+            error: error instanceof Error ? error.message : "Internal system error during order processing."
+        };
+    }
+}

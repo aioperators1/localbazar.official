@@ -93,6 +93,9 @@ export default async function AdminOrderDetailsPage(props: AdminOrderDetailsPage
                         <h1 className="text-3xl font-black text-slate-900 tracking-tight flex items-center gap-3">
                             <span>Order</span>
                             <span className="text-slate-400 font-medium">#{serializedOrder.id.slice(-6).toUpperCase()}</span>
+                            {serializedOrder.type === "EXPRESS" && (
+                                <span className="text-[11px] font-black tracking-widest uppercase bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full ml-2">Express</span>
+                            )}
                         </h1>
                         <div className="flex items-center gap-4 text-[13px] font-medium text-slate-500">
                              <div className="flex items-center gap-2">

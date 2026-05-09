@@ -25,7 +25,8 @@ import {
     Facebook,
     Twitter,
     FileText,
-    Banknote
+    Banknote,
+    Crosshair
 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ImageUpload } from "@/components/admin/ImageUpload";
@@ -60,6 +61,10 @@ export default function SettingsPage() {
         homepageSubtitle: "LUXURY COLLECTION",
         aboutText: "Experience the ultimate expression of modesty and elegance with our handcrafted abayas.",
         codEnabled: "true",
+        facebookPixelId: "",
+        facebookAccessToken: "",
+        snapchatPixelId: "",
+        tiktokPixelId: "",
         homepageImage: "https://images.unsplash.com/photo-1566174053879-31528523f8ae?q=80&w=2000",
         heroWatermark: "AUTHENTIC",
         shippingMethods: JSON.stringify([
@@ -490,6 +495,73 @@ export default function SettingsPage() {
                                     </div>
                                 </div>
                             ))}
+                        </div>
+                    </div>
+
+                    {/* Tracking Pixels & Analytics */}
+                    <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm mt-6">
+                        <div className="flex items-center gap-3 mb-6">
+                            <Crosshair className="w-5 h-5 text-gray-500" />
+                            <h3 className="text-[14px] font-bold text-black uppercase tracking-wider">Tracking & Pixels</h3>
+                        </div>
+                        
+                        <div className="space-y-6">
+                            <div className="space-y-3">
+                                <Label className="text-[12px] font-semibold text-gray-700 ml-1">Facebook Pixel ID</Label>
+                                <div className="relative">
+                                     <Facebook className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#1877F2]" />
+                                     <Input 
+                                         value={settings.facebookPixelId || ""} 
+                                         onChange={(e) => handleChange("facebookPixelId", e.target.value)}
+                                         placeholder="e.g. 123456789012345"
+                                         className="bg-white border-gray-200 pl-10 text-[13px] text-black"
+                                         disabled={!canEdit("settings")}
+                                     />
+                                </div>
+                            </div>
+
+                            <div className="space-y-3">
+                                <Label className="text-[12px] font-semibold text-gray-700 ml-1">Facebook Conversions API Token</Label>
+                                <div className="relative">
+                                     <Shield className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#1877F2]" />
+                                     <Input 
+                                         value={settings.facebookAccessToken || ""} 
+                                         onChange={(e) => handleChange("facebookAccessToken", e.target.value)}
+                                         placeholder="EAAB..."
+                                         className="bg-white border-gray-200 pl-10 text-[13px] text-black"
+                                         disabled={!canEdit("settings")}
+                                     />
+                                </div>
+                                <p className="text-[11px] text-gray-500 ml-1 mt-1">Required for server-side event tracking and deduplication.</p>
+                            </div>
+
+                            <div className="space-y-3">
+                                <Label className="text-[12px] font-semibold text-gray-700 ml-1">Snapchat Pixel ID</Label>
+                                <div className="relative">
+                                     <Activity className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#FFFC00]" />
+                                     <Input 
+                                         value={settings.snapchatPixelId || ""} 
+                                         onChange={(e) => handleChange("snapchatPixelId", e.target.value)}
+                                         placeholder="e.g. xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+                                         className="bg-white border-gray-200 pl-10 text-[13px] text-black"
+                                         disabled={!canEdit("settings")}
+                                     />
+                                </div>
+                            </div>
+
+                            <div className="space-y-3">
+                                <Label className="text-[12px] font-semibold text-gray-700 ml-1">TikTok Pixel ID</Label>
+                                <div className="relative">
+                                     <Monitor className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#000000]" />
+                                     <Input 
+                                         value={settings.tiktokPixelId || ""} 
+                                         onChange={(e) => handleChange("tiktokPixelId", e.target.value)}
+                                         placeholder="e.g. CXXXXXX..."
+                                         className="bg-white border-gray-200 pl-10 text-[13px] text-black"
+                                         disabled={!canEdit("settings")}
+                                     />
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

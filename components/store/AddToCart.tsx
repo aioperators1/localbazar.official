@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/components/providers/language-provider";
 import { toast } from "sonner";
+import { trackEvent } from "@/lib/tracking";
 
 interface AddToCartProps {
     product: {
@@ -45,6 +46,15 @@ export function AddToCart({ product, fullWidth = true, className, quantity = 1, 
             quantity: quantity,
             size: product.size,
             color: product.color
+        });
+
+        trackEvent({
+            eventName: "AddToCart",
+            value: product.price,
+            currency: "QAR",
+            content_ids: [product.id],
+            content_type: "product",
+            contents: [{ id: product.id, quantity: quantity, price: product.price }]
         });
 
         // Simulate network/store delay for effect

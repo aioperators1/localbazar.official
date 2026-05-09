@@ -12,6 +12,7 @@ export interface Category {
     parentId: string | null;
     createdAt: string;
     featured?: boolean;
+    expressCheckout?: boolean;
     showInHomeTabs?: boolean;
     orderInHomeTabs?: number;
     showInHomeCurated?: boolean;
@@ -93,6 +94,7 @@ export interface Order {
     userId: string | null;
     total: number;
     status: string;
+    type?: string;
     paymentMethod: string;
     paymentStatus: string;
     email?: string | null;
@@ -145,6 +147,10 @@ export interface AdminSetting {
     aboutText?: string;
     homepageImage?: string;
     whatsappNumber?: string;
+    facebookPixelId?: string;
+    facebookAccessToken?: string;
+    snapchatPixelId?: string;
+    tiktokPixelId?: string;
     [key: string]: any;
 }
 
